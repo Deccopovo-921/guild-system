@@ -5,38 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏆 公会锦标赛任务系统</title>
     <style>
-        :root {
-            --bg: #0d1117;
-            --card: #161b22;
-            --border: #30363d;
-            --gold: #e2b04a;
-            --accent: #58a6ff;
-            --danger: #f85149;
-            --success: #3fb950;
-            --text: #c9d1d9;
-            --text2: #8b949e;
-            --tag-bg: #1a2332;
-            --hover: #1c2129;
-            --radius: 12px;
-        }
+        :root{--bg:#0d1117;--card:#161b22;--border:#30363d;--gold:#e2b04a;--accent:#58a6ff;--danger:#f85149;--success:#3fb950;--text:#c9d1d9;--text2:#8b949e;--tag-bg:#1a2332;--hover:#1c2129;--radius:12px}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: var(--bg); color: var(--text);
-            min-height: 100vh; line-height: 1.5;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-        }
-        .toast-container{
-            position:fixed;top:16px;left:50%;transform:translateX(-50%);
-            z-index:9999;display:flex;flex-direction:column;gap:8px;
-            pointer-events:none;width:90%;max-width:500px;
-        }
-        .toast{
-            padding:12px 20px;border-radius:10px;font-size:14px;
-            text-align:center;animation:toastIn .3s ease;
-            box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:auto;
-        }
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+        .toast-container{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:500px}
+        .toast{padding:12px 20px;border-radius:10px;font-size:14px;text-align:center;animation:toastIn .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.4);pointer-events:auto}
         .toast.success{background:#1a3a2a;color:#3fb950;border:1px solid #3fb95040}
         .toast.error{background:#3a1a1a;color:#f85149;border:1px solid #f8514940}
         .toast.info{background:#1a2a3a;color:#58a6ff;border:1px solid #58a6ff40}
@@ -44,972 +17,186 @@
         @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
         .toast.fadeout{animation:toastOut .3s ease forwards}
         @keyframes toastOut{to{opacity:0;transform:translateY(-20px)}}
-
-        .login-wrap{
-            display:flex;justify-content:center;align-items:center;
-            min-height:100vh;padding:20px;
-        }
-        .login-card{
-            background:var(--card);border:1px solid var(--border);
-            border-radius:16px;padding:36px 28px;width:100%;max-width:400px;text-align:center;
-        }
+        .login-wrap{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+        .login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px 28px;width:100%;max-width:400px;text-align:center}
         .login-card .logo{font-size:48px;margin-bottom:8px}
         .login-card h1{font-size:24px;margin-bottom:4px;color:#fff}
         .login-card .sub{color:var(--text2);font-size:13px;margin-bottom:24px}
         .login-card label{display:block;text-align:left;font-size:13px;color:var(--text2);margin-bottom:6px}
-        .login-card input{
-            width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);
-            color:var(--text);border-radius:10px;font-size:15px;outline:none;
-            transition:border .2s;margin-bottom:16px;text-align:center;
-        }
+        .login-card input{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;font-size:15px;outline:none;transition:border .2s;margin-bottom:16px;text-align:center}
         .login-card input:focus{border-color:var(--accent)}
-        .login-card .btn-login{
-            width:100%;padding:12px;border:none;border-radius:10px;
-            font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;
-            background:var(--accent);color:#fff;margin-bottom:12px;
-        }
-        .login-card .btn-login:hover{opacity:.9}
-        .login-card .btn-sync{
-            width:100%;padding:8px;border-radius:10px;font-size:12px;
-            cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text2);
-        }
+        .login-card .btn-login{width:100%;padding:12px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;background:var(--accent);color:#fff;margin-bottom:12px}
+        .login-card .btn-sync{width:100%;padding:8px;border-radius:10px;font-size:12px;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text2)}
         .login-card .btn-sync:hover{background:var(--hover)}
         .login-card .hint{font-size:11px;color:var(--text2);margin-top:12px}
         .login-card .maker{font-size:11px;color:#555;margin-top:16px}
-
         .main-wrap{display:none;min-height:100vh;padding-top:100px}
-        .header{
-            background:var(--card);border-bottom:1px solid var(--border);
-            padding:10px 16px;display:flex;align-items:center;
-            justify-content:space-between;flex-wrap:wrap;gap:8px;
-            position:fixed;top:0;left:0;right:0;z-index:200;
-        }
+        .header{background:var(--card);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:fixed;top:0;left:0;right:0;z-index:200}
         .header .title-area{display:flex;align-items:center;gap:8px}
         .header .title{font-size:15px;font-weight:700;color:#fff}
         .header .guild-info{font-size:11px;color:var(--text2);display:flex;align-items:center;flex-wrap:wrap;gap:6px}
         .header .badge{font-size:10px;padding:2px 8px;border-radius:12px;background:var(--tag-bg);color:var(--accent)}
-        .btn-logout{
-            background:transparent;border:1px solid var(--danger);color:var(--danger);
-            padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;
-        }
+        .btn-logout{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px}
         .btn-logout:hover{background:var(--danger);color:#fff}
         .btn-xs{padding:3px 8px;font-size:11px;border-radius:5px}
-
-        .tabs{
-            display:flex;gap:4px;padding:8px 12px;overflow-x:auto;
-            background:var(--card);border-bottom:1px solid var(--border);
-            position:fixed;top:50px;left:0;right:0;z-index:199;
-            -webkit-overflow-scrolling:touch;
-        }
+        .tabs{display:flex;gap:4px;padding:8px 12px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);position:fixed;top:50px;left:0;right:0;z-index:199;-webkit-overflow-scrolling:touch}
         .tabs::-webkit-scrollbar{height:0}
-        .tab{
-            padding:7px 12px;border-radius:20px;font-size:12px;
-            white-space:nowrap;cursor:pointer;transition:all .2s;
-            background:var(--bg);color:var(--text2);border:1px solid var(--border);
-            flex-shrink:0;font-weight:500;
-        }
+        .tab{padding:7px 12px;border-radius:20px;font-size:12px;white-space:nowrap;cursor:pointer;transition:all .2s;background:var(--bg);color:var(--text2);border:1px solid var(--border);flex-shrink:0;font-weight:500}
         .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
         .tab:hover:not(.active){background:var(--hover)}
-
         .content{padding:14px;max-width:900px;margin:0 auto}
         .tab-content{display:none}
         .tab-content.active{display:block}
-
-        .card{
-            background:var(--card);border:1px solid var(--border);
-            border-radius:var(--radius);padding:14px;margin-bottom:10px;
-            position:relative;transition:border .2s;
-        }
+        .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;position:relative;transition:border .2s}
         .card:hover{border-color:#4a5568}
         .card .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:6px;flex-wrap:wrap}
         .card .card-title{font-size:14px;font-weight:600;color:#fff}
-        .card .card-subtitle{font-size:12px;color:var(--text2)}
-        .card .btn-close{
-            position:absolute;top:6px;right:6px;
-            width:22px;height:22px;border-radius:50%;border:none;
-            background:transparent;color:var(--text2);cursor:pointer;
-            font-size:13px;display:flex;align-items:center;justify-content:center;
-            transition:all .2s;line-height:1;z-index:2;
-        }
+        .card .btn-close{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s;line-height:1;z-index:2}
         .card .btn-close:hover{background:var(--danger);color:#fff}
-
         .form-group{margin-bottom:10px}
         .form-group label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px}
-        .form-group input,.form-group textarea,.form-group select{
-            width:100%;padding:9px 10px;background:var(--bg);border:1px solid var(--border);
-            color:var(--text);border-radius:8px;font-size:13px;outline:none;
-            transition:border .2s;font-family:inherit;
-        }
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:9px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;outline:none;transition:border .2s;font-family:inherit}
         .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent)}
         .form-group textarea{resize:vertical;min-height:70px}
         .form-row{display:flex;gap:8px;flex-wrap:wrap}
         .form-row .form-group{flex:1;min-width:100px}
         select{appearance:none;-webkit-appearance:none;cursor:pointer}
         select option{background:var(--card);color:var(--text)}
-
-        .btn{
-            padding:7px 14px;border:none;border-radius:8px;cursor:pointer;
-            font-size:12px;font-weight:600;transition:all .2s;
-            display:inline-flex;align-items:center;gap:4px;
-        }
-        .btn-accent{background:var(--accent);color:#fff}
-        .btn-accent:hover{background:#4090e0}
-        .btn-danger{background:var(--danger);color:#fff}
-        .btn-danger:hover{background:#d63a42}
-        .btn-success{background:var(--success);color:#fff}
-        .btn-success:hover{background:#35a044}
-        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-        .btn-outline:hover{background:var(--tag-bg)}
+        .btn{padding:7px 14px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:4px}
+        .btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{background:#4090e0}
+        .btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#d63a42}
+        .btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#35a044}
+        .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{background:var(--tag-bg)}
         .btn-sm{padding:4px 8px;font-size:11px;border-radius:6px}
-        .btn-block{width:100%;justify-content:center}
         .btn-gold{background:var(--gold);color:#000}
-
-        .search-box{display:flex;gap:6px;margin-bottom:10px}
-        .search-box input{flex:1}
-        .tag{
-            display:inline-block;padding:3px 8px;border-radius:10px;
-            font-size:11px;background:var(--tag-bg);color:var(--text);
-            margin:2px 3px 2px 0;
-        }
-        .tag.gold{background:#2a2010;color:var(--gold)}
-        .tag.accent{background:#102040;color:var(--accent)}
-
+        .search-box{display:flex;gap:6px;margin-bottom:10px}.search-box input{flex:1}
+        .tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;background:var(--tag-bg);color:var(--text);margin:2px 3px 2px 0}
+        .tag.gold{background:#2a2010;color:var(--gold)}.tag.accent{background:#102040;color:var(--accent)}
         .member-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-        .member-tag{
-            display:inline-flex;align-items:center;gap:4px;
-            padding:4px 8px;border-radius:6px;font-size:12px;
-            background:var(--tag-bg);border:1px solid var(--border);
-        }
-        .member-tag .remove{
-            cursor:pointer;color:var(--text2);font-size:14px;line-height:1;
-            transition:color .2s;margin-left:2px;
-        }
-        .member-tag .remove:hover{color:var(--danger)}
-
+        .member-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:12px;background:var(--tag-bg);border:1px solid var(--border)}
+        .member-tag .remove{cursor:pointer;color:var(--text2);font-size:14px;line-height:1;transition:color .2s;margin-left:2px}.member-tag .remove:hover{color:var(--danger)}
         .guild-card .info-row{font-size:12px;margin-bottom:3px}
-        .guild-card .info-row .label{color:var(--text2)}
-        .guild-card .info-row .value{color:var(--text);margin-left:3px}
+        .guild-card .info-row .label{color:var(--text2)}.guild-card .info-row .value{color:var(--text);margin-left:3px}
         .guild-card .note-highlight{color:var(--gold);font-size:11px}
         .guild-card .guild-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
-
         .dropdown-wrap{position:relative}
-        .dropdown-menu{
-            position:absolute;top:100%;left:0;right:0;z-index:50;
-            background:var(--card);border:1px solid var(--border);
-            border-radius:8px;max-height:180px;overflow-y:auto;display:none;
-            box-shadow:0 8px 24px rgba(0,0,0,.5);
-        }
+        .dropdown-menu{position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
         .dropdown-menu.show{display:block}
-        .dropdown-item{
-            padding:9px 12px;cursor:pointer;font-size:13px;
-            transition:background .2s;
-        }
-        .dropdown-item:hover{background:var(--hover)}
-
-        .empty-state{text-align:center;padding:30px 16px;color:var(--text2)}
-        .empty-state .icon{font-size:40px;margin-bottom:8px}
-        .empty-state .text{font-size:13px}
-
+        .dropdown-item{padding:9px 12px;cursor:pointer;font-size:13px;transition:background .2s}.dropdown-item:hover{background:var(--hover)}
+        .empty-state{text-align:center;padding:30px 16px;color:var(--text2)}.empty-state .icon{font-size:40px;margin-bottom:8px}.empty-state .text{font-size:13px}
         .divider{border:none;border-top:1px solid var(--border);margin:12px 0}
-        .section-title{
-            font-size:13px;font-weight:600;color:var(--text);
-            margin-bottom:10px;display:flex;align-items:center;gap:5px;
-        }
+        .section-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:5px}
         .score-big{font-size:24px;font-weight:700;color:var(--gold)}
-        .highlight-box{
-            background:var(--tag-bg);border:1px solid var(--border);
-            border-radius:8px;padding:10px;margin:8px 0;
-        }
-        .rank-badge{
-            display:inline-flex;align-items:center;justify-content:center;
-            width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700;
-            margin-right:6px;
-        }
-        .rank-1{background:#e2b04a;color:#000}
-        .rank-2{background:#b0b8c0;color:#000}
-        .rank-3{background:#cd7f32;color:#fff}
-        .rank-other{background:var(--tag-bg);color:var(--text2)}
-
-        .diamond-toggle{
-            display:inline-flex;align-items:center;gap:6px;
-            padding:6px 12px;border-radius:20px;cursor:pointer;
-            background:var(--tag-bg);border:1px solid var(--border);
-            font-size:12px;user-select:none;
-        }
+        .highlight-box{background:var(--tag-bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0}
+        .diamond-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;cursor:pointer;background:var(--tag-bg);border:1px solid var(--border);font-size:12px;user-select:none}
         .diamond-toggle.on{background:#2a2010;border-color:var(--gold);color:var(--gold)}
-
-        @media(max-width:600px){
-            .header{padding:8px 12px}
-            .header .title{font-size:13px}
-            .content{padding:10px}
-            .card{padding:10px}
-            .tabs{padding:6px 8px;gap:2px}
-            .tab{padding:5px 10px;font-size:11px}
-            .form-row{flex-direction:column;gap:0}
-            .search-box{flex-direction:column}
-            .login-card{padding:20px 16px}
-            .guild-card .guild-actions{flex-direction:column}
-            .guild-card .guild-actions .btn{width:100%;justify-content:center}
-            .main-wrap{padding-top:90px}
-            .tabs{top:44px}
-        }
+        .tier-btn{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--tag-bg);color:var(--text2);cursor:pointer;font-size:11px;transition:all .2s}.tier-btn.active,.tier-btn.gold-active{background:#2a2010;color:var(--gold);border-color:var(--gold)}
+        .collapse-header{cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px 0}
+        .collapse-body{display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px}.collapse-body.open{display:block}
+        @media(max-width:600px){.header{padding:8px 12px}.header .title{font-size:13px}.content{padding:10px}.card{padding:10px}.tabs{padding:6px 8px;gap:2px}.tab{padding:5px 10px;font-size:11px}.form-row{flex-direction:column;gap:0}.search-box{flex-direction:column}.login-card{padding:20px 16px}.guild-card .guild-actions{flex-direction:column}.guild-card .guild-actions .btn{width:100%;justify-content:center}.main-wrap{padding-top:90px}.tabs{top:44px}}
     </style>
 </head>
 <body>
-
 <div class="toast-container" id="toastContainer"></div>
-
-<!-- 登录页 -->
 <div class="login-wrap" id="loginPage">
-    <div class="login-card">
-        <div class="logo">🏆</div>
-        <h1>公会锦标赛</h1>
-        <p class="sub">📋 任务管理系统</p>
-        <label>🔑 请输入密钥或公会邀请码</label>
-        <input type="text" id="loginInput" placeholder="管理员密钥 / 5位邀请码" maxlength="20" autocomplete="off">
-        <button class="btn-login" id="btnLogin">🚀 登 录</button>
-        <button class="btn-sync" id="btnSync">🔄 手动同步云端数据</button>
-        <p class="hint">💡 公会成员请输入5位数字邀请码</p>
-        <p class="maker">🎨 制作人：PSD</p>
-    </div>
+    <div class="login-card"><div class="logo">🏆</div><h1>公会锦标赛</h1><p class="sub">📋 任务管理系统</p><label>🔑 请输入密钥或公会邀请码</label><input type="text" id="loginInput" placeholder="管理员密钥 / 5位邀请码" maxlength="20" autocomplete="off"><button class="btn-login" id="btnLogin">🚀 登 录</button><button class="btn-sync" id="btnSync">🔄 手动同步云端数据</button><p class="hint">💡 公会成员请输入5位数字邀请码</p><p class="maker">🎨 制作人：PSD</p></div>
 </div>
-
-<!-- 主界面 -->
 <div class="main-wrap" id="mainPage">
-    <div class="header">
-        <div class="title-area">
-            <span class="title" id="headerTitle">🏆 公会锦标赛</span>
-            <span class="badge" id="headerBadge"></span>
-        </div>
-        <div class="guild-info" id="headerInfo"></div>
-        <button class="btn-logout" id="btnLogout">🚪 退出</button>
-    </div>
-    <div class="tabs" id="tabNav"></div>
-    <div class="content" id="tabContent"></div>
+    <div class="header"><div class="title-area"><span class="title" id="headerTitle">🏆 公会锦标赛</span><span class="badge" id="headerBadge"></span></div><div class="guild-info" id="headerInfo"></div><button class="btn-logout" id="btnLogout">🚪 退出</button></div>
+    <div class="tabs" id="tabNav"></div><div class="content" id="tabContent"></div>
 </div>
-
 <script>
-const ADMIN_KEY = '19990921';
-const SUPABASE_URL = 'https://vpvdqoapskhtrgldpcwt.supabase.co/rest/v1';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdmRxb2Fwc2todHJnbGRwY3d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTM0MjIsImV4cCI6MjA5NzM4OTQyMn0.vq2mZihVUewqFDpXzhOIwdWYxzwN7kZcyEK0uY5wm0s';
-const TIMEOUT_MINUTES = 30;
-
-const ACHIEVEMENT_TIERS = [
-    { name:'🥉 基础', score:600, rewards:'人参5 + 金香香5 + 三件套3' },
-    { name:'🥈 进阶', score:800, rewards:'人参10 + 金香香10 + 三件套5' },
-    { name:'🥇 高级', score:1200, rewards:'人参20 + 聊天气泡 + 三件套8' },
-    { name:'💎 稀有', score:1300, rewards:'称号 + 聊天气泡 + 领带' },
-    { name:'👑 传说', score:1400, rewards:'皮肤 + 聊天气泡7天 + 称号7天 + 领带' }
-];
-
-function showToast(msg, type='info') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = msg;
-    container.appendChild(toast);
-    setTimeout(() => { toast.classList.add('fadeout'); setTimeout(() => toast.remove(), 300); }, 2800);
-}
-
-async function supabaseFetch(endpoint, method='GET', body=null) {
-    const url = `${SUPABASE_URL}/${endpoint}`;
-    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-    const options = { method, headers };
-    if (body && method !== 'GET') options.body = JSON.stringify(body);
-    const res = await fetch(url, options);
-    if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `HTTP ${res.status}`); }
-    const text = await res.text();
-    return text ? JSON.parse(text) : [];
-}
-
-const db = {
-    guilds: {
-        list: () => supabaseFetch('guilds?select=*&order=created_at.desc'),
-        get: (id) => supabaseFetch(`guilds?id=eq.${id}&select=*`),
-        getByCode: (code) => supabaseFetch(`guilds?invite_code=eq.${code}&select=*`),
-        create: (data) => supabaseFetch('guilds', 'POST', data),
-        update: (id, data) => supabaseFetch(`guilds?id=eq.${id}`, 'PATCH', data),
-        delete: (id) => supabaseFetch(`guilds?id=eq.${id}`, 'DELETE')
-    },
-    members: {
-        list: (guildId) => supabaseFetch(`members?guild_id=eq.${guildId}&select=*&order=real_name.asc`),
-        getByName: (guildId, name) => supabaseFetch(`members?guild_id=eq.${guildId}&real_name=eq.${encodeURIComponent(name)}&select=*`),
-        create: (data) => supabaseFetch('members', 'POST', data),
-        update: (id, data) => supabaseFetch(`members?id=eq.${id}`, 'PATCH', data),
-        delete: (id) => supabaseFetch(`members?id=eq.${id}`, 'DELETE')
-    },
-    tasks: {
-        list: (guildId) => supabaseFetch(`tasks?guild_id=eq.${guildId}&select=*&order=task_name.asc`),
-        create: (data) => supabaseFetch('tasks', 'POST', data),
-        update: (id, data) => supabaseFetch(`tasks?id=eq.${id}`, 'PATCH', data),
-        delete: (id) => supabaseFetch(`tasks?id=eq.${id}`, 'DELETE')
-    },
-    taskMembers: {
-        list: (taskId) => supabaseFetch(`task_members?task_id=eq.${taskId}&select=*`),
-        listByMember: (memberId) => supabaseFetch(`task_members?member_id=eq.${memberId}&select=*`),
-        add: (data) => supabaseFetch('task_members', 'POST', data),
-        delete: (id) => supabaseFetch(`task_members?id=eq.${id}`, 'DELETE'),
-        deleteByTaskAndMember: (taskId, memberId) => supabaseFetch(`task_members?task_id=eq.${taskId}&member_id=eq.${memberId}`, 'DELETE')
-    }
-};
-
-const session = {
-    get() { try { return JSON.parse(sessionStorage.getItem('guild_session')) || null; } catch { return null; } },
-    set(data) { sessionStorage.setItem('guild_session', JSON.stringify(data)); },
-    clear() { sessionStorage.removeItem('guild_session'); }
-};
-function rememberCode(code) { localStorage.setItem('guild_remember_code', code); }
-function getRememberedCode() { return localStorage.getItem('guild_remember_code') || ''; }
-
-let timeoutTimer;
-function resetTimeout() {
-    clearTimeout(timeoutTimer);
-    if (session.get()) timeoutTimer = setTimeout(() => { session.clear(); showToast('⏰ 30分钟无操作，已自动退出', 'warning'); showLoginPage(); }, TIMEOUT_MINUTES * 60 * 1000);
-}
-['click','keydown','scroll','touchstart','input'].forEach(evt => document.addEventListener(evt, resetTimeout));
-
-function showLoginPage() {
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('mainPage').style.display = 'none';
-    document.getElementById('loginInput').value = getRememberedCode();
-    session.clear(); clearTimeout(timeoutTimer);
-}
-function showMainPage() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainPage').style.display = 'block';
-    resetTimeout();
-}
-
-let currentGuildId = null, currentRole = null, allGuilds = [], allMembers = [], allTasks = [];
-
-document.getElementById('loginInput').value = getRememberedCode();
-document.getElementById('btnLogin').addEventListener('click', doLogin);
-document.getElementById('loginInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
-
-async function doLogin() {
-    const input = document.getElementById('loginInput').value.trim();
-    if (!input) { showToast('⚠️ 请输入密钥或邀请码', 'warning'); return; }
-    if (input === ADMIN_KEY) {
-        session.set({ role:'admin' }); currentRole = 'admin'; currentGuildId = null;
-        showToast('👑 欢迎管理员！', 'success'); showMainPage(); await loadAdminPage(); return;
-    }
-    if (/^\d{5}$/.test(input)) {
-        try {
-            const guilds = await db.guilds.getByCode(input);
-            if (guilds.length === 0) { showToast('❌ 该邀请码不存在，请核对后重新输入', 'error'); return; }
-            const guild = guilds[0];
-            session.set({ role:'member', guildId:guild.id }); currentRole = 'member'; currentGuildId = guild.id;
-            rememberCode(input); showToast(`🎉 欢迎加入「${guild.name}」！`, 'success'); showMainPage();
-            await loadMemberPage(guild);
-        } catch(e) { showToast('❌ 网络错误', 'error'); }
-        return;
-    }
-    showToast('⚠️ 格式错误', 'warning');
-}
-document.getElementById('btnSync').addEventListener('click', async () => {
-    showToast('🔄 正在同步...', 'info');
-    try { await db.guilds.list(); showToast('✅ 同步成功！', 'success'); } catch(e) { showToast('❌ 同步失败', 'error'); }
-});
-document.getElementById('btnLogout').addEventListener('click', () => {
-    if (confirm('确定退出吗？')) { showLoginPage(); showToast('👋 已退出', 'info'); }
-});
-
-async function loadAdminPage() {
-    currentGuildId = null;
-    document.getElementById('headerTitle').textContent = '👑 管理员后台';
-    document.getElementById('headerBadge').textContent = '超级管理员';
-    document.getElementById('headerInfo').textContent = '管理所有公会';
-    setupTabs([
-        { name:'🔍 查询', id:'tab-search' },
-        { name:'📋 任务', id:'tab-task-mgr' },
-        { name:'👥 成员', id:'tab-member-mgr' },
-        { name:'🧠 推荐', id:'tab-recommend' },
-        { name:'🏰 公会', id:'tab-guild-mgr' }
-    ]);
-    await loadAllGuilds();
-}
-async function loadAllGuilds() { try { allGuilds = await db.guilds.list(); } catch(e) { allGuilds = []; } }
-
-function setupTabs(tabs) {
-    const tabNav = document.getElementById('tabNav');
-    const tabContent = document.getElementById('tabContent');
-    tabNav.innerHTML = ''; tabContent.innerHTML = '';
-    tabs.forEach((tab, i) => {
-        const btn = document.createElement('div');
-        btn.className = 'tab' + (i===0?' active':'');
-        btn.textContent = tab.name;
-        btn.addEventListener('click', () => {
-            tabNav.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            tabContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(tab.id).classList.add('active');
-        });
-        tabNav.appendChild(btn);
-        const panel = document.createElement('div');
-        panel.className = 'tab-content' + (i===0?' active':'');
-        panel.id = tab.id;
-        tabContent.appendChild(panel);
-    });
-    initAdminSearchTab(); initTaskMgrTab(); initMemberMgrTab();
-    initRecommendTab(); initGuildMgrTab();
-}
-
-// ===== 查询标签 =====
-function initAdminSearchTab() {
-    const panel = document.getElementById('tab-search'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="card"><div class="section-title">👤 查成员能做什么任务</div>
-        <div class="search-box"><input type="text" id="adminSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnAdminSearchMember">🔍</button></div>
-        <div id="adminMemberResult"></div></div>
-        <hr class="divider">
-        <div class="card"><div class="section-title">📋 查任务有谁能做</div>
-        <div class="search-box"><input type="text" id="adminSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnAdminSearchTask">🔍</button></div>
-        <div id="adminTaskResult"></div></div>`;
-    document.getElementById('adminSearchMember').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchMemberForAdmin();});
-    document.getElementById('btnAdminSearchMember').addEventListener('click',searchMemberForAdmin);
-    document.getElementById('adminSearchTask').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchTaskForAdmin();});
-    document.getElementById('btnAdminSearchTask').addEventListener('click',searchTaskForAdmin);
-}
-async function searchMemberForAdmin() {
-    const q = document.getElementById('adminSearchMember').value.trim();
-    const div = document.getElementById('adminMemberResult');
-    if (!q||!currentGuildId) { div.innerHTML = !currentGuildId?'<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>':''; return; }
-    const members = await db.members.list(currentGuildId);
-    const filtered = members.filter(m=>m.real_name.includes(q)||(m.alias||'').includes(q));
-    if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return;}
-    let html='';
-    for(const m of filtered){
-        const tml = await db.taskMembers.listByMember(m.id);
-        const tids = tml.map(t=>t.task_id);
-        const tasks = allTasks.filter(t=>tids.includes(t.id));
-        html+=`<div class="card"><div class="card-header"><span class="card-title">👤 ${m.real_name}</span></div><div style="font-size:12px;color:var(--text2)">别名：${m.alias||'无'}</div><div style="font-size:12px;color:var(--gold)">📋 能做：</div><div class="member-tags">${tasks.length?tasks.map(t=>`<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`;
-    }
-    div.innerHTML=html;
-}
-async function searchTaskForAdmin() {
-    const q = document.getElementById('adminSearchTask').value.trim();
-    const div = document.getElementById('adminTaskResult');
-    if (!q||!currentGuildId) { div.innerHTML = !currentGuildId?'<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>':''; return; }
-    const tasks = await db.tasks.list(currentGuildId);
-    const filtered = tasks.filter(t=>t.task_name.includes(q));
-    if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return;}
-    let html='';
-    for(const t of filtered){
-        const tml = await db.taskMembers.list(t.id);
-        const mids = tml.map(tm=>tm.member_id);
-        const members = allMembers.filter(m=>mids.includes(m.id));
-        html+=`<div class="card"><div class="card-header"><span class="card-title">📋 ${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div><div style="font-size:12px;color:var(--text2)">👥 能做的人：</div><div class="member-tags">${members.length?members.map(m=>`<span class="member-tag">${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`;
-    }
-    div.innerHTML=html;
-}
+const ADMIN_KEY='19990921';
+const SUPABASE_URL='https://vpvdqoapskhtrgldpcwt.supabase.co/rest/v1';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdmRxb2Fwc2todHJnbGRwY3d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTM0MjIsImV4cCI6MjA5NzM4OTQyMn0.vq2mZihVUewqFDpXzhOIwdWYxzwN7kZcyEK0uY5wm0s';
+const TIMEOUT_MINUTES=30;
+const ACHIEVEMENT_TIERS=[{name:'🥉基础',score:600,rewards:'人参5+金香香5+三件套3'},{name:'🥈进阶',score:800,rewards:'人参10+金香香10+三件套5'},{name:'🥇高级',score:1200,rewards:'人参20+聊天气泡+三件套8'},{name:'💎稀有',score:1300,rewards:'称号+聊天气泡+领带'},{name:'👑传说',score:1400,rewards:'皮肤+聊天气泡7天+称号7天+领带'}];
+function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;c.appendChild(t);setTimeout(()=>{t.classList.add('fadeout');setTimeout(()=>t.remove(),300)},2800)}
+async function supabaseFetch(endpoint,method='GET',body=null){const url=`${SUPABASE_URL}/${endpoint}`;const headers={'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'};const options={method,headers};if(body&&method!=='GET')options.body=JSON.stringify(body);const res=await fetch(url,options);if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.message||`HTTP ${res.status}`)}const text=await res.text();return text?JSON.parse(text):[]}
+const db={guilds:{list:()=>supabaseFetch('guilds?select=*&order=created_at.desc'),get:(id)=>supabaseFetch(`guilds?id=eq.${id}&select=*`),getByCode:(code)=>supabaseFetch(`guilds?invite_code=eq.${code}&select=*`),create:(data)=>supabaseFetch('guilds','POST',data),update:(id,data)=>supabaseFetch(`guilds?id=eq.${id}`,'PATCH',data),delete:(id)=>supabaseFetch(`guilds?id=eq.${id}`,'DELETE')},members:{list:(guildId)=>supabaseFetch(`members?guild_id=eq.${guildId}&select=*&order=real_name.asc`),getByName:(guildId,name)=>supabaseFetch(`members?guild_id=eq.${guildId}&real_name=eq.${encodeURIComponent(name)}&select=*`),create:(data)=>supabaseFetch('members','POST',data),update:(id,data)=>supabaseFetch(`members?id=eq.${id}`,'PATCH',data),delete:(id)=>supabaseFetch(`members?id=eq.${id}`,'DELETE')},tasks:{list:(guildId)=>supabaseFetch(`tasks?guild_id=eq.${guildId}&select=*&order=task_name.asc`),create:(data)=>supabaseFetch('tasks','POST',data),update:(id,data)=>supabaseFetch(`tasks?id=eq.${id}`,'PATCH',data),delete:(id)=>supabaseFetch(`tasks?id=eq.${id}`,'DELETE')},taskMembers:{list:(taskId)=>supabaseFetch(`task_members?task_id=eq.${taskId}&select=*`),listByMember:(memberId)=>supabaseFetch(`task_members?member_id=eq.${memberId}&select=*`),add:(data)=>supabaseFetch('task_members','POST',data),delete:(id)=>supabaseFetch(`task_members?id=eq.${id}`,'DELETE'),deleteByTaskAndMember:(taskId,memberId)=>supabaseFetch(`task_members?task_id=eq.${taskId}&member_id=eq.${memberId}`,'DELETE')}};
+const session={get(){try{return JSON.parse(sessionStorage.getItem('guild_session'))||null}catch{return null}},set(data){sessionStorage.setItem('guild_session',JSON.stringify(data))},clear(){sessionStorage.removeItem('guild_session')}};
+function rememberCode(code){localStorage.setItem('guild_remember_code',code)}function getRememberedCode(){return localStorage.getItem('guild_remember_code')||''}
+let timeoutTimer;function resetTimeout(){clearTimeout(timeoutTimer);if(session.get())timeoutTimer=setTimeout(()=>{session.clear();showToast('⏰30分钟无操作，已退出','warning');showLoginPage()},TIMEOUT_MINUTES*60*1000)}
+['click','keydown','scroll','touchstart','input'].forEach(evt=>document.addEventListener(evt,resetTimeout));
+function showLoginPage(){document.getElementById('loginPage').style.display='flex';document.getElementById('mainPage').style.display='none';document.getElementById('loginInput').value=getRememberedCode();session.clear();clearTimeout(timeoutTimer)}
+function showMainPage(){document.getElementById('loginPage').style.display='none';document.getElementById('mainPage').style.display='block';resetTimeout()}
+let currentGuildId=null,currentRole=null,allGuilds=[],allMembers=[],allTasks=[];
+document.getElementById('loginInput').value=getRememberedCode();
+document.getElementById('btnLogin').addEventListener('click',doLogin);
+document.getElementById('loginInput').addEventListener('keydown',(e)=>{if(e.key==='Enter')doLogin()});
+async function doLogin(){const input=document.getElementById('loginInput').value.trim();if(!input){showToast('⚠️请输入密钥或邀请码','warning');return}if(input===ADMIN_KEY){session.set({role:'admin'});currentRole='admin';currentGuildId=null;showToast('👑欢迎管理员！','success');showMainPage();await loadAdminPage();return}if(/^\d{5}$/.test(input)){try{const guilds=await db.guilds.getByCode(input);if(guilds.length===0){showToast('❌邀请码不存在，请核对','error');return}const guild=guilds[0];session.set({role:'member',guildId:guild.id});currentRole='member';currentGuildId=guild.id;rememberCode(input);showToast(`🎉欢迎加入「${guild.name}」！`,'success');showMainPage();await loadMemberPage(guild)}catch(e){showToast('❌网络错误','error')}return}showToast('⚠️格式错误','warning')}
+document.getElementById('btnSync').addEventListener('click',async()=>{showToast('🔄正在同步...','info');try{await db.guilds.list();showToast('✅同步成功！','success')}catch(e){showToast('❌同步失败','error')}});
+document.getElementById('btnLogout').addEventListener('click',()=>{if(confirm('确定退出吗？')){showLoginPage();showToast('👋已退出','info')}});
+async function loadAdminPage(){currentGuildId=null;document.getElementById('headerTitle').textContent='👑管理员后台';document.getElementById('headerBadge').textContent='超级管理员';document.getElementById('headerInfo').textContent='管理所有公会';setupTabs([{name:'🔍查询',id:'tab-search'},{name:'📋任务',id:'tab-task-mgr'},{name:'👥成员',id:'tab-member-mgr'},{name:'🧠推荐',id:'tab-recommend'},{name:'🏰公会',id:'tab-guild-mgr'}]);await loadAllGuilds()}
+async function loadAllGuilds(){try{allGuilds=await db.guilds.list()}catch(e){allGuilds=[]}}
+function setupTabs(tabs){const tabNav=document.getElementById('tabNav');const tabContent=document.getElementById('tabContent');tabNav.innerHTML='';tabContent.innerHTML='';tabs.forEach((tab,i)=>{const btn=document.createElement('div');btn.className='tab'+(i===0?' active':'');btn.textContent=tab.name;btn.addEventListener('click',()=>{tabNav.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');tabContent.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(tab.id).classList.add('active')});tabNav.appendChild(btn);const panel=document.createElement('div');panel.className='tab-content'+(i===0?' active':'');panel.id=tab.id;tabContent.appendChild(panel)});initAdminSearchTab();initTaskMgrTab();initMemberMgrTab();initRecommendTab();initGuildMgrTab()}// ===== 查询标签 =====
+function initAdminSearchTab(){const p=document.getElementById('tab-search');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">👤查成员能做什么任务</div><div class="search-box"><input type="text" id="adminSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnAdminSearchMember">🔍</button></div><div id="adminMemberResult"></div></div><hr class="divider"><div class="card"><div class="section-title">📋查任务有谁能做</div><div class="search-box"><input type="text" id="adminSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnAdminSearchTask">🔍</button></div><div id="adminTaskResult"></div></div>`;document.getElementById('adminSearchMember').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchMemberForAdmin()});document.getElementById('btnAdminSearchMember').addEventListener('click',searchMemberForAdmin);document.getElementById('adminSearchTask').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchTaskForAdmin()});document.getElementById('btnAdminSearchTask').addEventListener('click',searchTaskForAdmin)}
+async function searchMemberForAdmin(){const q=document.getElementById('adminSearchMember').value.trim();const div=document.getElementById('adminMemberResult');if(!q||!currentGuildId){div.innerHTML=!currentGuildId?'<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>':'';return}const members=await db.members.list(currentGuildId);const filtered=members.filter(m=>m.real_name.includes(q)||(m.alias||'').includes(q));if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return}let html='';for(const m of filtered){const tml=await db.taskMembers.listByMember(m.id);const tids=tml.map(t=>t.task_id);const tasks=allTasks.filter(t=>tids.includes(t.id));html+=`<div class="card"><div class="card-header"><span class="card-title">👤${m.real_name}</span></div><div style="font-size:12px;color:var(--text2)">别名：${m.alias||'无'}</div><div style="font-size:12px;color:var(--gold)">📋能做：</div><div class="member-tags">${tasks.length?tasks.map(t=>`<span class="tag gold">${t.task_name}⭐${t.score}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`}div.innerHTML=html}
+async function searchTaskForAdmin(){const q=document.getElementById('adminSearchTask').value.trim();const div=document.getElementById('adminTaskResult');if(!q||!currentGuildId){div.innerHTML=!currentGuildId?'<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>':'';return}const tasks=await db.tasks.list(currentGuildId);const filtered=tasks.filter(t=>t.task_name.includes(q));if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return}let html='';for(const t of filtered){const tml=await db.taskMembers.list(t.id);const mids=tml.map(tm=>tm.member_id);const members=allMembers.filter(m=>mids.includes(m.id));html+=`<div class="card"><div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div><div style="font-size:12px;color:var(--text2)">👥能做的人：</div><div class="member-tags">${members.length?members.map(m=>`<span class="member-tag">${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`}div.innerHTML=html}
 
 // ===== 任务管理 =====
-function initTaskMgrTab() {
-    const panel = document.getElementById('tab-task-mgr'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="card"><div class="section-title">➕ 新建任务</div>
-        <div class="form-row"><div class="form-group"><label>📝 任务名称</label><input type="text" id="newTaskName" placeholder="例如：击败BOSS"></div>
-        <div class="form-group"><label>⭐ 分数</label><input type="number" id="newTaskScore" placeholder="50" min="0"></div></div>
-        <div class="form-group"><label>👤 初始能做的人（选填）</label><input type="text" id="newTaskMember" placeholder="输入大名，可留空"></div>
-        <button class="btn btn-accent btn-sm" id="btnAddTask">✅ 添加任务</button></div>
-        <div class="card"><div class="section-title">📋 批量添加任务</div>
-        <div class="form-group"><label>每行：任务名,分数</label><textarea id="batchTaskImport" placeholder="击败BOSS,50&#10;收集物资,30"></textarea></div>
-        <button class="btn btn-success btn-sm" id="btnBatchTaskImport">📥 批量导入任务</button></div>
-        <hr class="divider">
-        <div class="card"><div class="section-title">👥 批量加入成员到任务</div>
-        <div class="form-row"><div class="form-group"><label>📋 选择任务</label><select id="selectTaskForBatch"><option value="">-- 请选择 --</option></select></div>
-        <div class="form-group"><label>👤 搜索成员（逗号分隔多人）</label><div class="dropdown-wrap"><input type="text" id="batchMemberSearch" placeholder="模糊搜索，逗号分隔多人..." autocomplete="off"><div class="dropdown-menu" id="batchMemberDropdown"></div></div></div></div>
-        <button class="btn btn-accent btn-sm" id="btnBatchAdd">➕ 添加到任务</button></div>
-        <hr class="divider"><div class="section-title">📋 所有任务</div><div id="taskList"></div>`;
-    document.getElementById('btnAddTask').addEventListener('click',addTask);
-    document.getElementById('newTaskName').addEventListener('keydown',(e)=>{if(e.key==='Enter')addTask();});
-    document.getElementById('btnBatchTaskImport').addEventListener('click',batchImportTasks);
-    document.getElementById('btnBatchAdd').addEventListener('click',batchAddMember);
-    const bi = document.getElementById('batchMemberSearch'), dd = document.getElementById('batchMemberDropdown');
-    bi.addEventListener('input',()=>filterMemberDropdown(bi,dd));
-    bi.addEventListener('focus',()=>filterMemberDropdown(bi,dd));
-    document.addEventListener('click',(e)=>{if(!e.target.closest('.dropdown-wrap'))dd.classList.remove('show');});
-    loadTasksToSelect(); loadTaskList();
-}
-async function addTask() {
-    if(!currentGuildId){showToast('⚠️ 请先进公会','warning');return;}
-    const name=document.getElementById('newTaskName').value.trim(),score=parseInt(document.getElementById('newTaskScore').value)||0,memberName=document.getElementById('newTaskMember').value.trim();
-    if(!name){showToast('⚠️ 请输入任务名称','warning');return;}
-    try{
-        const nt=await db.tasks.create({guild_id:currentGuildId,task_name:name,score});
-        if(nt.length&&memberName){const m=await db.members.getByName(currentGuildId,memberName);if(m.length)await db.taskMembers.add({task_id:nt[0].id,member_id:m[0].id});}
-        showToast('✅ 任务添加成功！','success');
-        document.getElementById('newTaskName').value='';document.getElementById('newTaskScore').value='';document.getElementById('newTaskMember').value='';
-        await refreshCurrentGuildData(); loadTasksToSelect(); loadTaskList();
-    }catch(e){showToast('❌ 添加失败','error');}
-}
-async function batchImportTasks() {
-    if (!currentGuildId) { showToast('⚠️ 请先进公会', 'warning'); return; }
-    const text = document.getElementById('batchTaskImport').value.trim();
-    if (!text) { showToast('⚠️ 请输入任务数据', 'warning'); return; }
-    
-    const existingTasks = await db.tasks.list(currentGuildId);
-    const existingNames = new Set(existingTasks.map(t => t.task_name));
-    
-    const lines = text.split('\n').filter(l => l.trim());
-    let s = 0, f = 0, skip = 0;
-    
-    for (const line of lines) {
-        const parts = line.split(',').map(p => p.trim());
-        const name = parts[0];
-        if (!name) { f++; continue; }
-        if (existingNames.has(name)) { skip++; continue; }
-        try {
-            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: parseInt(parts[1]) || 0 });
-            existingNames.add(name);
-            s++;
-        } catch (e) { console.warn('任务导入失败:', name, e.message); f++; }
-    }
-    
-    let msg = `✅ 成功导入 ${s} 个`;
-    if (skip > 0) msg += `，跳过 ${skip} 个重复`;
-    if (f > 0) msg += `，失败 ${f} 个`;
-    showToast(msg, s > 0 ? 'success' : 'warning');
-    document.getElementById('batchTaskImport').value = '';
-    loadTasksToSelect();
-    loadTaskList();
-}
-function filterMemberDropdown(input,dropdown){
-    const q=input.value.trim().toLowerCase();
-    dropdown.innerHTML='';
-    if(!q){dropdown.classList.remove('show');return;}
-    const filtered=allMembers.filter(m=>m.real_name.toLowerCase().includes(q));
-    if(!filtered.length){dropdown.innerHTML='<div class="dropdown-item" style="color:var(--text2)">未找到</div>';}
-    else{filtered.forEach(m=>{const item=document.createElement('div');item.className='dropdown-item';item.textContent=`${m.real_name}${m.alias?'（'+m.alias+'）':''}`;item.addEventListener('click',()=>{input.value=m.real_name;dropdown.classList.remove('show');});dropdown.appendChild(item);});}
-    dropdown.classList.add('show');
-}
-async function batchAddMember(){
-    if(!currentGuildId){showToast('⚠️ 请先进公会','warning');return;}
-    const taskId=document.getElementById('selectTaskForBatch').value,memberName=document.getElementById('batchMemberSearch').value.trim();
-    if(!taskId){showToast('⚠️ 请选择任务','warning');return;}
-    if(!memberName){showToast('⚠️ 请输入成员大名','warning');return;}
-    const names=memberName.split(/[,，、]/).map(s=>s.trim()).filter(s=>s);let s=0,f=0;
-    for(const name of names){
-        try{const m=await db.members.getByName(currentGuildId,name);if(!m.length){f++;continue;}await db.taskMembers.add({task_id:parseInt(taskId),member_id:m[0].id});s++;}catch(e){f++;}
-    }
-    showToast(`✅ 成功添加 ${s} 人${f>0?'，失败 '+f+' 人':''}`,s>0?'success':'warning');
-    document.getElementById('batchMemberSearch').value=''; loadTaskList();
-}
-async function loadTasksToSelect(){
-    const sel=document.getElementById('selectTaskForBatch');if(!sel||!currentGuildId)return;
-    try{allTasks=await db.tasks.list(currentGuildId);sel.innerHTML='<option value="">-- 请选择 --</option>';allTasks.forEach(t=>{sel.innerHTML+=`<option value="${t.id}">${t.task_name} ⭐${t.score}</option>`;});}catch(e){}
-}
-async function loadTaskList(){
-    const div=document.getElementById('taskList');if(!div||!currentGuildId)return;
-    try{
-        allTasks=await db.tasks.list(currentGuildId);
-        if(!allTasks.length){div.innerHTML='<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';return;}
-        let html='';
-        for(const t of allTasks){
-            const tml=await db.taskMembers.list(t.id);
-            const mids=tml.map(tm=>tm.member_id);
-            const members=allMembers.filter(m=>mids.includes(m.id));
-            html+=`<div class="card"><button class="btn-close" onclick="deleteTask(${t.id})" title="删除任务">✕</button>
-            <div class="card-header"><span class="card-title">📋 ${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
-            <div style="font-size:12px;color:var(--text2)">👥 能做的人：</div><div class="member-tags">${members.length?members.map(m=>`<span class="member-tag">${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`;
-        }
-        div.innerHTML=html;
-    }catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>';}
-}
-async function deleteTask(id){if(!confirm('确定删除整个任务吗？'))return;try{await db.tasks.delete(id);showToast('🗑️ 已删除','success');loadTaskList();}catch(e){showToast('❌ 删除失败','error');}}
-async function removeTaskMember(taskId,memberId){try{await db.taskMembers.deleteByTaskAndMember(taskId,memberId);showToast('✅ 已移除','success');loadTaskList();}catch(e){showToast('❌ 移除失败','error');}}
+function initTaskMgrTab(){const p=document.getElementById('tab-task-mgr');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">➕新建任务</div><div class="form-row"><div class="form-group"><label>📝任务名称</label><input type="text" id="newTaskName" placeholder="例如：击败BOSS"></div><div class="form-group"><label>⭐分数</label><input type="number" id="newTaskScore" placeholder="50" min="0"></div></div><div class="form-group"><label>👤初始能做的人（选填）</label><input type="text" id="newTaskMember" placeholder="输入大名，可留空"></div><button class="btn btn-accent btn-sm" id="btnAddTask">✅添加任务</button></div><div class="card"><div class="section-title">📋批量添加任务</div><div class="form-group"><label>每行：任务名,分数</label><textarea id="batchTaskImport" placeholder="击败BOSS,50&#10;收集物资,30"></textarea></div><button class="btn btn-success btn-sm" id="btnBatchTaskImport">📥批量导入</button></div><hr class="divider"><div class="card"><div class="section-title">📦任务模板</div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板</button><button class="btn btn-outline btn-sm" id="btnSaveTemplate">💾保存当前为模板</button><button class="btn btn-outline btn-sm" id="btnLoadTemplate">📂加载我的模板</button><button class="btn btn-outline btn-sm" id="btnEditPreset">✏️编辑预设模板</button><span style="font-size:11px;color:var(--text2)">（约160个任务）</span></div></div><hr class="divider"><div class="card"><div class="section-title">👥批量加入成员到任务</div><div class="form-row"><div class="form-group"><label>📋选择任务</label><select id="selectTaskForBatch"><option value="">--请选择--</option></select></div><div class="form-group"><label>👤搜索成员（逗号分隔多人）</label><div class="dropdown-wrap"><input type="text" id="batchMemberSearch" placeholder="模糊搜索，逗号分隔多人..." autocomplete="off"><div class="dropdown-menu" id="batchMemberDropdown"></div></div></div></div><button class="btn btn-accent btn-sm" id="btnBatchAdd">➕添加到任务</button></div><hr class="divider"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="section-title" style="margin:0">📋所有任务</div><div><button class="btn btn-outline btn-sm" id="btnSelectAll">☑️全选</button><button class="btn btn-danger btn-sm" id="btnBatchDelete">🗑️批量删除</button></div></div><div id="taskList"></div>`;document.getElementById('btnAddTask').addEventListener('click',addTask);document.getElementById('newTaskName').addEventListener('keydown',(e)=>{if(e.key==='Enter')addTask()});document.getElementById('btnBatchTaskImport').addEventListener('click',batchImportTasks);document.getElementById('btnBatchAdd').addEventListener('click',batchAddMember);document.getElementById('btnUseTemplate').addEventListener('click',usePresetTemplate);document.getElementById('btnSaveTemplate').addEventListener('click',saveMyTemplate);document.getElementById('btnLoadTemplate').addEventListener('click',loadMyTemplate);document.getElementById('btnEditPreset').addEventListener('click',editPresetTemplate);document.getElementById('btnSelectAll').addEventListener('click',toggleSelectAll);document.getElementById('btnBatchDelete').addEventListener('click',batchDeleteTasks);const bi=document.getElementById('batchMemberSearch'),dd=document.getElementById('batchMemberDropdown');bi.addEventListener('input',()=>filterMemberDropdown(bi,dd));bi.addEventListener('focus',()=>filterMemberDropdown(bi,dd));document.addEventListener('click',(e)=>{if(!e.target.closest('.dropdown-wrap'))dd.classList.remove('show')});loadTasksToSelect();loadTaskList()}
+async function addTask(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const name=document.getElementById('newTaskName').value.trim(),score=parseInt(document.getElementById('newTaskScore').value)||0,memberName=document.getElementById('newTaskMember').value.trim();if(!name){showToast('⚠️请输入任务名称','warning');return}try{const nt=await db.tasks.create({guild_id:currentGuildId,task_name:name,score});if(nt.length&&memberName){const m=await db.members.getByName(currentGuildId,memberName);if(m.length)await db.taskMembers.add({task_id:nt[0].id,member_id:m[0].id})}showToast('✅任务添加成功！','success');document.getElementById('newTaskName').value='';document.getElementById('newTaskScore').value='';document.getElementById('newTaskMember').value='';await refreshCurrentGuildData();loadTasksToSelect();loadTaskList()}catch(e){showToast('❌添加失败','error')}}
+async function batchImportTasks(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const text=document.getElementById('batchTaskImport').value.trim();if(!text){showToast('⚠️请输入任务数据','warning');return}const existingTasks=await db.tasks.list(currentGuildId);const existingNames=new Set(existingTasks.map(t=>t.task_name));const lines=text.split('\n').filter(l=>l.trim());let s=0,f=0,skip=0;for(const line of lines){const parts=line.split(',').map(p=>p.trim());const name=parts[0];if(!name){f++;continue}if(existingNames.has(name)){skip++;continue}try{await db.tasks.create({guild_id:currentGuildId,task_name:name,score:parseInt(parts[1])||0});existingNames.add(name);s++}catch(e){console.warn('导入失败:',name,e.message);f++}}let msg=`✅成功导入${s}个`;if(skip>0)msg+=`，跳过${skip}个重复`;if(f>0)msg+=`，失败${f}个`;showToast(msg,s>0?'success':'warning');document.getElementById('batchTaskImport').value='';loadTasksToSelect();loadTaskList()}
+function filterMemberDropdown(input,dropdown){const q=input.value.trim().toLowerCase();dropdown.innerHTML='';if(!q){dropdown.classList.remove('show');return}const filtered=allMembers.filter(m=>m.real_name.toLowerCase().includes(q));if(!filtered.length){dropdown.innerHTML='<div class="dropdown-item" style="color:var(--text2)">未找到</div>'}else{filtered.forEach(m=>{const item=document.createElement('div');item.className='dropdown-item';item.textContent=`${m.real_name}${m.alias?'（'+m.alias+'）':''}`;item.addEventListener('click',()=>{input.value=m.real_name;dropdown.classList.remove('show')});dropdown.appendChild(item)})}dropdown.classList.add('show')}
+async function batchAddMember(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const taskId=document.getElementById('selectTaskForBatch').value,memberName=document.getElementById('batchMemberSearch').value.trim();if(!taskId){showToast('⚠️请选择任务','warning');return}if(!memberName){showToast('⚠️请输入成员大名','warning');return}const names=memberName.split(/[,，、]/).map(s=>s.trim()).filter(s=>s);let s=0,f=0;for(const name of names){try{const m=await db.members.getByName(currentGuildId,name);if(!m.length){f++;continue}await db.taskMembers.add({task_id:parseInt(taskId),member_id:m[0].id});s++}catch(e){f++}}showToast(`✅成功添加${s}人${f>0?'，失败'+f+'人':''}`,s>0?'success':'warning');document.getElementById('batchMemberSearch').value='';loadTaskList()}
+async function loadTasksToSelect(){const sel=document.getElementById('selectTaskForBatch');if(!sel||!currentGuildId)return;try{allTasks=await db.tasks.list(currentGuildId);sel.innerHTML='<option value="">--请选择--</option>';allTasks.forEach(t=>{sel.innerHTML+=`<option value="${t.id}">${t.task_name}⭐${t.score}</option>`})}catch(e){}}
+async function loadTaskList(){const div=document.getElementById('taskList');if(!div||!currentGuildId)return;try{allTasks=await db.tasks.list(currentGuildId);if(!allTasks.length){div.innerHTML='<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';return}let html='';for(const t of allTasks){const tml=await db.taskMembers.list(t.id);const mids=tml.map(tm=>tm.member_id);const members=allMembers.filter(m=>mids.includes(m.id));const checked=selectedTasks.has(t.id)?'checked':'';html+=`<div class="card"><div style="display:flex;align-items:flex-start;gap:6px"><input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:15px;height:15px;cursor:pointer"><div style="flex:1"><button class="btn-close" onclick="deleteTask(${t.id})" title="删除任务">✕</button><div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div><div style="font-size:12px;color:var(--text2)">👥能做的人：</div><div class="member-tags">${members.length?members.map(m=>`<span class="member-tag">${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div></div></div>`}div.innerHTML=html}catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'}}
+async function deleteTask(id){if(!confirm('确定删除整个任务吗？'))return;try{await db.tasks.delete(id);showToast('🗑️已删除','success');loadTaskList()}catch(e){showToast('❌删除失败','error')}}
+async function removeTaskMember(taskId,memberId){try{await db.taskMembers.deleteByTaskAndMember(taskId,memberId);showToast('✅已移除','success');loadTaskList()}catch(e){showToast('❌移除失败','error')}}
 
 // ===== 成员管理 =====
-function initMemberMgrTab(){
-    const panel=document.getElementById('tab-member-mgr');if(!panel)return;
-    panel.innerHTML=`
-        <div class="card"><div class="section-title">➕ 添加成员</div>
-        <div class="form-row"><div class="form-group"><label>👤 大名（必填，唯一）</label><input type="text" id="newMemberName" placeholder="输入大名"></div>
-        <div class="form-group"><label>🏷️ 别名（选填，逗号分隔）</label><input type="text" id="newMemberAlias" placeholder="例如：阿三,三哥"></div></div>
-        <button class="btn btn-accent btn-sm" id="btnAddMember">✅ 添加成员</button></div>
-        <div class="card"><div class="section-title">📥 批量导入成员</div>
-        <div class="form-group"><label>每行：大名,别名1,别名2（已存在则更新别名）</label><textarea id="batchMemberImport" placeholder="张三,阿三,三哥&#10;李四,四弟&#10;王五"></textarea></div>
-        <button class="btn btn-success btn-sm" id="btnBatchImport">📥 批量导入</button></div>
-        <hr class="divider">
-        <div class="search-box"><input type="text" id="memberSearchFilter" placeholder="🔍 搜索成员大名或别名..."><button class="btn btn-accent btn-sm" id="btnClearMemberSearch">✕</button></div>
-        <div class="section-title">👥 所有成员 <span id="memberCount" style="font-size:11px;color:var(--text2)"></span></div><div id="memberList"></div>`;
-    document.getElementById('btnAddMember').addEventListener('click',addMember);
-    document.getElementById('newMemberName').addEventListener('keydown',(e)=>{if(e.key==='Enter')addMember();});
-    document.getElementById('btnBatchImport').addEventListener('click',batchImportMembers);
-    document.getElementById('memberSearchFilter').addEventListener('input',(e)=>{loadMemberList(e.target.value.trim());});
-    document.getElementById('btnClearMemberSearch').addEventListener('click',()=>{document.getElementById('memberSearchFilter').value='';loadMemberList();});
-    loadMemberList();
-}
-async function addMember(){
-    if(!currentGuildId){showToast('⚠️ 请先进公会','warning');return;}
-    const name=document.getElementById('newMemberName').value.trim(),alias=document.getElementById('newMemberAlias').value.trim();
-    if(!name){showToast('⚠️ 请输入大名','warning');return;}
-    try{await db.members.create({guild_id:currentGuildId,real_name:name,alias});showToast('✅ 添加成功！','success');document.getElementById('newMemberName').value='';document.getElementById('newMemberAlias').value='';await refreshCurrentGuildData();loadMemberList();}
-    catch(e){showToast('❌ 大名可能已存在','error');}
-}
-async function batchImportMembers(){
-    if(!currentGuildId){showToast('⚠️ 请先进公会','warning');return;}
-    const text=document.getElementById('batchMemberImport').value.trim();
-    if(!text){showToast('⚠️ 请输入成员数据','warning');return;}
-    const lines=text.split('\n').filter(l=>l.trim());let created=0,updated=0,fail=0;
-    for(const line of lines){
-        const parts=line.split(',').map(s=>s.trim());const name=parts[0],alias=parts.slice(1).join(',');
-        if(!name){fail++;continue;}
-        try{
-            const existing=await db.members.getByName(currentGuildId,name);
-            if(existing.length){await db.members.update(existing[0].id,{alias});updated++;}
-            else{await db.members.create({guild_id:currentGuildId,real_name:name,alias});created++;}
-        }catch(e){console.warn('导入失败:',name,e.message);fail++;}
-    }
-    let msg=`✅ 新增 ${created} 人`;if(updated>0)msg+=`，更新 ${updated} 人`;if(fail>0)msg+=`，失败 ${fail} 人（F12查看）`;
-    showToast(msg,'success');document.getElementById('batchMemberImport').value='';await refreshCurrentGuildData();loadMemberList();
-}
-async function loadMemberList(filterQuery=''){
-    const div=document.getElementById('memberList');if(!div||!currentGuildId)return;
-    try{
-        allMembers=await db.members.list(currentGuildId);
-        let filtered=allMembers;
-        if(filterQuery){const q=filterQuery.toLowerCase();filtered=allMembers.filter(m=>m.real_name.toLowerCase().includes(q)||(m.alias||'').toLowerCase().includes(q));}
-        const ce=document.getElementById('memberCount');if(ce)ce.textContent=`（${filtered.length}/${allMembers.length}人）`;
-        if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return;}
-        let html='';
-        for(const m of filtered){
-            html+=`<div class="card"><button class="btn-close" onclick="deleteMember(${m.id})">✕</button>
-            <div class="card-header"><span class="card-title">👤 ${m.real_name}</span>
-            <div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick="editMemberName(${m.id},'${m.real_name.replace(/'/g,"\\'")}')">✏️ 改大名</button>
-            <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g,"\\'")}','${(m.alias||'').replace(/'/g,"\\'")}')">✏️ 改别名</button></div></div>
-            <div style="font-size:12px;color:var(--text2)">🏷️ 别名：${m.alias?m.alias.replace(/,/g,'、'):'无'}</div></div>`;
-        }
-        div.innerHTML=html;
-    }catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>';}
-}
-async function deleteMember(id){if(!confirm('确定删除该成员吗？'))return;try{await db.members.delete(id);showToast('🗑️ 已删除','success');await refreshCurrentGuildData();loadMemberList();if(document.getElementById('taskList'))loadTaskList();}catch(e){showToast('❌ 删除失败','error');}}
-async function editMemberName(memberId,currentName){
-    const newName=prompt(`✏️ 修改「${currentName}」的大名`,currentName);
-    if(!newName||newName.trim()===''||newName.trim()===currentName)return;
-    try{await db.members.update(memberId,{real_name:newName.trim()});showToast('✅ 大名已更新','success');await refreshCurrentGuildData();loadMemberList();}
-    catch(e){showToast('❌ 修改失败，大名可能重复','error');}
-}
-
-async function loadRankList() {
-    const div = document.getElementById('rankList'); if (!div || !currentGuildId) return;
-    try {
-        const members = await db.members.list(currentGuildId);
-        const tasks = await db.tasks.list(currentGuildId);
-        let rankings = [];
-        for (const m of members) {
-            const tml = await db.taskMembers.listByMember(m.id);
-            const tids = tml.map(t => t.task_id);
-            const mtasks = tasks.filter(t => tids.includes(t.id));
-            const totalScore = mtasks.reduce((sum, t) => sum + t.score, 0);
-            rankings.push({ ...m, taskCount: mtasks.length, totalScore });
-        }
-        rankings.sort((a, b) => b.totalScore - a.totalScore);
-        if (!rankings.length) { div.innerHTML = '<div class="empty-state"><div class="icon">👻</div><div class="text">暂无成员</div></div>'; return; }
-        let html = '';
-        rankings.forEach((m, i) => {
-            const rank = i + 1;
-            let rankClass = 'rank-other';
-            if (rank === 1) rankClass = 'rank-1';
-            else if (rank === 2) rankClass = 'rank-2';
-            else if (rank === 3) rankClass = 'rank-3';
-            html += `<div class="card"><div class="card-header">
-                <span style="display:flex;align-items:center"><span class="rank-badge ${rankClass}">${rank}</span>
-                <span class="card-title">👤 ${m.real_name}</span></span>
-                <span class="tag gold">⭐ ${m.totalScore}分</span></div>
-                <div style="font-size:12px;color:var(--text2)">📋 完成 ${m.taskCount} 个任务${m.alias ? ' | 🏷️ ' + m.alias.replace(/,/g, '、') : ''}</div></div>`;
-        });
-        div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; }
-}
-
-// ===== 智能推荐 =====
-function initRecommendTab() {
-    const panel = document.getElementById('tab-recommend'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="card"><div class="section-title">🧠 智能推荐</div>
-        <div class="form-group"><label>👤 选择成员</label><select id="recommendMember"><option value="">-- 请选择成员 --</option></select></div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <span class="diamond-toggle" id="diamondToggle" onclick="toggleDiamond()">💎 已花1200钻（18→24任务）</span>
-        </div>
-        <button class="btn btn-accent btn-sm" id="btnRecommend">🔍 分析推荐</button></div>
-        <div id="recommendResult"></div>`;
-    document.getElementById('btnRecommend').addEventListener('click', doRecommend);
-    loadRecommendMembers();
-}
-let diamondMode = false;
-function toggleDiamond() {
-    diamondMode = !diamondMode;
-    const el = document.getElementById('diamondToggle');
-    if (diamondMode) { el.classList.add('on'); el.innerHTML = '💎 钻石模式（24任务）✅'; }
-    else { el.classList.remove('on'); el.innerHTML = '💎 已花1200钻（18→24任务）'; }
-}
-async function loadRecommendMembers() {
-    const sel = document.getElementById('recommendMember'); if (!sel || !currentGuildId) return;
-    try {
-        const members = await db.members.list(currentGuildId);
-        sel.innerHTML = '<option value="">-- 请选择成员 --</option>';
-        members.forEach(m => { sel.innerHTML += `<option value="${m.id}">${m.real_name}${m.alias ? '（' + m.alias + '）' : ''}</option>`; });
-    } catch (e) { }
-}
-async function doRecommend() {
-    if (!currentGuildId) { showToast('⚠️ 请先进公会', 'warning'); return; }
-    const memberId = document.getElementById('recommendMember').value;
-    if (!memberId) { showToast('⚠️ 请选择成员', 'warning'); return; }
-    const div = document.getElementById('recommendResult');
-    const maxTasks = diamondMode ? 24 : 18;
-    try {
-        const member = (await db.members.list(currentGuildId)).find(m => m.id == memberId);
-        const tml = await db.taskMembers.listByMember(memberId);
-        const tids = tml.map(t => t.task_id);
-        const tasks = (await db.tasks.list(currentGuildId)).filter(t => tids.includes(t.id));
-        tasks.sort((a, b) => b.score - a.score);
-        const topTasks = tasks.slice(0, maxTasks);
-        const totalScore = topTasks.reduce((sum, t) => sum + t.score, 0);
-
-        // 成就档位分析
-        let achieveHTML = '';
-        ACHIEVEMENT_TIERS.forEach(tier => {
-            const reachable = totalScore >= tier.score;
-            achieveHTML += `<div style="padding:4px 0;font-size:12px;color:${reachable ? 'var(--success)' : 'var(--text2)'}">
-                ${reachable ? '✅' : '⬜'} ${tier.name}：${tier.score}分 — ${tier.rewards}</div>`;
-        });
-
-        let html = `<div class="card"><div class="card-header"><span class="card-title">👤 ${member.real_name}</span>
-            <span class="tag gold">💎 ${diamondMode ? '24' : '18'}任务模式</span></div>
-            <div class="highlight-box"><span class="score-big">${totalScore}</span> <span style="color:var(--text2)">预计总分</span>
-            <span style="margin-left:8px;font-size:12px;color:var(--text2)">（${topTasks.length}个任务）</span></div>
-            <div class="section-title">🏆 成就档位</div>${achieveHTML}
-            <hr class="divider"><div class="section-title">📋 推荐任务清单（按分数排序）</div>`;
-        if (!topTasks.length) { html += '<span style="color:var(--text2);font-size:12px">暂无任务</span>'; }
-        else { topTasks.forEach((t, i) => { html += `<div class="member-tag" style="margin:3px">${i + 1}. ${t.task_name} ⭐${t.score}</div>`; }); }
-        html += '</div>';
-        div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">分析失败</div></div>'; }
-}
+function initMemberMgrTab(){const p=document.getElementById('tab-member-mgr');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">➕添加成员</div><div class="form-row"><div class="form-group"><label>👤大名（必填，唯一）</label><input type="text" id="newMemberName" placeholder="输入大名"></div><div class="form-group"><label>🏷️别名（选填，逗号分隔）</label><input type="text" id="newMemberAlias" placeholder="例如：阿三,三哥"></div></div><button class="btn btn-accent btn-sm" id="btnAddMember">✅添加成员</button></div><div class="card"><div class="section-title">📥批量导入成员</div><div class="form-group"><label>每行：大名,别名1,别名2（已存在则更新别名）</label><textarea id="batchMemberImport" placeholder="张三,阿三,三哥&#10;李四,四弟&#10;王五"></textarea></div><button class="btn btn-success btn-sm" id="btnBatchImport">📥批量导入</button></div><hr class="divider"><div class="search-box"><input type="text" id="memberSearchFilter" placeholder="🔍搜索成员大名或别名..."><button class="btn btn-accent btn-sm" id="btnClearMemberSearch">✕</button></div><div class="section-title">👥所有成员<span id="memberCount" style="font-size:11px;color:var(--text2)"></span></div><div id="memberList"></div>`;document.getElementById('btnAddMember').addEventListener('click',addMember);document.getElementById('newMemberName').addEventListener('keydown',(e)=>{if(e.key==='Enter')addMember()});document.getElementById('btnBatchImport').addEventListener('click',batchImportMembers);document.getElementById('memberSearchFilter').addEventListener('input',(e)=>{loadMemberList(e.target.value.trim())});document.getElementById('btnClearMemberSearch').addEventListener('click',()=>{document.getElementById('memberSearchFilter').value='';loadMemberList()});loadMemberList()}
+async function addMember(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const name=document.getElementById('newMemberName').value.trim(),alias=document.getElementById('newMemberAlias').value.trim();if(!name){showToast('⚠️请输入大名','warning');return}try{await db.members.create({guild_id:currentGuildId,real_name:name,alias});showToast('✅添加成功！','success');document.getElementById('newMemberName').value='';document.getElementById('newMemberAlias').value='';await refreshCurrentGuildData();loadMemberList()}catch(e){showToast('❌大名可能已存在','error')}}
+async function batchImportMembers(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const text=document.getElementById('batchMemberImport').value.trim();if(!text){showToast('⚠️请输入成员数据','warning');return}const lines=text.split('\n').filter(l=>l.trim());let created=0,updated=0,fail=0;for(const line of lines){const parts=line.split(',').map(s=>s.trim());const name=parts[0],alias=parts.slice(1).join(',');if(!name){fail++;continue}try{const existing=await db.members.getByName(currentGuildId,name);if(existing.length){await db.members.update(existing[0].id,{alias});updated++}else{await db.members.create({guild_id:currentGuildId,real_name:name,alias});created++}}catch(e){console.warn('导入失败:',name,e.message);fail++}}let msg=`✅新增${created}人`;if(updated>0)msg+=`，更新${updated}人`;if(fail>0)msg+=`，失败${fail}人（F12查看）`;showToast(msg,'success');document.getElementById('batchMemberImport').value='';await refreshCurrentGuildData();loadMemberList()}
+async function loadMemberList(filterQuery=''){const div=document.getElementById('memberList');if(!div||!currentGuildId)return;try{allMembers=await db.members.list(currentGuildId);let filtered=allMembers;if(filterQuery){const q=filterQuery.toLowerCase();filtered=allMembers.filter(m=>m.real_name.toLowerCase().includes(q)||(m.alias||'').toLowerCase().includes(q))}const ce=document.getElementById('memberCount');if(ce)ce.textContent=`（${filtered.length}/${allMembers.length}人）`;if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return}let html='';for(const m of filtered){html+=`<div class="card"><button class="btn-close" onclick="deleteMember(${m.id})">✕</button><div class="card-header"><span class="card-title">👤${m.real_name}</span><div style="display:flex;gap:3px"><button class="btn btn-outline btn-xs" onclick="editMemberName(${m.id},'${m.real_name.replace(/'/g,"\\'")}')">✏️改大名</button><button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g,"\\'")}','${(m.alias||'').replace(/'/g,"\\'")}')">✏️改别名</button></div></div><div style="font-size:12px;color:var(--text2)">🏷️别名：${m.alias?m.alias.replace(/,/g,'、'):'无'}</div></div>`}div.innerHTML=html}catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'}}
+async function deleteMember(id){if(!confirm('确定删除该成员吗？'))return;try{await db.members.delete(id);showToast('🗑️已删除','success');await refreshCurrentGuildData();loadMemberList();if(document.getElementById('taskList'))loadTaskList()}catch(e){showToast('❌删除失败','error')}}
+async function editMemberName(memberId,currentName){const newName=prompt(`✏️修改「${currentName}」的大名`,currentName);if(!newName||newName.trim()===''||newName.trim()===currentName)return;try{await db.members.update(memberId,{real_name:newName.trim()});showToast('✅大名已更新','success');await refreshCurrentGuildData();loadMemberList()}catch(e){showToast('❌修改失败，大名可能重复','error')}}
+async function editAlias(memberId,name,currentAlias){const newAlias=prompt(`✏️编辑「${name}」的别名\n（逗号或顿号分隔多个别名）`,currentAlias);if(newAlias===null)return;try{await db.members.update(memberId,{alias:newAlias.trim()});showToast('✅别名已更新','success');await refreshCurrentGuildData();loadMemberList()}catch(e){showToast('❌更新失败','error')}}// ===== 智能推荐 =====
+let memberTargets={};
+function initRecommendTab(){const p=document.getElementById('tab-recommend');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">🎯设置我的目标档位</div><div class="form-row"><div class="form-group"><label>👤选择成员</label><select id="recommendMember"><option value="">--请选择成员--</option></select></div><div class="form-group"><label>🎯目标档位</label><div style="display:flex;gap:4px;flex-wrap:wrap" id="tierBtns"></div></div></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span class="diamond-toggle" id="diamondToggle" onclick="toggleDiamond()">💎已花1200钻（18→24任务）</span></div><button class="btn btn-accent btn-sm" id="btnSetTarget">💾保存目标</button><div id="personalRecommend"></div></div><hr class="divider"><div class="section-title">📊全员冲分计划</div><div id="allMembersPlan"></div>`;const tierBtns=document.getElementById('tierBtns');ACHIEVEMENT_TIERS.forEach((tier,i)=>{const btn=document.createElement('span');btn.className='tier-btn';btn.textContent=tier.name;btn.dataset.score=tier.score;btn.addEventListener('click',()=>{tierBtns.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active','gold-active'));btn.classList.add('active','gold-active')});tierBtns.appendChild(btn)});document.getElementById('btnSetTarget').addEventListener('click',saveMemberTarget);document.getElementById('recommendMember').addEventListener('change',loadMemberTarget);loadRecommendMembers();loadAllMembersPlan()}
+let diamondMode=false;
+function toggleDiamond(){diamondMode=!diamondMode;const el=document.getElementById('diamondToggle');if(diamondMode){el.classList.add('on');el.innerHTML='💎钻石模式（24任务）✅'}else{el.classList.remove('on');el.innerHTML='💎已花1200钻（18→24任务）'}}
+async function loadRecommendMembers(){const sel=document.getElementById('recommendMember');if(!sel||!currentGuildId)return;try{const members=await db.members.list(currentGuildId);sel.innerHTML='<option value="">--请选择成员--</option>';members.forEach(m=>{sel.innerHTML+=`<option value="${m.id}">${m.real_name}${m.alias?'（'+m.alias+'）':''}</option>`})}catch(e){}}
+async function loadMemberTarget(){const memberId=document.getElementById('recommendMember').value;if(!memberId)return;const target=memberTargets[memberId];if(target){const btns=document.querySelectorAll('#tierBtns .tier-btn');btns.forEach(b=>{b.classList.remove('active','gold-active');if(parseInt(b.dataset.score)===target)b.classList.add('active','gold-active')})}}
+async function saveMemberTarget(){const memberId=document.getElementById('recommendMember').value;if(!memberId){showToast('⚠️请选择成员','warning');return}const activeBtn=document.querySelector('#tierBtns .tier-btn.active');if(!activeBtn){showToast('⚠️请选择目标档位','warning');return}const targetScore=parseInt(activeBtn.dataset.score);memberTargets[memberId]=targetScore;try{const member=(await db.members.list(currentGuildId)).find(m=>m.id==memberId);const tml=await db.taskMembers.listByMember(memberId);const tids=tml.map(t=>t.task_id);const tasks=(await db.tasks.list(currentGuildId)).filter(t=>tids.includes(t.id));tasks.sort((a,b)=>b.score-a.score);const maxTasks=diamondMode?24:18;const topTasks=tasks.slice(0,maxTasks);const totalScore=topTasks.reduce((s,t)=>s+t.score,0);const diff=targetScore-totalScore;let html=`<div class="card"><div class="card-header"><span class="card-title">👤${member.real_name}</span><span class="tag gold">目标：${targetScore}分</span></div><div class="highlight-box">⭐能做总分：<b>${totalScore}</b>（${topTasks.length}个任务）`;if(diff>0)html+=`<br>⚠️还差<b style="color:var(--danger)">${diff}</b>分，即使全做也达不到目标`;else html+=`<br>✅可以达到目标！`;html+=`</div><div class="section-title">📋推荐任务（按分数排序）</div>`;if(!topTasks.length)html+='<span style="color:var(--text2);font-size:12px">暂无任务</span>';else topTasks.forEach((t,i)=>{html+=`<div class="member-tag" style="margin:3px">${i+1}.${t.task_name}⭐${t.score}</div>`});html+='</div>';document.getElementById('personalRecommend').innerHTML=html;showToast('💾目标已保存','success');loadAllMembersPlan()}catch(e){showToast('❌操作失败','error')}}
+async function loadAllMembersPlan(){const div=document.getElementById('allMembersPlan');if(!div||!currentGuildId)return;try{const members=await db.members.list(currentGuildId);const tasks=await db.tasks.list(currentGuildId);let plans=[];for(const m of members){const tml=await db.taskMembers.listByMember(m.id);const tids=tml.map(t=>t.task_id);const mtasks=tasks.filter(t=>tids.includes(t.id));mtasks.sort((a,b)=>b.score-a.score);const totalScore=mtasks.reduce((s,t)=>s+t.score,0);const target=memberTargets[m.id]||0;plans.push({...m,totalScore,taskCount:mtasks.length,target,topTasks:mtasks.slice(0,18)})}const tiers=[1400,1300,1200,800,600];let html='';tiers.forEach(tierScore=>{const tierPlans=plans.filter(p=>p.target===tierScore).sort((a,b)=>b.totalScore-a.totalScore);if(!tierPlans.length)return;const tierName=ACHIEVEMENT_TIERS.find(t=>t.score===tierScore)?.name||`${tierScore}分`;html+=`<div class="card"><div class="section-title">${tierName}（${tierPlans.length}人）</div>`;tierPlans.forEach((p,i)=>{const diff=p.target-p.totalScore;const top18Score=p.topTasks.reduce((s,t)=>s+t.score,0);html+=`<div class="card" style="background:var(--bg);margin-bottom:4px"><div class="collapse-header" onclick="toggleCollapse(this)"><span><b>👤${p.real_name}</b>⭐能做${p.totalScore}分${diff>0?`<span style="color:var(--danger)">还差${diff}分</span>`:'<span style="color:var(--success)">可达标✅</span>'}</span><span style="font-size:11px;color:var(--text2)">展开▶</span></div><div class="collapse-body"><div style="font-size:12px;color:var(--text2)">📋能做${p.taskCount}个任务|18任务最高${top18Score}分</div><div class="member-tags">${p.topTasks.map((t,j)=>`<span class="member-tag">${j+1}.${t.task_name}⭐${t.score}</span>`).join('')}</div></div></div>`});html+='</div>'});if(!html)html='<div class="empty-state"><div class="icon">🎯</div><div class="text">还没有人设置目标</div></div>';div.innerHTML=html}catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'}}
+function toggleCollapse(header){const body=header.nextElementSibling;const arrow=header.querySelector('span:last-child');if(body.classList.contains('open')){body.classList.remove('open');arrow.textContent='展开▶'}else{body.classList.add('open');arrow.textContent='收起▲'}}
 
 // ===== 公会管理 =====
-function initGuildMgrTab() {
-    const panel = document.getElementById('tab-guild-mgr'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="card"><div class="section-title">🏰 创建新公会</div>
-        <div class="form-row"><div class="form-group"><label>📛 公会名称</label><input type="text" id="newGuildName" placeholder="例如：战神联盟"></div>
-        <div class="form-group"><label>📝 我的备注</label><input type="text" id="newGuildNote" placeholder="仅自己可见"></div></div>
-        <button class="btn btn-accent btn-sm" id="btnCreateGuild">🎉 创建公会</button></div>
-        <hr class="divider"><div class="section-title">📋 所有公会</div><div id="guildList"></div>`;
-    document.getElementById('btnCreateGuild').addEventListener('click', createGuild);
-    document.getElementById('newGuildName').addEventListener('keydown', (e) => { if (e.key === 'Enter') createGuild(); });
-    loadGuildList();
-}
-async function createGuild() {
-    const name = document.getElementById('newGuildName').value.trim() || '新公会';
-    const note = document.getElementById('newGuildNote').value.trim();
-    let code; let exists = true;
-    while (exists) { code = String(Math.floor(10000 + Math.random() * 90000)); const ex = await db.guilds.getByCode(code); exists = ex.length > 0; }
-    try {
-        await db.guilds.create({ name, invite_code: code, admin_note: note });
-        showToast(`🎉 创建成功！邀请码：${code}`, 'success');
-        document.getElementById('newGuildName').value = ''; document.getElementById('newGuildNote').value = '';
-        await loadAllGuilds(); loadGuildList();
-    } catch (e) { showToast('❌ 创建失败', 'error'); }
-}
-async function loadGuildList() {
-    const div = document.getElementById('guildList'); if (!div) return;
-    await loadAllGuilds();
-    if (!allGuilds.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🏰</div><div class="text">还没有公会</div></div>'; return; }
-    const countMap = {};
-    await Promise.all(allGuilds.map(async (g) => { try { const m = await db.members.list(g.id); countMap[g.id] = m.length; } catch (e) { countMap[g.id] = '?'; } }));
-    let html = '';
-    for (const g of allGuilds) {
-        html += `<div class="card guild-card">
-            <div class="info-row"><span class="label">🏰 公会名称：</span><span class="value">${g.name}</span></div>
-            <div class="info-row"><span class="label">🔑 邀请码：</span><span class="value" style="color:var(--gold);font-size:16px;font-weight:700">${g.invite_code}</span></div>
-            <div class="info-row"><span class="label">👥 人数：</span><span class="value">${countMap[g.id] !== undefined ? countMap[g.id] : '...'} 人</span></div>
-            <div class="info-row"><span class="label">📝 我的备注：</span><span class="note-highlight">${g.admin_note || '无'}</span></div>
-            <div class="guild-actions">
-                <button class="btn btn-accent btn-sm" onclick="enterGuild(${g.id})">🚀 进入公会</button>
-                <button class="btn btn-outline btn-sm" onclick="viewGuild(${g.id})">👀 查看</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteGuild(${g.id},'${g.invite_code}')">🗑️ 删除</button></div></div>`;
-    }
-    div.innerHTML = html;
-}
-async function enterGuild(guildId) {
-    currentGuildId = guildId; const guild = allGuilds.find(g => g.id === guildId);
-    document.getElementById('headerTitle').textContent = `🏰 ${guild.name}`;
-    document.getElementById('headerBadge').textContent = '管理员模式';
-    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:6px">↩ 返回</button>`;
-    await refreshCurrentGuildData();
-    initAdminSearchTab(); initTaskMgrTab(); initMemberMgrTab(); initRankTab(); initRecommendTab();
-    const tabs = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('.tab-content');
-    tabs.forEach(t => t.classList.remove('active')); panels.forEach(p => p.classList.remove('active'));
-    if (tabs[0]) tabs[0].classList.add('active');
-    const p0 = document.getElementById('tab-search'); if (p0) p0.classList.add('active');
-    showToast(`✅ 已进入「${guild.name}」`, 'success');
-}
-async function backToAdmin() {
-    currentGuildId = null;
-    document.getElementById('headerTitle').textContent = '👑 管理员后台';
-    document.getElementById('headerBadge').textContent = '超级管理员';
-    document.getElementById('headerInfo').textContent = '管理所有公会';
-    await loadAllGuilds();
-    setupTabs([
-        { name:'🔍 查询', id:'tab-search' },
-        { name:'📋 任务', id:'tab-task-mgr' },
-        { name:'👥 成员', id:'tab-member-mgr' },
-        { name:'🧠 推荐', id:'tab-recommend' },
-        { name:'🏰 公会', id:'tab-guild-mgr' }
-    ]);
-    showToast('↩ 已返回管理员后台', 'info');
-}
-async function viewGuild(guildId) {
-    const guild = allGuilds.find(g => g.id === guildId);
-    const members = await db.members.list(guildId);
-    const tasks = await db.tasks.list(guildId);
-    let msg = `🏰 ${guild.name}\n🔑 邀请码：${guild.invite_code}\n\n👥 成员（${members.length}人）：\n`;
-    members.forEach(m => { msg += `  - ${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}\n`; });
-    msg += `\n📋 任务（${tasks.length}个）：\n`;
-    tasks.forEach(t => { msg += `  - ${t.task_name} ⭐${t.score}分\n`; });
-    alert(msg);
-}
-async function deleteGuild(guildId, code) {
-    if (!confirm(`⚠️ 确定删除该公会吗？\n邀请码：${code}\n\n所有数据不可恢复，用户将被强制退出！`)) return;
-    try { await db.guilds.delete(guildId); showToast('🗑️ 已删除', 'success'); await loadAllGuilds(); loadGuildList();
-        if (currentGuildId === guildId) { currentGuildId = null; document.getElementById('headerTitle').textContent = '👑 管理员后台'; document.getElementById('headerInfo').textContent = '管理所有公会'; }
-    } catch (e) { showToast('❌ 删除失败', 'error'); }
-}
+function initGuildMgrTab(){const p=document.getElementById('tab-guild-mgr');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">🏰创建新公会</div><div class="form-row"><div class="form-group"><label>📛公会名称</label><input type="text" id="newGuildName" placeholder="例如：战神联盟"></div><div class="form-group"><label>📝我的备注</label><input type="text" id="newGuildNote" placeholder="仅自己可见"></div></div><button class="btn btn-accent btn-sm" id="btnCreateGuild">🎉创建公会</button></div><hr class="divider"><div class="section-title">📋所有公会</div><div id="guildList"></div>`;document.getElementById('btnCreateGuild').addEventListener('click',createGuild);document.getElementById('newGuildName').addEventListener('keydown',(e)=>{if(e.key==='Enter')createGuild()});loadGuildList()}
+async function createGuild(){const name=document.getElementById('newGuildName').value.trim()||'新公会';const note=document.getElementById('newGuildNote').value.trim();let code;let exists=true;while(exists){code=String(Math.floor(10000+Math.random()*90000));const ex=await db.guilds.getByCode(code);exists=ex.length>0}try{await db.guilds.create({name,invite_code:code,admin_note:note});showToast(`🎉创建成功！邀请码：${code}`,'success');document.getElementById('newGuildName').value='';document.getElementById('newGuildNote').value='';await loadAllGuilds();loadGuildList()}catch(e){showToast('❌创建失败','error')}}
+async function loadGuildList(){const div=document.getElementById('guildList');if(!div)return;await loadAllGuilds();if(!allGuilds.length){div.innerHTML='<div class="empty-state"><div class="icon">🏰</div><div class="text">还没有公会</div></div>';return}const countMap={};await Promise.all(allGuilds.map(async(g)=>{try{const m=await db.members.list(g.id);countMap[g.id]=m.length}catch(e){countMap[g.id]='?'}}));let html='';for(const g of allGuilds){html+=`<div class="card guild-card"><div class="info-row"><span class="label">🏰公会名称：</span><span class="value">${g.name}</span></div><div class="info-row"><span class="label">🔑邀请码：</span><span class="value" style="color:var(--gold);font-size:16px;font-weight:700">${g.invite_code}</span></div><div class="info-row"><span class="label">👥人数：</span><span class="value">${countMap[g.id]!==undefined?countMap[g.id]:'...'}人</span></div><div class="info-row"><span class="label">📝我的备注：</span><span class="note-highlight">${g.admin_note||'无'}</span></div><div class="guild-actions"><button class="btn btn-accent btn-sm" onclick="enterGuild(${g.id})">🚀进入公会</button><button class="btn btn-outline btn-sm" onclick="viewGuild(${g.id})">👀查看</button><button class="btn btn-danger btn-sm" onclick="deleteGuild(${g.id},'${g.invite_code}')">🗑️删除</button></div></div>`}div.innerHTML=html}
+async function enterGuild(guildId){currentGuildId=guildId;const guild=allGuilds.find(g=>g.id===guildId);document.getElementById('headerTitle').textContent=`🏰${guild.name}`;document.getElementById('headerBadge').textContent='管理员模式';document.getElementById('headerInfo').innerHTML=`邀请码：${guild.invite_code}<button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:6px">↩返回</button>`;await refreshCurrentGuildData();initAdminSearchTab();initTaskMgrTab();initMemberMgrTab();initRecommendTab();const tabs=document.querySelectorAll('.tab');const panels=document.querySelectorAll('.tab-content');tabs.forEach(t=>t.classList.remove('active'));panels.forEach(p=>p.classList.remove('active'));if(tabs[0])tabs[0].classList.add('active');const p0=document.getElementById('tab-search');if(p0)p0.classList.add('active');showToast(`✅已进入「${guild.name}」`,'success')}
+async function backToAdmin(){currentGuildId=null;document.getElementById('headerTitle').textContent='👑管理员后台';document.getElementById('headerBadge').textContent='超级管理员';document.getElementById('headerInfo').textContent='管理所有公会';await loadAllGuilds();setupTabs([{name:'🔍查询',id:'tab-search'},{name:'📋任务',id:'tab-task-mgr'},{name:'👥成员',id:'tab-member-mgr'},{name:'🧠推荐',id:'tab-recommend'},{name:'🏰公会',id:'tab-guild-mgr'}]);showToast('↩已返回管理员后台','info')}
+async function viewGuild(guildId){const guild=allGuilds.find(g=>g.id===guildId);const members=await db.members.list(guildId);const tasks=await db.tasks.list(guildId);let msg=`🏰${guild.name}\n🔑邀请码：${guild.invite_code}\n\n👥成员（${members.length}人）：\n`;members.forEach(m=>{msg+=`  - ${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}\n`});msg+=`\n📋任务（${tasks.length}个）：\n`;tasks.forEach(t=>{msg+=`  - ${t.task_name}⭐${t.score}分\n`});alert(msg)}
+async function deleteGuild(guildId,code){if(!confirm(`⚠️确定删除该公会吗？\n邀请码：${code}\n\n所有数据不可恢复，用户将被强制退出！`))return;try{await db.guilds.delete(guildId);showToast('🗑️已删除','success');await loadAllGuilds();loadGuildList();if(currentGuildId===guildId){currentGuildId=null;document.getElementById('headerTitle').textContent='👑管理员后台';document.getElementById('headerInfo').textContent='管理所有公会'}}catch(e){showToast('❌删除失败','error')}}
 
 // ===== 公会成员页面 =====
-async function loadMemberPage(guild) {
-    currentGuildId = guild.id;
-    document.getElementById('headerTitle').textContent = `🏰 ${guild.name}`;
-    document.getElementById('headerBadge').textContent = '公会成员';
-    let memberCount = 0;
-    try { const m = await db.members.list(currentGuildId); memberCount = m.length; } catch (e) { }
-    document.getElementById('headerInfo').innerHTML = `👥 ${memberCount}人 | 邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:6px">✏️ 改名</button>`;
-    await refreshCurrentGuildData();
-    setupTabs([
-        { name: '🔍 查询', id: 'tab-search' },
-        { name: '📋 任务', id: 'tab-task-mgr' },
-        { name: '👥 成员', id: 'tab-member-mgr' },
-        { name: '🧠 推荐', id: 'tab-recommend' }
-    ]);
-    initMemberSearchTab();
-}
-async function renameGuild() {
-    if (!currentGuildId) return;
-    try { const g = await db.guilds.get(currentGuildId); if (!g.length) return;
-        const n = prompt('✏️ 修改公会名称', g[0].name); if (!n || !n.trim()) return;
-        await db.guilds.update(currentGuildId, { name: n.trim() });
-        document.getElementById('headerTitle').textContent = `🏰 ${n.trim()}`; showToast('✅ 名称已更新', 'success');
-    } catch (e) { showToast('❌ 修改失败', 'error'); }
-}
-function initMemberSearchTab() {
-    const panel = document.getElementById('tab-search'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="card"><div class="section-title">👤 查成员能做什么任务</div>
-        <div class="search-box"><input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button></div>
-        <div id="memberMemberResult"></div></div>
-        <hr class="divider">
-        <div class="card"><div class="section-title">📋 查任务有谁能做</div>
-        <div class="search-box"><input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button></div>
-        <div id="memberTaskResult"></div>
-        <div id="addSelfBox" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
-            <div class="section-title">🙋 添加自己到这个任务</div>
-            <div class="form-row"><div class="form-group"><label>👤 大名（必填）</label><input type="text" id="addSelfName"></div>
-            <div class="form-group"><label>🏷️ 别名（选填，逗号分隔）</label><input type="text" id="addSelfAlias"></div></div>
-            <button class="btn btn-success btn-sm" id="btnAddSelf">✅ 确认添加</button></div></div>`;
-    document.getElementById('memberSearchMember').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchMemberForMember(); });
-    document.getElementById('btnMemberSearchMember').addEventListener('click', searchMemberForMember);
-    document.getElementById('memberSearchTask').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchTaskForMember(); });
-    document.getElementById('btnMemberSearchTask').addEventListener('click', searchTaskForMember);
-    document.getElementById('btnAddSelf').addEventListener('click', addSelfToTask);
-    window._memberTaskResultCallback = function (taskId) { window._currentTaskId = taskId; document.getElementById('addSelfBox').style.display = 'block'; };
-}
-async function searchMemberForMember() {
-    const q = document.getElementById('memberSearchMember').value.trim();
-    const div = document.getElementById('memberMemberResult'); if (!q) { div.innerHTML = ''; return; }
-    try {
-        const members = await db.members.list(currentGuildId);
-        const filtered = members.filter(m => m.real_name.includes(q) || (m.alias || '').includes(q));
-        if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>'; return; }
-        let html = '';
-        for (const m of filtered) {
-            const tml = await db.taskMembers.listByMember(m.id);
-            const tids = tml.map(t => t.task_id);
-            const tasks = allTasks.filter(t => tids.includes(t.id));
-            html += `<div class="card"><div class="card-header"><span class="card-title">👤 ${m.real_name}</span>
-                <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g, "\\'")}','${(m.alias || '').replace(/'/g, "\\'")}')">✏️ 编辑别名</button></div>
-                <div style="font-size:12px;color:var(--text2)">别名：${m.alias || '无'}</div>
-                <div style="font-size:12px;color:var(--gold)">📋 能做：</div><div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`;
-        }
-        div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'; }
-}
-async function searchTaskForMember() {
-    const q = document.getElementById('memberSearchTask').value.trim();
-    const div = document.getElementById('memberTaskResult'); if (!q) { div.innerHTML = ''; return; }
-    try {
-        const tasks = await db.tasks.list(currentGuildId);
-        const filtered = tasks.filter(t => t.task_name.includes(q));
-        if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>'; return; }
-        let html = '';
-        for (const t of filtered) {
-            const tml = await db.taskMembers.list(t.id);
-            const mids = tml.map(tm => tm.member_id);
-            const members = allMembers.filter(m => mids.includes(m.id));
-            html += `<div class="card"><div class="card-header"><span class="card-title">📋 ${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
-                <div style="font-size:12px;color:var(--text2)">👥 能做的人：</div><div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
-                <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="window._memberTaskResultCallback(${t.id})">🙋 我也能做！</button></div>`;
-        }
-        div.innerHTML = html; document.getElementById('addSelfBox').style.display = 'none';
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'; }
-}
-async function addSelfToTask() {
-    const taskId = window._currentTaskId;
-    if (!taskId) { showToast('⚠️ 请先搜索任务', 'warning'); return; }
-    const name = document.getElementById('addSelfName').value.trim(), alias = document.getElementById('addSelfAlias').value.trim();
-    if (!name) { showToast('⚠️ 请输入大名', 'warning'); return; }
-    try {
-        let member; const ex = await db.members.getByName(currentGuildId, name);
-        if (ex.length) member = ex[0];
-        else { const created = await db.members.create({ guild_id: currentGuildId, real_name: name, alias }); member = created[0]; }
-        await db.taskMembers.add({ task_id: taskId, member_id: member.id });
-        showToast('✅ 已添加到任务！', 'success');
-        document.getElementById('addSelfName').value = ''; document.getElementById('addSelfAlias').value = '';
-        document.getElementById('addSelfBox').style.display = 'none';
-        await refreshCurrentGuildData(); searchTaskForMember();
-    } catch (e) { showToast('❌ 添加失败，可能已存在', 'error'); }
-}
-async function editAlias(memberId, name, currentAlias) {
-    const newAlias = prompt(`✏️ 编辑「${name}」的别名\n（逗号或顿号分隔多个别名）`, currentAlias);
-    if (newAlias === null) return;
-    try { await db.members.update(memberId, { alias: newAlias.trim() }); showToast('✅ 别名已更新', 'success'); await refreshCurrentGuildData(); searchMemberForMember(); }
-    catch (e) { showToast('❌ 更新失败', 'error'); }
-}
+async function loadMemberPage(guild){currentGuildId=guild.id;document.getElementById('headerTitle').textContent=`🏰${guild.name}`;document.getElementById('headerBadge').textContent='公会成员';let memberCount=0;try{const m=await db.members.list(currentGuildId);memberCount=m.length}catch(e){}document.getElementById('headerInfo').innerHTML=`👥${memberCount}人|邀请码：${guild.invite_code}<button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:6px">✏️改名</button>`;await refreshCurrentGuildData();setupTabs([{name:'🔍查询',id:'tab-search'},{name:'📋任务',id:'tab-task-mgr'},{name:'👥成员',id:'tab-member-mgr'},{name:'🧠推荐',id:'tab-recommend'}]);initMemberSearchTab()}
+async function renameGuild(){if(!currentGuildId)return;try{const g=await db.guilds.get(currentGuildId);if(!g.length)return;const n=prompt('✏️修改公会名称',g[0].name);if(!n||!n.trim())return;await db.guilds.update(currentGuildId,{name:n.trim()});document.getElementById('headerTitle').textContent=`🏰${n.trim()}`;showToast('✅名称已更新','success')}catch(e){showToast('❌修改失败','error')}}
+function initMemberSearchTab(){const p=document.getElementById('tab-search');if(!p)return;p.innerHTML=`<div class="card"><div class="section-title">👤查成员能做什么任务</div><div class="search-box"><input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button></div><div id="memberMemberResult"></div></div><hr class="divider"><div class="card"><div class="section-title">📋查任务有谁能做</div><div class="search-box"><input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button></div><div id="memberTaskResult"></div><div id="addSelfBox" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)"><div class="section-title">🙋添加自己到这个任务</div><div class="form-row"><div class="form-group"><label>👤大名（必填）</label><input type="text" id="addSelfName"></div><div class="form-group"><label>🏷️别名（选填，逗号分隔）</label><input type="text" id="addSelfAlias"></div></div><button class="btn btn-success btn-sm" id="btnAddSelf">✅确认添加</button></div></div>`;document.getElementById('memberSearchMember').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchMemberForMember()});document.getElementById('btnMemberSearchMember').addEventListener('click',searchMemberForMember);document.getElementById('memberSearchTask').addEventListener('keydown',(e)=>{if(e.key==='Enter')searchTaskForMember()});document.getElementById('btnMemberSearchTask').addEventListener('click',searchTaskForMember);document.getElementById('btnAddSelf').addEventListener('click',addSelfToTask);window._memberTaskResultCallback=function(taskId){window._currentTaskId=taskId;document.getElementById('addSelfBox').style.display='block'}}
+async function searchMemberForMember(){const q=document.getElementById('memberSearchMember').value.trim();const div=document.getElementById('memberMemberResult');if(!q){div.innerHTML='';return}try{const members=await db.members.list(currentGuildId);const filtered=members.filter(m=>m.real_name.includes(q)||(m.alias||'').includes(q));if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return}let html='';for(const m of filtered){const tml=await db.taskMembers.listByMember(m.id);const tids=tml.map(t=>t.task_id);const tasks=allTasks.filter(t=>tids.includes(t.id));html+=`<div class="card"><div class="card-header"><span class="card-title">👤${m.real_name}</span><button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g,"\\'")}','${(m.alias||'').replace(/'/g,"\\'")}')">✏️编辑别名</button></div><div style="font-size:12px;color:var(--text2)">别名：${m.alias||'无'}</div><div style="font-size:12px;color:var(--gold)">📋能做：</div><div class="member-tags">${tasks.length?tasks.map(t=>`<span class="tag gold">${t.task_name}⭐${t.score}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div></div>`}div.innerHTML=html}catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'}}
+async function searchTaskForMember(){const q=document.getElementById('memberSearchTask').value.trim();const div=document.getElementById('memberTaskResult');if(!q){div.innerHTML='';return}try{const tasks=await db.tasks.list(currentGuildId);const filtered=tasks.filter(t=>t.task_name.includes(q));if(!filtered.length){div.innerHTML='<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';return}let html='';for(const t of filtered){const tml=await db.taskMembers.list(t.id);const mids=tml.map(tm=>tm.member_id);const members=allMembers.filter(m=>mids.includes(m.id));html+=`<div class="card"><div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div><div style="font-size:12px;color:var(--text2)">👥能做的人：</div><div class="member-tags">${members.length?members.map(m=>`<span class="member-tag">${m.real_name}${m.alias?'（'+m.alias.replace(/,/g,'、')+'）':''}</span>`).join(''):'<span style="color:var(--text2);font-size:11px">暂无</span>'}</div><button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="window._memberTaskResultCallback(${t.id})">🙋我也能做！</button></div>`}div.innerHTML=html;document.getElementById('addSelfBox').style.display='none'}catch(e){div.innerHTML='<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'}}
+async function addSelfToTask(){const taskId=window._currentTaskId;if(!taskId){showToast('⚠️请先搜索任务','warning');return}const name=document.getElementById('addSelfName').value.trim(),alias=document.getElementById('addSelfAlias').value.trim();if(!name){showToast('⚠️请输入大名','warning');return}try{let member;const ex=await db.members.getByName(currentGuildId,name);if(ex.length)member=ex[0];else{const created=await db.members.create({guild_id:currentGuildId,real_name:name,alias});member=created[0]}await db.taskMembers.add({task_id:taskId,member_id:member.id});showToast('✅已添加到任务！','success');document.getElementById('addSelfName').value='';document.getElementById('addSelfAlias').value='';document.getElementById('addSelfBox').style.display='none';await refreshCurrentGuildData();searchTaskForMember()}catch(e){showToast('❌添加失败，可能已存在','error')}}
 
-async function refreshCurrentGuildData() {
-    if (!currentGuildId) return;
-    try { allMembers = await db.members.list(currentGuildId); allTasks = await db.tasks.list(currentGuildId); } catch (e) { }
-}
+async function refreshCurrentGuildData(){if(!currentGuildId)return;try{allMembers=await db.members.list(currentGuildId);allTasks=await db.tasks.list(currentGuildId)}catch(e){}}
+
+// ===== 批量任务操作 =====
+let selectedTasks=new Set();
+function toggleSelectAll(){if(selectedTasks.size===allTasks.length){selectedTasks.clear()}else{allTasks.forEach(t=>selectedTasks.add(t.id))}loadTaskList()}
+function toggleSelectTask(id){if(selectedTasks.has(id))selectedTasks.delete(id);else selectedTasks.add(id)}
+async function batchDeleteTasks(){if(!selectedTasks.size){showToast('⚠️请先勾选任务','warning');return}if(!confirm(`确定删除${selectedTasks.size}个任务吗？`))return;let s=0,f=0;for(const id of selectedTasks){try{await db.tasks.delete(id);s++}catch(e){f++}}selectedTasks.clear();showToast(`✅删除${s}个${f>0?'，失败'+f+'个':''}`,'success');loadTasksToSelect();loadTaskList()}
+
+// ===== 任务模板 =====
+const PRESET_TEMPLATE=[["艺人-百灵鸟",10],["600级白素贞",16],["600级聂小倩",16],["艺人-英姿",16],["600级黄飞鸿",16],["600级武松",16],["百灵鸟-晨曦鸟语",16],["600级红衣教主",16],["600级林冲",16],["艺人-素芬",18],["彩霞-夜玫瑰",18],["英姿-沙滩排球",18],["觉醒+1聂小倩",18],["秋菊-冬日烟花",18],["艺人-艳红",18],["乾隆-御驾亲征",21],["乾隆-大明湖畔",21],["人才-小燕子-雀跃欢腾",21],["宋江-其疾如风",21],["步惊云-无上霸剑",21],["步惊云-绝世好剑",21],["孙悟空-定海神针",21],["艺人-秋菊",21],["600级张良",21],["守护神-篮球天才",21],["守护神-齐天大圣",21],["守护神-魔法见习生",21],["守护神-奇迹小兵",21],["守护神-光箭天女",21],["乾隆-盛世大帝",21],["郑经理+3意气风发",21],["守护神-天才厨师",21],["守护神-机甲少年",21],["守护神-快乐小鬼",21],["高启兰+3茶楼相会",21],["聂风-麒麟疯魔",21],["步惊云-云栖良辰",21],["孙悟空-方寸学艺",21],["艺人-静静",21],["静静+3孟钰",21],["艺人-彩霞",21],["强哥+3繁华盛会",21],["守护神-卡牌之王",21],["史蒂芬周-黯然销魂",21],["至尊宝-夕阳武士",21],["守护神-沉香",21],["彩霞+3夜玫瑰",21],["守护者-哪吒",21],["至尊宝-万妖之王",21],["觉醒+2聂小倩",22],["觉醒+2白素贞",22],["觉醒+2紫霞仙子",22],["觉醒+2红衣教主",22],["觉醒+2小燕子",22],["觉醒+2黄飞鸿",22],["600级孙悟空",23],["600级青丘神女",23],["600级聂风",23],["孙悟空+3大圣归来",23],["600级武则天",23],["守护神-寿神",23],["守护神-禄神",23],["守护神-玄武",23],["史蒂芬周+3食神归位",23],["孙悟空+3蟠桃园记",23],["高启强+3锋芒毕露",23],["守护神-青龙",23],["人才-紫霞仙子+3爱无期限",23],["武则天+3媚色倾唐",23],["步惊云+3无上霸剑",23],["步惊云+3排云掌",23],["守护神-年兽",23],["艺人-港星",24],["艺人-含香",24],["艺人-高启兰",24],["艺人-选美皇后",24],["选美皇后-佳人茶韵",24],["阿莲-喜收硕果",24],["白居易-天涯故交",24],["海燕-贺岁佳人",24],["阿诗玛-苗寨风光",24],["淑珍-璀璨时代",24],["艺人-小燕子-英姿飒爽",24],["小燕子-雀跃不已",24],["玲儿-桨漾童夏",24],["葬爱-哥特公主",24],["英姿-棋逢对手",24],["童心-午后扰闲",24],["紫霞仙子-明曦春霞",24],["紫霞仙子-嫦娥",24],["亦君-风光留影",24],["艺人-红衣教主-秋光散断",24],["艺人-红衣教主-剑破秋月",24],["艺人-白素贞-龙伴端阳",24],["觉醒+3白素贞",24],["港星-帝女花",24],["港星-暮然回首",24],["高启兰-千傩万象",24],["铁扇公主-云阶春晖",24],["艺人-聂小倩-林间倩影",24],["艺人-白素贞-西湖之约",24],["艺人-聂小倩-皑雪琴声",24],["海燕-还燕归巢",24],["艺人-葬爱",24],["阿诗玛-绚烂花火",24],["艺人-亦君",24],["武则天+5寒寺诗情",25],["750级高启强",25],["750级武则天",25],["人才-小燕子+5欢腾雀跃",25],["750级步惊云",25],["500级国民男神",25],["750级聂风",25],["宋江+5聚义梁山",25],["阿莲+3喜收硕果",26],["艺人-春三十娘",26],["艺人-第二梦",26],["艺人-白晶晶",26],["艺人-上官婉儿",26],["艺人-白居易",26],["上官婉儿-素心守正",26],["晚蔚-爱心圣诞",26],["白晶晶-刻骨铭心",26],["艺人-夏雨荷",26],["艺人-红衣教主+3剑破秋月",26],["艺人-晚蔚",26],["艺人-女儿国国王",26],["艺人-楚楚",26],["春三十娘-一池春色",26],["艺人-顾倾倾",26],["艺人-柳飘飘",26],["觉醒+1孙悟空",27],["觉醒+1高启强",27],["觉醒+1步惊云",27],["觉醒+1聂风",27],["觉醒+1青丘神女",27],["觉醒+1乾隆",27],["觉醒+1史蒂芬周",27],["觉醒+1武则天",27],["艺人-妲己",27],["艺人-玫瑰小姐",28],["淑珍+5璀璨时代",28],["高启兰+5千傩万象",28],["艺人-白素贞+5龙伴端阳",28],["艺人-陈书婷",28],["夏雨荷-青荷雨待",29],["夏雨荷-轻舟画扇",29],["玫瑰小姐-自由飞驰",29],["陈书婷-瀚海女王",29],["觉醒+2青丘神女",29],["觉醒+2聂风",29],["觉醒+2武则天",29],["陈书婷-旖旎春睡",29],["觉醒+2至尊宝",29],["觉醒+2高启强",29],["白晶晶+3刻骨铭心",29],["玫瑰小姐-流音韶光",29],["玫瑰小姐+3流音韶光",30],["白晶晶-白骨红颜",30],["陈书婷-鎏金夜宴",30],["含香-蝶衣破茧",30],["夏雨荷-画境声欢",30],["觉醒+3孙悟空",30],["夏雨荷+3轻舟画扇",30],["玫瑰小姐-破棘盛放",30],["上官婉儿+5素心守正",30],["夏雨荷+5青荷雨待",30],["觉醒＋3高启强",30],["含香 蝶翼破茧",30]];
+async function usePresetTemplate(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}if(!confirm(`⚠️将导入预设模板（${PRESET_TEMPLATE.length}个任务），\n已存在的同名任务会跳过。\n确定继续吗？`))return;let s=0,skip=0,f=0;for(const[name,score]of PRESET_TEMPLATE){try{const existing=await supabaseFetch(`tasks?guild_id=eq.${currentGuildId}&task_name=eq.${encodeURIComponent(name)}&select=id`);if(existing.length){skip++;continue}await db.tasks.create({guild_id:currentGuildId,task_name:name,score});s++}catch(e){f++}}showToast(`✅导入${s}个${skip>0?'，跳过'+skip+'个':''}${f>0?'，失败'+f+'个':''}`,'success');loadTasksToSelect();loadTaskList()}
+function saveMyTemplate(){if(!allTasks.length){showToast('⚠️当前没有任务可保存','warning');return}const data=allTasks.map(t=>`${t.task_name},${t.score}`).join('\n');localStorage.setItem('guild_my_template',data);showToast(`💾已保存${allTasks.length}个任务为模板`,'success')}
+async function loadMyTemplate(){if(!currentGuildId){showToast('⚠️请先进公会','warning');return}const data=localStorage.getItem('guild_my_template');if(!data){showToast('⚠️没有已保存的模板','warning');return}const lines=data.split('\n').filter(l=>l.trim());if(!confirm(`📂加载我的模板（${lines.length}个任务），确定导入吗？`))return;let s=0,skip=0,f=0;for(const line of lines){const parts=line.split(',').map(p=>p.trim());if(!parts[0])continue;try{const existing=await supabaseFetch(`tasks?guild_id=eq.${currentGuildId}&task_name=eq.${encodeURIComponent(parts[0])}&select=id`);if(existing.length){skip++;continue}await db.tasks.create({guild_id:currentGuildId,task_name:parts[0],score:parseInt(parts[1])||0});s++}catch(e){f++}}showToast(`✅导入${s}个${skip>0?'，跳过'+skip+'个':''}`,'success');loadTasksToSelect();loadTaskList()}
+function editPresetTemplate(){const current=PRESET_TEMPLATE.map(t=>t.join(',')).join('\n');const newData=prompt('✏️编辑预设模板（每行：任务名,分数）\n\n修改后保存会覆盖预设模板',current);if(newData===null)return;const lines=newData.split('\n').filter(l=>l.trim());const newTemplate=lines.map(l=>{const parts=l.split(',').map(p=>p.trim());return[parts[0],parseInt(parts[1])||0]});PRESET_TEMPLATE.length=0;newTemplate.forEach(t=>PRESET_TEMPLATE.push(t));showToast(`✅预设模板已更新（${PRESET_TEMPLATE.length}个任务）`,'success')}
 
 // ===== 启动 =====
-(async function init() {
-    const rememberedCode = getRememberedCode();
-    if (rememberedCode) document.getElementById('loginInput').value = rememberedCode;
-    const sess = session.get();
-    if (sess) {
-        if (sess.role === 'admin') { currentRole = 'admin'; showMainPage(); await loadAdminPage(); }
-        else if (sess.role === 'member' && sess.guildId) {
-            currentRole = 'member'; currentGuildId = sess.guildId;
-            try { const guilds = await db.guilds.get(sess.guildId);
-                if (guilds.length) { showMainPage(); await loadMemberPage(guilds[0]); }
-                else { showToast('⚠️ 公会已删除，请重新登录', 'warning'); showLoginPage(); }
-            } catch (e) { showMainPage(); }
-        }
-    }
-    resetTimeout();
-})();
+(async function init(){const rememberedCode=getRememberedCode();if(rememberedCode)document.getElementById('loginInput').value=rememberedCode;const sess=session.get();if(sess){if(sess.role==='admin'){currentRole='admin';showMainPage();await loadAdminPage()}else if(sess.role==='member'&&sess.guildId){currentRole='member';currentGuildId=sess.guildId;try{const guilds=await db.guilds.get(sess.guildId);if(guilds.length){showMainPage();await loadMemberPage(guilds[0])}else{showToast('⚠️公会已删除，请重新登录','warning');showLoginPage()}}catch(e){showMainPage()}}}resetTimeout()})();
 </script>
 </body>
 </html>

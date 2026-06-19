@@ -1027,8 +1027,10 @@ async function loadMemberList(filterQuery = '') {
             const aliasDisplay = m.alias ? m.alias.replace(/,/g, '、') : '无';
             html += `<div class="card">
                 <button class="btn-close" onclick="deleteMember(${m.id})" title="删除成员">✕</button>
-                <div class="card-header"><span class="card-title">👤 ${m.real_name}</span></div>
-                <div style="font-size:13px;color:var(--text2)">🏷️ 别名：${aliasDisplay}</div>
+<div class="card-header">
+    <span class="card-title">👤 ${m.real_name}</span>
+    <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g,"\\'")}','${(m.alias||'').replace(/'/g,"\\'")}')">✏️ 编辑别名</button>
+</div>                <div style="font-size:13px;color:var(--text2)">🏷️ 别名：${aliasDisplay}</div>
             </div>`;
         }
         listDiv.innerHTML = html;
@@ -1129,7 +1131,7 @@ async function loadGuildList() {
         html += `<div class="card guild-card">
             <div class="info-row"><span class="label">🏰 公会名称：</span><span class="value">${g.name}</span></div>
             <div class="info-row"><span class="label">🔑 邀请码：</span><span class="value" style="color:var(--gold);font-size:16px;font-weight:700">${g.invite_code}</span></div>
-            <div class="info-row"><span class="label">👥 人数：</span><span class="value"><div class="info-row"><span class="label">👥 人数：</span><span class="value">${countMap[g.id] || '?'} 人</span></div>
+            <div class="info-row"><span class="label">👥 人数：</span><span class="value">
             </span></div>
             <div class="info-row"><span class="label">📝 我的备注：</span><span class="note-highlight">${g.admin_note || '无'}</span></div>
             <div class="guild-actions">

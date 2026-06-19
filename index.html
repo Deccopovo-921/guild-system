@@ -544,18 +544,35 @@ async function addTask() {
     }catch(e){showToast('❌ 添加失败','error');}
 }
 async function batchImportTasks() {
-    if(!currentGuildId){showToast('⚠️ 请先进公会','warning');return;}
-    const text=document.getElementById('batchTaskImport').value.trim();
-    if(!text){showToast('⚠️ 请输入任务数据','warning');return;}
-    const lines=text.split('\n').filter(l=>l.trim());let s=0,f=0;
-    for(const line of lines){
-        const parts=line.split(',').map(p=>p.trim());
-        if(!parts[0]){f++;continue;}
-        try{await db.tasks.create({guild_id:currentGuildId,task_name:parts[0],score:parseInt(parts[1])||0});s++;}
-        catch(e){console.warn('任务导入失败:',parts[0],e.message);f++;}
+    if (!currentGuildId) { showToast('⚠️ 请先进公会', 'warning'); return; }
+    const text = document.getElementById('batchTaskImport').value.trim();
+    if (!text) { showToast('⚠️ 请输入任务数据', 'warning'); return; }
+    
+    const existingTasks = await db.tasks.list(currentGuildId);
+    const existingNames = new Set(existingTasks.map(t => t.task_name));
+    
+    const lines = text.split('\n').filter(l => l.trim());
+    let s = 0, f = 0, skip = 0;
+    
+    for (const line of lines) {
+        const parts = line.split(',').map(p => p.trim());
+        const name = parts[0];
+        if (!name) { f++; continue; }
+        if (existingNames.has(name)) { skip++; continue; }
+        try {
+            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: parseInt(parts[1]) || 0 });
+            existingNames.add(name);
+            s++;
+        } catch (e) { console.warn('任务导入失败:', name, e.message); f++; }
     }
-    showToast(`✅ 成功导入 ${s} 个${f>0?'，失败 '+f+' 个':''}`,s>0?'success':'error');
-    document.getElementById('batchTaskImport').value=''; loadTasksToSelect(); loadTaskList();
+    
+    let msg = `✅ 成功导入 ${s} 个`;
+    if (skip > 0) msg += `，跳过 ${skip} 个重复`;
+    if (f > 0) msg += `，失败 ${f} 个`;
+    showToast(msg, s > 0 ? 'success' : 'warning');
+    document.getElementById('batchTaskImport').value = '';
+    loadTasksToSelect();
+    loadTaskList();
 }
 function filterMemberDropdown(input,dropdown){
     const q=input.value.trim().toLowerCase();

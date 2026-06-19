@@ -1205,8 +1205,10 @@ async function loadMemberPage(guild) {
     currentGuildId = guild.id;
     document.getElementById('headerTitle').textContent = `🏰 ${guild.name}`;
     document.getElementById('headerBadge').textContent = '公会成员';
-    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:8px">✏️ 改名</button>`;
-    await refreshCurrentGuildData();
+    // 加载人数
+    let memberCount = 0;
+    try { const m = await db.members.list(currentGuildId); memberCount = m.length; } catch(e) {}
+    document.getElementById('headerInfo').innerHTML = `👥 ${memberCount}人 | 邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:8px">✏️ 改名</button>`;    await refreshCurrentGuildData();
     setupTabs([
         { name: '🔍 任务查询', id: 'tab-search' },
         { name: '📋 任务管理', id: 'tab-task-mgr' },

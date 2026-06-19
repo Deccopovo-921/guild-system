@@ -423,7 +423,6 @@ async function loadAdminPage() {
         { name:'🔍 查询', id:'tab-search' },
         { name:'📋 任务', id:'tab-task-mgr' },
         { name:'👥 成员', id:'tab-member-mgr' },
-        { name:'🏆 排行', id:'tab-rank' },
         { name:'🧠 推荐', id:'tab-recommend' },
         { name:'🏰 公会', id:'tab-guild-mgr' }
     ]);
@@ -452,7 +451,7 @@ function setupTabs(tabs) {
         tabContent.appendChild(panel);
     });
     initAdminSearchTab(); initTaskMgrTab(); initMemberMgrTab();
-    initRankTab(); initRecommendTab(); initGuildMgrTab();
+    initRecommendTab(); initGuildMgrTab();
 }
 
 // ===== 查询标签 =====
@@ -674,14 +673,7 @@ async function editMemberName(memberId,currentName){
     try{await db.members.update(memberId,{real_name:newName.trim()});showToast('✅ 大名已更新','success');await refreshCurrentGuildData();loadMemberList();}
     catch(e){showToast('❌ 修改失败，大名可能重复','error');}
 }
-// ===== 排行榜 =====
-function initRankTab() {
-    const panel = document.getElementById('tab-rank'); if (!panel) return;
-    panel.innerHTML = `
-        <div class="section-title">🏆 成员排行榜</div>
-        <div id="rankList"><div class="empty-state"><div class="icon">⏳</div><div class="text">加载中...</div></div></div>`;
-    loadRankList();
-}
+
 async function loadRankList() {
     const div = document.getElementById('rankList'); if (!div || !currentGuildId) return;
     try {
@@ -828,7 +820,7 @@ async function enterGuild(guildId) {
     currentGuildId = guildId; const guild = allGuilds.find(g => g.id === guildId);
     document.getElementById('headerTitle').textContent = `🏰 ${guild.name}`;
     document.getElementById('headerBadge').textContent = '管理员模式';
-    document.getElementById('headerInfo').textContent = `邀请码：${guild.invite_code}`;
+    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:6px">↩ 返回</button>`;
     await refreshCurrentGuildData();
     initAdminSearchTab(); initTaskMgrTab(); initMemberMgrTab(); initRankTab(); initRecommendTab();
     const tabs = document.querySelectorAll('.tab');
@@ -837,6 +829,21 @@ async function enterGuild(guildId) {
     if (tabs[0]) tabs[0].classList.add('active');
     const p0 = document.getElementById('tab-search'); if (p0) p0.classList.add('active');
     showToast(`✅ 已进入「${guild.name}」`, 'success');
+}
+async function backToAdmin() {
+    currentGuildId = null;
+    document.getElementById('headerTitle').textContent = '👑 管理员后台';
+    document.getElementById('headerBadge').textContent = '超级管理员';
+    document.getElementById('headerInfo').textContent = '管理所有公会';
+    await loadAllGuilds();
+    setupTabs([
+        { name:'🔍 查询', id:'tab-search' },
+        { name:'📋 任务', id:'tab-task-mgr' },
+        { name:'👥 成员', id:'tab-member-mgr' },
+        { name:'🧠 推荐', id:'tab-recommend' },
+        { name:'🏰 公会', id:'tab-guild-mgr' }
+    ]);
+    showToast('↩ 已返回管理员后台', 'info');
 }
 async function viewGuild(guildId) {
     const guild = allGuilds.find(g => g.id === guildId);
@@ -868,7 +875,6 @@ async function loadMemberPage(guild) {
         { name: '🔍 查询', id: 'tab-search' },
         { name: '📋 任务', id: 'tab-task-mgr' },
         { name: '👥 成员', id: 'tab-member-mgr' },
-        { name: '🏆 排行', id: 'tab-rank' },
         { name: '🧠 推荐', id: 'tab-recommend' }
     ]);
     initMemberSearchTab();

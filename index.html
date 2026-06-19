@@ -632,25 +632,6 @@ async function searchMemberForAdmin() {
             resultDiv.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配的成员</div></div>';
             return;
         }
-        let html = '';
-        for (const member of filtered) {
-            const tmList = await db.taskMembers.listByMember(member.id);
-            const taskIds = tmList.map(tm => tm.task_id);
-            const tasks = allTasks.filter(t => taskIds.includes(t.id));
-            html += `<div class="card">
-                <div class="card-header"><span class="card-title">👤 ${member.real_name}</span></div>
-                <div style="font-size:13px;color:var(--text2);margin-bottom:6px">别名：${member.alias || '无'}</div>
-                <div style="font-size:13px;color:var(--gold)">📋 能做的任务：</div>
-                <div class="member-tags">`;
-            if (tasks.length === 0) {
-                html += '<span style="color:var(--text2);font-size:12px">暂无</span>';
-            } else {
-                tasks.forEach(t => {
-                    html += `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`;
-                });
-            }
-            html += `</div></div>`;
-        }
         resultDiv.innerHTML = html;
     } catch(e) {
         resultDiv.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
@@ -948,8 +929,13 @@ function initMemberMgrTab() {
             <button class="btn btn-success" id="btnBatchImport">📥 批量导入</button>
         </div>
         <hr class="divider">
+        <!-- 成员搜索 -->
+        <div class="search-box">
+            <input type="text" id="memberSearchFilter" placeholder="🔍 搜索成员大名或别名...">
+            <button class="btn btn-accent btn-sm" id="btnClearMemberSearch">✕ 清除</button>
+        </div>
         <!-- 成员列表 -->
-        <div class="section-title">👥 所有成员</div>
+        <div class="section-title">👥 所有成员 <span id="memberCount" style="font-size:12px;color:var(--text2)"></span></div>
         <div id="memberList"></div>
     `;
 
@@ -959,7 +945,15 @@ function initMemberMgrTab() {
     });
     document.getElementById('btnBatchImport').addEventListener('click', batchImportMembers);
     
-    loadMemberList();
+loadMemberList();
+    
+    document.getElementById('memberSearchFilter').addEventListener('input', (e) => {
+        loadMemberList(e.target.value.trim());
+    });
+    document.getElementById('btnClearMemberSearch').addEventListener('click', () => {
+        document.getElementById('memberSearchFilter').value = '';
+        loadMemberList();
+    });
 }
 
 async function addMember() {
@@ -997,27 +991,39 @@ async function batchImportMembers() {
             await db.members.create({ guild_id: currentGuildId, real_name: name, alias });
             success++;
         } catch(e) {
+            console.warn('导入失败:', name, e.message);
             fail++;
         }
     }
     
-    showToast(`✅ 成功导入 ${success} 人${fail > 0 ? `，失败 ${fail} 人` : ''}`, success > 0 ? 'success' : 'error');
+     let failMsg = fail > 0 ? `，失败 ${fail} 人（按F12查看控制台）` : '';
+    showToast(`✅ 成功导入 ${success} 人${failMsg}`, success > 0 ? 'success' : 'error');
     document.getElementById('batchMemberImport').value = '';
     await refreshCurrentGuildData();
     loadMemberList();
 }
 
-async function loadMemberList() {
+async function loadMemberList(filterQuery = '') {
     const listDiv = document.getElementById('memberList');
     if (!listDiv || !currentGuildId) return;
     try {
         allMembers = await db.members.list(currentGuildId);
-        if (allMembers.length === 0) {
-            listDiv.innerHTML = '<div class="empty-state"><div class="icon">👻</div><div class="text">还没有成员，快来添加吧！</div></div>';
+        let filtered = allMembers;
+        if (filterQuery) {
+            const q = filterQuery.toLowerCase();
+            filtered = allMembers.filter(m => 
+                m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q)
+            );
+        }
+        const countEl = document.getElementById('memberCount');
+        if (countEl) countEl.textContent = `（${filtered.length}/${allMembers.length}人）`;
+        
+        if (filtered.length === 0) {
+            listDiv.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配的成员</div></div>';
             return;
         }
         let html = '';
-        for (const m of allMembers) {
+        for (const m of filtered) {
             const aliasDisplay = m.alias ? m.alias.replace(/,/g, '、') : '无';
             html += `<div class="card">
                 <button class="btn-close" onclick="deleteMember(${m.id})" title="删除成员">✕</button>
@@ -1112,12 +1118,19 @@ async function loadGuildList() {
         listDiv.innerHTML = '<div class="empty-state"><div class="icon">🏰</div><div class="text">还没有公会，快来创建第一个吧！</div></div>';
         return;
     }
-    
+        // 预加载人数
+    const countMap = {};
+    await Promise.all(allGuilds.map(async (g) => {
+        try { const m = await db.members.list(g.id); countMap[g.id] = m.length; }
+        catch(e) { countMap[g.id] = '?'; }
+    }));
     let html = '';
     for (const g of allGuilds) {
         html += `<div class="card guild-card">
             <div class="info-row"><span class="label">🏰 公会名称：</span><span class="value">${g.name}</span></div>
             <div class="info-row"><span class="label">🔑 邀请码：</span><span class="value" style="color:var(--gold);font-size:16px;font-weight:700">${g.invite_code}</span></div>
+            <div class="info-row"><span class="label">👥 人数：</span><span class="value"><div class="info-row"><span class="label">👥 人数：</span><span class="value">${countMap[g.id] || '?'} 人</span></div>
+            </span></div>
             <div class="info-row"><span class="label">📝 我的备注：</span><span class="note-highlight">${g.admin_note || '无'}</span></div>
             <div class="guild-actions">
                 <button class="btn btn-accent btn-sm" onclick="enterGuild(${g.id})">🚀 进入公会</button>
@@ -1192,7 +1205,7 @@ async function loadMemberPage(guild) {
     currentGuildId = guild.id;
     document.getElementById('headerTitle').textContent = `🏰 ${guild.name}`;
     document.getElementById('headerBadge').textContent = '公会成员';
-    document.getElementById('headerInfo').textContent = `邀请码：${guild.invite_code}`;
+    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:8px">✏️ 改名</button>`;
     await refreshCurrentGuildData();
     setupTabs([
         { name: '🔍 任务查询', id: 'tab-search' },
@@ -1431,6 +1444,20 @@ async function refreshCurrentGuildData() {
     
     resetTimeout();
 })();
+async function renameGuild() {
+    if (!currentGuildId) return;
+    try {
+        const guilds = await db.guilds.get(currentGuildId);
+        if (guilds.length === 0) return;
+        const newName = prompt('✏️ 修改公会名称', guilds[0].name);
+        if (newName === null || newName.trim() === '') return;
+        await db.guilds.update(currentGuildId, { name: newName.trim() });
+        document.getElementById('headerTitle').textContent = `🏰 ${newName.trim()}`;
+        showToast('✅ 公会名称已更新', 'success');
+    } catch(e) {
+        showToast('❌ 修改失败', 'error');
+    }
+}
 </script>
 </body>
 </html>

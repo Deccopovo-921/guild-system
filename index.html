@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏆 公会竞标赛</title>
     <style>
-         :root {
+        :root {
             --bg: #0d1117;
             --card: #161b22;
             --border: #30363d;
@@ -118,7 +118,8 @@
         }
         .login-card .btn-sync:hover { background: var(--hover); }
         .login-card .hint { font-size: 11px; color: var(--text2); margin-top: 12px; }
-        .login-card .maker { font-size: 11px; color: #555; margin-top: 16px; }        .main-wrap { display: none; min-height: 100vh; padding-top: 100px; }
+        .login-card .maker { font-size: 11px; color: #555; margin-top: 16px; }
+        .main-wrap { display: none; min-height: 100vh; padding-top: 100px; }
         .header {
             background: var(--card);
             border-bottom: 1px solid var(--border);
@@ -323,7 +324,8 @@
         .tier-btn.active, .tier-btn.gold-active { background: #2a2010; color: var(--gold); border-color: var(--gold); }
         .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
         .collapse-body { display: none; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 6px; }
-        .collapse-body.open { display: block; }    </style>
+        .collapse-body.open { display: block; }
+    </style>
 </head>
 <body>
 <div class="toast-container" id="toastContainer"></div>
@@ -352,8 +354,7 @@
     <div class="tabs" id="tabNav"></div>
     <div class="content" id="tabContent"></div>
 </div>
-<script>
-const ADMIN_KEY = '19990921';
+<script>const ADMIN_KEY = '19990921';
 const SUPABASE_URL = 'https://vpvdqoapskhtrgldpcwt.supabase.co/rest/v1';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdmRxb2Fwc2todHJnbGRwY3d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTM0MjIsImV4cCI6MjA5NzM4OTQyMn0.vq2mZihVUewqFDpXzhOIwdWYxzwN7kZcyEK0uY5wm0s';
 const TIMEOUT_MINUTES = 30;
@@ -587,25 +588,46 @@ async function searchMemberForAdmin() {
         div.innerHTML = !currentGuildId ? '<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>' : '';
         return;
     }
-    const members = await db.members.list(currentGuildId);
-    const filtered = members.filter(m => m.real_name.includes(q) || (m.alias || '').includes(q));
-    if (!filtered.length) {
-        div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
-        return;
+    showToast('🔍搜索中...', 'info');
+    try {
+        const members = await db.members.list(currentGuildId);
+        const filtered = members.filter(m => m.real_name.includes(q) || (m.alias || '').includes(q));
+        if (!filtered.length) {
+            div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
+            return;
+        }
+        const memberIds = filtered.map(m => m.id);
+        let allTaskMembers = [];
+        const batchSize = 50;
+        for (let i = 0; i < memberIds.length; i += batchSize) {
+            const batch = memberIds.slice(i, i + batchSize);
+            const ids = batch.join(',');
+            const results = await supabaseFetch(`task_members?member_id=in.(${ids})&select=*`);
+            allTaskMembers = allTaskMembers.concat(results);
+        }
+        const memberTaskMap = {};
+        for (const tm of allTaskMembers) {
+            if (!memberTaskMap[tm.member_id]) memberTaskMap[tm.member_id] = [];
+            memberTaskMap[tm.member_id].push(tm.task_id);
+        }
+        let html = '';
+        for (const m of filtered) {
+            const tids = memberTaskMap[m.id] || [];
+            const tasks = allTasks.filter(t => tids.includes(t.id));
+            html += `<div class="card">
+                <div class="card-header"><span class="card-title">👤${m.real_name}</span></div>
+                <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
+                <div style="font-size:11px;color:var(--gold)">📋能做：</div>
+                <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
+            </div>`;
+        }
+        div.innerHTML = html;
+        showToast(`✅找到${filtered.length}位成员`, 'success');
+    } catch (e) {
+        div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
+        showToast('❌查询失败', 'error');
+        console.error(e);
     }
-    let html = '';
-    for (const m of filtered) {
-        const tml = await db.taskMembers.listByMember(m.id);
-        const tids = tml.map(t => t.task_id);
-        const tasks = allTasks.filter(t => tids.includes(t.id));
-        html += `<div class="card">
-            <div class="card-header"><span class="card-title">👤${m.real_name}</span></div>
-            <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
-            <div style="font-size:11px;color:var(--gold)">📋能做：</div>
-            <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
-        </div>`;
-    }
-    div.innerHTML = html;
 }
 
 async function searchTaskForAdmin() {
@@ -615,33 +637,52 @@ async function searchTaskForAdmin() {
         div.innerHTML = !currentGuildId ? '<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>' : '';
         return;
     }
-    const tasks = await db.tasks.list(currentGuildId);
-    const filtered = tasks.filter(t => t.task_name.includes(q));
-    if (!filtered.length) {
-        div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
-        return;
+    showToast('🔍搜索中...', 'info');
+    try {
+        const tasks = await db.tasks.list(currentGuildId);
+        const filtered = tasks.filter(t => t.task_name.includes(q));
+        if (!filtered.length) {
+            div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
+            return;
+        }
+        const taskIds = filtered.map(t => t.id);
+        let allTaskMembers = [];
+        const batchSize = 50;
+        for (let i = 0; i < taskIds.length; i += batchSize) {
+            const batch = taskIds.slice(i, i + batchSize);
+            const ids = batch.join(',');
+            const results = await supabaseFetch(`task_members?task_id=in.(${ids})&select=*`);
+            allTaskMembers = allTaskMembers.concat(results);
+        }
+        const taskMemberMap = {};
+        for (const tm of allTaskMembers) {
+            if (!taskMemberMap[tm.task_id]) taskMemberMap[tm.task_id] = [];
+            taskMemberMap[tm.task_id].push(tm.member_id);
+        }
+        let html = '';
+        for (const t of filtered) {
+            const mids = taskMemberMap[t.id] || [];
+            const members = allMembers.filter(m => mids.includes(m.id));
+            html += `<div class="card">
+                <div class="card-header">
+                    <span class="card-title">📋${t.task_name}</span>
+                    <div style="display:flex;gap:3px;align-items:center">
+                        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                        <span class="tag gold">⭐${t.score}分</span>
+                    </div>
+                </div>
+                <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
+                <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
+            </div>`;
+        }
+        div.innerHTML = html;
+        showToast(`✅找到${filtered.length}个任务`, 'success');
+    } catch (e) {
+        div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
+        showToast('❌查询失败', 'error');
+        console.error(e);
     }
-    let html = '';
-    for (const t of filtered) {
-        const tml = await db.taskMembers.list(t.id);
-        const mids = tml.map(tm => tm.member_id);
-        const members = allMembers.filter(m => mids.includes(m.id));
-        html += `<div class="card">
-            <div class="card-header">
-    <span class="card-title">📋${t.task_name}</span>
-    <div style="display:flex;gap:3px;align-items:center">
-        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-        <span class="tag gold">⭐${t.score}分</span>
-    </div>
-</div>
-            <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
-            <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
-        </div>`;
-    }
-    div.innerHTML = html;
-}
-
-// ===== 任务管理 =====
+}// ===== 任务管理 =====
 function initTaskMgrTab() {
     const p = document.getElementById('tab-task-mgr');
     if (!p) return;
@@ -827,10 +868,24 @@ async function loadTaskList() {
             div.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';
             return;
         }
+        // 批量获取所有任务的成员关系
+        const taskIds = allTasks.map(t => t.id);
+        let allTaskMembers = [];
+        const batchSize = 50;
+        for (let i = 0; i < taskIds.length; i += batchSize) {
+            const batch = taskIds.slice(i, i + batchSize);
+            const ids = batch.join(',');
+            const results = await supabaseFetch(`task_members?task_id=in.(${ids})&select=*`);
+            allTaskMembers = allTaskMembers.concat(results);
+        }
+        const taskMemberMap = {};
+        for (const tm of allTaskMembers) {
+            if (!taskMemberMap[tm.task_id]) taskMemberMap[tm.task_id] = [];
+            taskMemberMap[tm.task_id].push(tm.member_id);
+        }
         let html = '';
         for (const t of allTasks) {
-            const tml = await db.taskMembers.list(t.id);
-            const mids = tml.map(tm => tm.member_id);
+            const mids = taskMemberMap[t.id] || [];
             const members = allMembers.filter(m => mids.includes(m.id));
             const checked = selectedTasks.has(t.id) ? 'checked' : '';
             html += `<div class="card">
@@ -839,12 +894,12 @@ async function loadTaskList() {
                     <div style="flex:1">
                         <button class="btn-close" onclick="deleteTask(${t.id})" title="删除任务">✕</button>
                         <div class="card-header">
-    <span class="card-title">📋${t.task_name}</span>
-    <div style="display:flex;gap:3px;align-items:center">
-        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-        <span class="tag gold">⭐${t.score}分</span>
-    </div>
-</div>
+                            <span class="card-title">📋${t.task_name}</span>
+                            <div style="display:flex;gap:3px;align-items:center">
+                                <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                                <span class="tag gold">⭐${t.score}分</span>
+                            </div>
+                        </div>
                         <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
                         <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
                     </div>
@@ -852,19 +907,29 @@ async function loadTaskList() {
             </div>`;
         }
         div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; }
+    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; console.error(e); }
 }
+
+// 🚀 修复：编辑任务同时修改名称和分数
 async function editTask(id, oldName, oldScore) {
     const newName = prompt('✏️修改任务名称', oldName);
     if (newName === null || newName.trim() === '') return;
-    const newScore = prompt('⭐修改分数', oldScore);
+    const newScore = prompt('⭐修改分数（当前：' + oldScore + '分）', oldScore);
     if (newScore === null || newScore.trim() === '') return;
+    const scoreNum = parseInt(newScore);
+    if (isNaN(scoreNum) || scoreNum < 0) {
+        showToast('⚠️请输入有效的分数（大于等于0）', 'warning');
+        return;
+    }
     try {
-        await db.tasks.update(id, { task_name: newName.trim(), score: parseInt(newScore) || 0 });
+        await db.tasks.update(id, { task_name: newName.trim(), score: scoreNum });
         showToast('✅任务已更新', 'success');
+        await refreshCurrentGuildData();
+        loadTasksToSelect();
         loadTaskList();
     } catch (e) { showToast('❌修改失败', 'error'); }
 }
+
 async function deleteTask(id) {
     if (!confirm('确定删除整个任务吗？')) return;
     try { await db.tasks.delete(id); showToast('🗑️已删除', 'success'); loadTaskList(); }
@@ -893,12 +958,12 @@ function filterTaskList(q) {
                 <div style="flex:1">
                     <button class="btn-close" onclick="deleteTask(${t.id})">✕</button>
                     <div class="card-header">
-    <span class="card-title">📋${t.task_name}</span>
-    <div style="display:flex;gap:3px;align-items:center">
-        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-        <span class="tag gold">⭐${t.score}分</span>
-    </div>
-</div>
+                        <span class="card-title">📋${t.task_name}</span>
+                        <div style="display:flex;gap:3px;align-items:center">
+                            <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                            <span class="tag gold">⭐${t.score}分</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>`;
@@ -1181,10 +1246,24 @@ async function loadAllMembersPlan() {
     try {
         const members = await db.members.list(currentGuildId);
         const tasks = await db.tasks.list(currentGuildId);
+        // 批量获取所有成员的任务关系
+        const memberIds = members.map(m => m.id);
+        let allTaskMembers = [];
+        const batchSize = 50;
+        for (let i = 0; i < memberIds.length; i += batchSize) {
+            const batch = memberIds.slice(i, i + batchSize);
+            const ids = batch.join(',');
+            const results = await supabaseFetch(`task_members?member_id=in.(${ids})&select=*`);
+            allTaskMembers = allTaskMembers.concat(results);
+        }
+        const memberTaskMap = {};
+        for (const tm of allTaskMembers) {
+            if (!memberTaskMap[tm.member_id]) memberTaskMap[tm.member_id] = [];
+            memberTaskMap[tm.member_id].push(tm.task_id);
+        }
         let plans = [];
         for (const m of members) {
-            const tml = await db.taskMembers.listByMember(m.id);
-            const tids = tml.map(t => t.task_id);
+            const tids = memberTaskMap[m.id] || [];
             const mtasks = tasks.filter(t => tids.includes(t.id));
             mtasks.sort((a, b) => b.score - a.score);
             const totalScore = mtasks.reduce((s, t) => s + t.score, 0);
@@ -1216,7 +1295,7 @@ async function loadAllMembersPlan() {
         });
         if (!html) html = '<div class="empty-state"><div class="icon">🎯</div><div class="text">还没有人设置目标</div></div>';
         div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; }
+    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; console.error(e); }
 }
 
 function toggleCollapse(header) {
@@ -1229,7 +1308,9 @@ function toggleCollapse(header) {
         body.classList.add('open');
         arrow.textContent = '收起▲';
     }
-}// ===== 公会管理 =====
+}
+
+// ===== 公会管理 =====
 function initGuildMgrTab() {
     const p = document.getElementById('tab-guild-mgr');
     if (!p) return;
@@ -1361,9 +1442,7 @@ async function deleteGuild(guildId, code) {
             document.getElementById('headerInfo').textContent = '管理所有公会';
         }
     } catch (e) { showToast('❌删除失败', 'error'); }
-}
-
-// ===== 公会成员页面 =====
+}// ===== 公会成员页面 =====
 async function loadMemberPage(guild) {
     currentGuildId = guild.id;
     document.getElementById('headerTitle').textContent = `🏰${guild.name}`;
@@ -1465,14 +1544,31 @@ async function searchTaskForMember() {
     const q = document.getElementById('memberSearchTask').value.trim();
     const div = document.getElementById('memberTaskResult');
     if (!q) { div.innerHTML = ''; return; }
+    showToast('🔍搜索中...', 'info');
     try {
         const tasks = await db.tasks.list(currentGuildId);
         const filtered = tasks.filter(t => t.task_name.includes(q));
-        if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>'; return; }
+        if (!filtered.length) {
+            div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
+            return;
+        }
+        const taskIds = filtered.map(t => t.id);
+        let allTaskMembers = [];
+        const batchSize = 50;
+        for (let i = 0; i < taskIds.length; i += batchSize) {
+            const batch = taskIds.slice(i, i + batchSize);
+            const ids = batch.join(',');
+            const results = await supabaseFetch(`task_members?task_id=in.(${ids})&select=*`);
+            allTaskMembers = allTaskMembers.concat(results);
+        }
+        const taskMemberMap = {};
+        for (const tm of allTaskMembers) {
+            if (!taskMemberMap[tm.task_id]) taskMemberMap[tm.task_id] = [];
+            taskMemberMap[tm.task_id].push(tm.member_id);
+        }
         let html = '';
         for (const t of filtered) {
-            const tml = await db.taskMembers.list(t.id);
-            const mids = tml.map(tm => tm.member_id);
+            const mids = taskMemberMap[t.id] || [];
             const members = allMembers.filter(m => mids.includes(m.id));
             html += `<div class="card">
                 <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
@@ -1483,7 +1579,12 @@ async function searchTaskForMember() {
         }
         div.innerHTML = html;
         document.getElementById('addSelfBox').style.display = 'none';
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'; }
+        showToast(`✅找到${filtered.length}个任务`, 'success');
+    } catch (e) {
+        div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
+        showToast('❌查询失败', 'error');
+        console.error(e);
+    }
 }
 
 async function addSelfToTask() {
@@ -1574,6 +1675,7 @@ const PRESET_TEMPLATE = [
     ["上官婉儿+5素心守正",30],["夏雨荷+5青荷雨待",30],["觉醒＋3高启强",30],["含香 蝶翼破茧",30]
 ];
 
+// 🚀 优化：预设模板导入（显示进度）
 async function usePresetTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     if (!confirm(`⚠️将导入预设模板（${PRESET_TEMPLATE.length}个任务），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
@@ -1581,19 +1683,38 @@ async function usePresetTemplate() {
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
-        let s = 0, skip = 0;
+        const tasksToCreate = [];
+        let skip = 0;
         for (const [name, score] of PRESET_TEMPLATE) {
             if (existingNames.has(name)) { skip++; continue; }
-            try {
-                await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score });
-                existingNames.add(name);
-                s++;
-            } catch (e) {}
+            tasksToCreate.push({ guild_id: currentGuildId, task_name: name, score: score });
+            existingNames.add(name);
         }
-        showToast(`✅导入${s}个${skip > 0 ? '，跳过' + skip + '个' : ''}`, 'success');
+        if (!tasksToCreate.length) {
+            showToast(`⚠️所有任务已存在（${skip}个）`, 'warning');
+            return;
+        }
+        let s = 0;
+        const total = tasksToCreate.length;
+        let lastProgress = 0;
+        for (let i = 0; i < tasksToCreate.length; i++) {
+            try {
+                await db.tasks.create(tasksToCreate[i]);
+                s++;
+                const progress = Math.floor((i + 1) / total * 100);
+                if (progress >= lastProgress + 10 || i === tasksToCreate.length - 1 || i % 10 === 0) {
+                    showToast(`⏳导入进度：${i + 1}/${total} (${progress}%)`, 'info');
+                    lastProgress = progress;
+                }
+            } catch (e) {
+                console.warn('导入失败:', tasksToCreate[i].task_name, e.message);
+            }
+        }
+        showToast(`✅成功导入${s}个${skip > 0 ? '，跳过' + skip + '个已有任务' : ''}`, 'success');
+        await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
-    } catch (e) { showToast('❌导入失败', 'error'); }
+    } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
 function saveMyTemplate() {
@@ -1603,6 +1724,7 @@ function saveMyTemplate() {
     showToast(`💾已保存${allTasks.length}个任务为模板`, 'success');
 }
 
+// 🚀 优化：加载我的模板（显示进度）
 async function loadMyTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const data = localStorage.getItem('guild_my_template');
@@ -1613,21 +1735,37 @@ async function loadMyTemplate() {
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
-        let s = 0, skip = 0;
+        const tasksToCreate = [];
+        let skip = 0;
         for (const line of lines) {
             const parts = line.split(',').map(p => p.trim());
             if (!parts[0]) continue;
             if (existingNames.has(parts[0])) { skip++; continue; }
+            tasksToCreate.push({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0 });
+            existingNames.add(parts[0]);
+        }
+        if (!tasksToCreate.length) {
+            showToast(`⚠️所有任务已存在（${skip}个）`, 'warning');
+            return;
+        }
+        let s = 0;
+        const total = tasksToCreate.length;
+        for (let i = 0; i < tasksToCreate.length; i++) {
             try {
-                await db.tasks.create({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0 });
-                existingNames.add(parts[0]);
+                await db.tasks.create(tasksToCreate[i]);
                 s++;
-            } catch (e) {}
+                if (i % 10 === 0 || i === tasksToCreate.length - 1) {
+                    showToast(`⏳导入进度：${i + 1}/${total}`, 'info');
+                }
+            } catch (e) {
+                console.warn('导入失败:', tasksToCreate[i].task_name, e.message);
+            }
         }
         showToast(`✅导入${s}个${skip > 0 ? '，跳过' + skip + '个' : ''}`, 'success');
+        await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
-    } catch (e) { showToast('❌导入失败', 'error'); }
+    } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
 function editPresetTemplate() {

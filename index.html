@@ -354,7 +354,8 @@
     <div class="tabs" id="tabNav"></div>
     <div class="content" id="tabContent"></div>
 </div>
-<script>const ADMIN_KEY = '19990921';
+<script>
+const ADMIN_KEY = '19990921';
 const SUPABASE_URL = 'https://vpvdqoapskhtrgldpcwt.supabase.co/rest/v1';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwdmRxb2Fwc2todHJnbGRwY3d0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MTM0MjIsImV4cCI6MjA5NzM4OTQyMn0.vq2mZihVUewqFDpXzhOIwdWYxzwN7kZcyEK0uY5wm0s';
 const TIMEOUT_MINUTES = 30;
@@ -553,7 +554,9 @@ function setupTabs(tabs) {
     initMemberMgrTab();
     initRecommendTab();
     initGuildMgrTab();
-}// ===== 查询标签 =====
+}
+
+// ===== 查询标签 =====
 function initAdminSearchTab() {
     const p = document.getElementById('tab-search');
     if (!p) return;
@@ -682,7 +685,9 @@ async function searchTaskForAdmin() {
         showToast('❌查询失败', 'error');
         console.error(e);
     }
-}// ===== 任务管理 =====
+}
+
+// ===== 任务管理 =====
 function initTaskMgrTab() {
     const p = document.getElementById('tab-task-mgr');
     if (!p) return;
@@ -996,14 +1001,6 @@ async function doUpdateTask(id, newName, newScore) {
         console.error(e);
     }
 }
-    try {
-        await db.tasks.update(id, { task_name: newName.trim(), score: scoreNum });
-        showToast('✅任务已更新', 'success');
-        await refreshCurrentGuildData();
-        loadTasksToSelect();
-        loadTaskList();
-    } catch (e) { showToast('❌修改失败', 'error'); }
-}
 
 async function deleteTask(id) {
     if (!confirm('确定删除整个任务吗？')) return;
@@ -1044,7 +1041,9 @@ function filterTaskList(q) {
         </div>`;
     }
     div.innerHTML = html;
-}// ===== 成员管理 =====
+}
+
+// ===== 成员管理 =====
 function initMemberMgrTab() {
     const p = document.getElementById('tab-member-mgr');
     if (!p) return;
@@ -1187,7 +1186,9 @@ async function editAlias(memberId, name, currentAlias) {
         await refreshCurrentGuildData();
         loadMemberList();
     } catch (e) { showToast('❌更新失败', 'error'); }
-}// ===== 智能推荐 =====
+}
+
+// ===== 智能推荐 =====
 let memberTargets = {};
 
 function initRecommendTab() {
@@ -1517,7 +1518,9 @@ async function deleteGuild(guildId, code) {
             document.getElementById('headerInfo').textContent = '管理所有公会';
         }
     } catch (e) { showToast('❌删除失败', 'error'); }
-}// ===== 公会成员页面 =====
+}
+
+// ===== 公会成员页面 =====
 async function loadMemberPage(guild) {
     currentGuildId = guild.id;
     document.getElementById('headerTitle').textContent = `🏰${guild.name}`;

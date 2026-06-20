@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏆 公会竞标赛</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
         :root {
             --bg: #0d1117;
             --card: #161b22;
@@ -19,38 +28,8 @@
             --hover: #1c2129;
             --radius: 12px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.5;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-        }
-        .toast-container {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
-            width: 90%;
-            max-width: 500px;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            text-align: center;
-            animation: toastIn .3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,.4);
-            pointer-events: auto;
-        }
+        .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 90%; max-width: 500px; }
+        .toast { padding: 12px 20px; border-radius: 10px; font-size: 14px; text-align: center; animation: toastIn .3s ease; box-shadow: 0 4px 20px rgba(0,0,0,.4); pointer-events: auto; }
         .toast.success { background: #1a3a2a; color: #3fb950; border: 1px solid #3fb95040; }
         .toast.error { background: #3a1a1a; color: #f85149; border: 1px solid #f8514940; }
         .toast.info { background: #1a2a3a; color: #58a6ff; border: 1px solid #58a6ff40; }
@@ -58,197 +37,53 @@
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .toast.fadeout { animation: toastOut .3s ease forwards; }
         @keyframes toastOut { to { opacity: 0; transform: translateY(-20px); } }
-        .login-wrap {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .login-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 36px 28px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+        .login-wrap { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 36px 28px; width: 100%; max-width: 400px; text-align: center; }
         .login-card .logo { font-size: 48px; margin-bottom: 8px; }
         .login-card h1 { font-size: 24px; margin-bottom: 4px; color: #fff; }
         .login-card .sub { color: var(--text2); font-size: 13px; margin-bottom: 24px; }
         .login-card label { display: block; text-align: left; font-size: 13px; color: var(--text2); margin-bottom: 6px; }
-        .login-card input {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-            transition: border .2s;
-            margin-bottom: 16px;
-            text-align: center;
-        }
+        .login-card input { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 10px; font-size: 15px; outline: none; transition: border .2s; margin-bottom: 16px; text-align: center; }
         .login-card input:focus { border-color: var(--accent); }
-        .login-card .btn-login {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            background: var(--accent);
-            color: #fff;
-            margin-bottom: 12px;
-        }
+        .login-card .btn-login { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .2s; background: var(--accent); color: #fff; margin-bottom: 12px; }
         .login-card .btn-login:hover { opacity: .9; }
-        .login-card .btn-sync {
-            width: 100%;
-            padding: 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            cursor: pointer;
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text2);
-        }
+        .login-card .btn-sync { width: 100%; padding: 8px; border-radius: 10px; font-size: 12px; cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--text2); }
         .login-card .btn-sync:hover { background: var(--hover); }
         .login-card .hint { font-size: 11px; color: var(--text2); margin-top: 12px; }
         .login-card .maker { font-size: 11px; color: #555; margin-top: 16px; }
         .main-wrap { display: none; min-height: 100vh; padding-top: 100px; }
-        .header {
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            padding: 8px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 200;
-            min-height: 48px;
-        }
+        .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 6px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; min-height: 48px; }
         .header .title-area { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .header .title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; }
         .header .guild-info { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 35%; }
         .header .badge { font-size: 9px; padding: 2px 6px; border-radius: 10px; background: var(--tag-bg); color: var(--accent); white-space: nowrap; }
-        .btn-logout {
-            background: transparent;
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
+        .btn-logout { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; white-space: nowrap; flex-shrink: 0; }
         .btn-logout:hover { background: var(--danger); color: #fff; }
         .btn-xs { padding: 2px 6px; font-size: 10px; border-radius: 4px; }
-        .tabs {
-            display: flex;
-            gap: 3px;
-            padding: 6px 10px;
-            overflow-x: auto;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            position: fixed;
-            top: 48px;
-            left: 0;
-            right: 0;
-            z-index: 199;
-            -webkit-overflow-scrolling: touch;
-        }
+        .tabs { display: flex; gap: 3px; padding: 6px 10px; overflow-x: auto; background: var(--card); border-bottom: 1px solid var(--border); position: fixed; top: 48px; left: 0; right: 0; z-index: 199; -webkit-overflow-scrolling: touch; }
         .tabs::-webkit-scrollbar { height: 0; }
-        .tab {
-            padding: 5px 10px;
-            border-radius: 16px;
-            font-size: 11px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all .2s;
-            background: var(--bg);
-            color: var(--text2);
-            border: 1px solid var(--border);
-            flex-shrink: 0;
-            font-weight: 500;
-        }
+        .tab { padding: 5px 10px; border-radius: 16px; font-size: 11px; white-space: nowrap; cursor: pointer; transition: all .2s; background: var(--bg); color: var(--text2); border: 1px solid var(--border); flex-shrink: 0; font-weight: 500; }
         .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         .tab:hover:not(.active) { background: var(--hover); }
         .content { padding: 12px; max-width: 900px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 12px;
-            margin-bottom: 8px;
-            position: relative;
-            transition: border .2s;
-        }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-bottom: 8px; position: relative; transition: border .2s; }
         .card:hover { border-color: #4a5568; }
         .card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px; flex-wrap: wrap; }
         .card .card-title { font-size: 13px; font-weight: 600; color: #fff; }
-        .card .btn-close {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            color: var(--text2);
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all .2s;
-            line-height: 1;
-            z-index: 2;
-        }
+        .card .btn-close { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; border: none; background: transparent; color: var(--text2); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all .2s; line-height: 1; z-index: 2; }
         .card .btn-close:hover { background: var(--danger); color: #fff; }
         .form-group { margin-bottom: 8px; }
         .form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 2px; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 7px 8px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 6px;
-            font-size: 12px;
-            outline: none;
-            transition: border .2s;
-            font-family: inherit;
-        }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 7px 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 12px; outline: none; transition: border .2s; font-family: inherit; }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
         .form-group textarea { resize: vertical; min-height: 60px; }
         .form-row { display: flex; gap: 6px; flex-wrap: wrap; }
         .form-row .form-group { flex: 1; min-width: 80px; }
         select { appearance: none; -webkit-appearance: none; cursor: pointer; }
         select option { background: var(--card); color: var(--text); }
-        .btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all .2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-        }
+        .btn { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all .2s; display: inline-flex; align-items: center; gap: 3px; }
         .btn-accent { background: var(--accent); color: #fff; }
         .btn-accent:hover { background: #4090e0; }
         .btn-danger { background: var(--danger); color: #fff; }
@@ -275,20 +110,7 @@
         .guild-card .note-highlight { color: var(--gold); font-size: 10px; }
         .guild-card .guild-actions { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
         .dropdown-wrap { position: relative; }
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 6px 16px rgba(0,0,0,.5);
-        }
+        .dropdown-menu { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--card); border: 1px solid var(--border); border-radius: 6px; max-height: 150px; overflow-y: auto; display: none; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
         .dropdown-menu.show { display: block; }
         .dropdown-item { padding: 7px 10px; cursor: pointer; font-size: 12px; transition: background .2s; }
         .dropdown-item:hover { background: var(--hover); }
@@ -297,29 +119,8 @@
         .empty-state .text { font-size: 12px; }
         .divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
         .section-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
-        .score-big { font-size: 20px; font-weight: 700; color: var(--gold); }
         .highlight-box { background: var(--tag-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0; }
-        .tier-btn {
-            padding: 4px 8px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: var(--tag-bg);
-            color: var(--text2);
-            cursor: pointer;
-            font-size: 10px;
-            transition: all .2s;
-        }
-        .tier-btn.active, .tier-btn.gold-active { background: #2a2010; color: var(--gold); border-color: var(--gold); }
-        .collapse-header {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 6px;
-            border-radius: 6px;
-            transition: background .2s;
-            user-select: none;
-        }
+        .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border-radius: 6px; transition: background .2s; user-select: none; }
         .collapse-header:hover { background: var(--hover); }
         .collapse-header .arrow { transition: transform .2s; font-size: 12px; }
         .collapse-header .arrow.open { transform: rotate(90deg); }
@@ -327,225 +128,56 @@
         .collapse-body.open { display: block; }
         .category-count { font-size: 11px; color: var(--text2); font-weight: 400; }
         .task-grid { display: flex; flex-direction: column; gap: 4px; }
-        .task-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 6px;
-            border-radius: 4px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            transition: background .2s;
-        }
+        .task-item { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); transition: background .2s; cursor: pointer; }
         .task-item:hover { background: var(--hover); }
+        .task-item .task-main { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; width: 100%; }
         .task-item .task-name { font-size: 12px; flex: 1; color: var(--text); }
         .task-item .task-score { font-size: 11px; color: var(--gold); font-weight: 600; margin-right: 4px; }
         .task-item .task-actions { display: flex; gap: 2px; flex-shrink: 0; }
         .task-item .task-actions .btn { padding: 1px 4px; font-size: 9px; }
-        .result-log { max-height: 150px; overflow-y: auto; font-size: 12px; margin-top: 6px; padding: 6px; background: var(--bg); border-radius: 4px; border: 1px solid var(--border); }
-        .result-log .ok { color: var(--success); }
-        .result-log .skip { color: var(--text2); }
-        .result-log .fail { color: var(--danger); }
-        .result-log .info { color: var(--accent); }
-        .empty-category { color: var(--text2); font-size: 11px; padding: 4px 6px; }
-        .task-check-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 4px 0;
-        }
-        .task-check-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: background .2s;
-            font-size: 12px;
-        }
-        .task-check-item:hover { background: var(--hover); }
-        .task-check-item input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .task-check-item .tci-name { flex: 1; color: var(--text); }
-        .task-check-item .tci-score { color: var(--gold); font-weight: 600; font-size: 11px; }
-        .task-check-item .tci-existing { color: var(--success); font-size: 10px; }
-        .task-check-item.disabled { opacity: 0.5; cursor: not-allowed; }
-        .task-check-item.disabled:hover { background: var(--bg); }
-        .task-check-item .tci-category { color: var(--text2); font-size: 10px; }
-        .sub-tag-filter {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: var(--text2);
-            margin-bottom: 6px;
-            padding: 4px 0;
-        }
-        .sub-tag-filter input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: var(--accent);
-        }
-        .score-filter-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            padding: 4px 0 8px 0;
-        }
-        .score-filter-group label {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            font-size: 12px;
-            color: var(--text2);
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            transition: all .2s;
-        }
+        .task-item .task-people { display: none; padding-left: 24px; margin-top: 2px; width: 100%; flex-wrap: wrap; gap: 3px; }
+        .task-item .task-people.open { display: flex; }
+        .task-item .toggle-icon { font-size: 10px; color: var(--text2); margin-right: 4px; transition: transform .2s; }
+        .task-item .toggle-icon.open { transform: rotate(90deg); }
+        .person-tag { display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px 2px 8px; border-radius: 12px; font-size: 11px; background: var(--tag-bg); border: 1px solid var(--border); margin: 2px 4px 2px 0; }
+        .person-tag .remove-person { cursor: pointer; color: var(--text2); font-size: 11px; line-height: 1; margin-left: 2px; }
+        .person-tag .remove-person:hover { color: var(--danger); }
+        .sub-tag-filter { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); margin-bottom: 6px; padding: 4px 0; }
+        .sub-tag-filter input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+        .score-filter-group { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 0 8px 0; }
+        .score-filter-group label { display: flex; align-items: center; gap: 2px; font-size: 12px; color: var(--text2); cursor: pointer; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg); transition: all .2s; }
         .score-filter-group label:hover { background: var(--hover); }
         .score-filter-group label.checked { border-color: var(--accent); color: var(--text); background: var(--tag-bg); }
         .score-filter-group input[type="checkbox"] { display: none; }
-        .recommend-result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 10px;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-        }
-        .recommend-result-item:last-child { border-bottom: none; }
-        .recommend-result-item .r-name { color: var(--text); }
-        .recommend-result-item .r-score { color: var(--gold); font-weight: 600; }
-        .rule-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 8px;
-            border-bottom: 1px solid var(--border);
-            font-size: 12px;
-        }
-        .rule-item:last-child { border-bottom: none; }
-        .rule-item .rule-keyword { color: var(--text); }
-        .rule-item .rule-category { color: var(--gold); font-size: 11px; }
-        .rule-item .rule-subtag { color: var(--accent); font-size: 11px; }
-        .rule-item .rule-actions { display: flex; gap: 4px; }
-        @media (max-width: 600px) {
-            .task-check-grid { grid-template-columns: 1fr; }
-            .score-filter-group label { font-size: 11px; padding: 2px 5px; }
-        }
-        .config-card { border: 1px solid var(--gold); }
-        .config-card .card-title { color: var(--gold); }
-        .tag-rule { 
-            display: inline-block; 
-            padding: 2px 8px; 
-            border-radius: 12px; 
-            font-size: 10px; 
-            margin: 2px 3px 2px 0;
-        }
-        .tag-rule.category { background: #1a2a1a; color: #7ddf7d; }
-        .tag-rule.subtag { background: #1a1a2a; color: #7d7ddf; }
-        .recommend-card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-            margin-top: 8px;
-        }
-        .recommend-card {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 12px;
-            position: relative;
-            transition: border .2s;
-            cursor: pointer;
-        }
+        .recommend-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
+        .recommend-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; position: relative; transition: border .2s; cursor: pointer; }
         .recommend-card:hover { border-color: var(--accent); }
         .recommend-card .rc-name { font-size: 14px; font-weight: 600; color: var(--text); }
         .recommend-card .rc-target { font-size: 12px; color: var(--gold); }
         .recommend-card .rc-scores { font-size: 11px; color: var(--text2); }
         .recommend-card .rc-count { font-size: 11px; color: var(--text2); }
-        .recommend-card .rc-delete {
-            position: absolute;
-            top: 4px;
-            right: 6px;
-            background: none;
-            border: none;
-            color: var(--text2);
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0 4px;
-        }
+        .recommend-card .rc-delete { position: absolute; top: 4px; right: 6px; background: none; border: none; color: var(--text2); cursor: pointer; font-size: 14px; padding: 0 4px; }
         .recommend-card .rc-delete:hover { color: var(--danger); }
-        .recommend-card .rc-edit {
-            position: absolute;
-            bottom: 4px;
-            right: 6px;
-            background: none;
-            border: none;
-            color: var(--text2);
-            cursor: pointer;
-            font-size: 11px;
-            padding: 0 4px;
-        }
+        .recommend-card .rc-edit { position: absolute; bottom: 4px; right: 6px; background: none; border: none; color: var(--text2); cursor: pointer; font-size: 11px; padding: 0 4px; }
         .recommend-card .rc-edit:hover { color: var(--accent); }
         .recommend-card .rc-body { display: none; padding-top: 6px; margin-top: 6px; border-top: 1px solid var(--border); }
         .recommend-card .rc-body.open { display: block; }
         .recommend-card .rc-body .task-item { font-size: 11px; padding: 2px 4px; }
-        .member-search-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-            box-shadow: 0 6px 16px rgba(0,0,0,.5);
-        }
+        .task-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
+        .task-check-item { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: background .2s; font-size: 12px; }
+        .task-check-item:hover { background: var(--hover); }
+        .task-check-item input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+        .task-check-item .tci-name { flex: 1; color: var(--text); }
+        .task-check-item .tci-score { color: var(--gold); font-weight: 600; font-size: 11px; }
+        .task-check-item .tci-existing { color: var(--success); font-size: 10px; }
+        .task-check-item.disabled { opacity: 0.5; cursor: not-allowed; }
+        .task-check-item.disabled:hover { background: var(--bg); }
+        .member-search-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--card); border: 1px solid var(--border); border-radius: 6px; max-height: 150px; overflow-y: auto; display: none; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
         .member-search-dropdown.show { display: block; }
-        .member-search-dropdown .ms-item {
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background .2s;
-        }
+        .member-search-dropdown .ms-item { padding: 6px 10px; cursor: pointer; font-size: 13px; transition: background .2s; }
         .member-search-dropdown .ms-item:hover { background: var(--hover); }
         .search-input-wrap { position: relative; }
-        .person-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            padding: 2px 6px 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            background: var(--tag-bg);
-            border: 1px solid var(--border);
-            margin: 2px 4px 2px 0;
-        }
-        .person-tag .remove-person {
-            cursor: pointer;
-            color: var(--text2);
-            font-size: 11px;
-            line-height: 1;
-            margin-left: 2px;
-        }
-        .person-tag .remove-person:hover { color: var(--danger); }
-        .person-tag .star { color: var(--gold); margin-right: 2px; }
+        @media (max-width: 600px) { .task-check-grid { grid-template-columns: 1fr; } .score-filter-group label { font-size: 11px; padding: 2px 5px; } }
     </style>
 </head>
 <body>
@@ -587,7 +219,6 @@ const ACHIEVEMENT_TIERS = [
     { name: '💎稀有', score: 1300, rewards: '称号+聊天气泡+领带' },
     { name: '👑传说', score: 1400, rewards: '皮肤+聊天气泡7天+称号7天+领带' }
 ];
-
 const TASK_CATEGORIES = [
     { id: '人才', icon: '👤', name: '人才' },
     { id: '人才觉醒', icon: '⚡', name: '人才觉醒' },
@@ -596,105 +227,106 @@ const TASK_CATEGORIES = [
     { id: '艺人皮肤', icon: '👗', name: '艺人皮肤' },
     { id: '守护神', icon: '🛡️', name: '守护神' }
 ];
-
 const SUB_TAGS = ['农', '商', '文', '娱', '无'];
 const SCORE_FILTERS = [30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 18, 16, 14, 10];
 
-function getCategoryLabel(categoryId) {
-    if (!categoryId) return '📂 未分类';
-    const found = TASK_CATEGORIES.find(c => c.id === categoryId);
-    return found ? found.icon + ' ' + found.name : '📂 未分类';
-}
-
-function showToast(msg, type = 'info') {
-    const c = document.getElementById('toastContainer');
-    const t = document.createElement('div');
+function showToast(msg, type) {
+    type = type || 'info';
+    var c = document.getElementById('toastContainer');
+    var t = document.createElement('div');
     t.className = 'toast ' + type;
     t.textContent = msg;
     c.appendChild(t);
-    setTimeout(() => {
+    setTimeout(function() {
         t.classList.add('fadeout');
-        setTimeout(() => t.remove(), 300);
+        setTimeout(function() { t.remove(); }, 300);
     }, 2800);
 }
 
-async function supabaseFetch(endpoint, method = 'GET', body = null) {
-    const url = `${SUPABASE_URL}/${endpoint}`;
-    const headers = {
+async function supabaseFetch(endpoint, method, body) {
+    method = method || 'GET';
+    var url = SUPABASE_URL + '/' + endpoint;
+    var headers = {
         'apikey': SUPABASE_KEY,
         'Authorization': 'Bearer ' + SUPABASE_KEY,
         'Content-Type': 'application/json',
         'Prefer': 'return=representation'
     };
-    const options = { method, headers };
+    var options = { method: method, headers: headers };
     if (body && method !== 'GET') options.body = JSON.stringify(body);
-    const res = await fetch(url, options);
+    var res = await fetch(url, options);
     if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
+        var err = await res.json().catch(function() { return {}; });
         throw new Error(err.message || 'HTTP ' + res.status);
     }
-    const text = await res.text();
+    var text = await res.text();
     return text ? JSON.parse(text) : [];
 }
 
-const db = {
+var db = {
     guilds: {
-        list: () => supabaseFetch('guilds?select=*&order=created_at.desc'),
-        get: (id) => supabaseFetch('guilds?id=eq.' + id + '&select=*'),
-        getByCode: (code) => supabaseFetch('guilds?invite_code=eq.' + code + '&select=*'),
-        create: (data) => supabaseFetch('guilds', 'POST', data),
-        update: (id, data) => supabaseFetch('guilds?id=eq.' + id, 'PATCH', data),
-        delete: (id) => supabaseFetch('guilds?id=eq.' + id, 'DELETE')
+        list: function() { return supabaseFetch('guilds?select=*&order=created_at.desc'); },
+        get: function(id) { return supabaseFetch('guilds?id=eq.' + id + '&select=*'); },
+        getByCode: function(code) { return supabaseFetch('guilds?invite_code=eq.' + code + '&select=*'); },
+        create: function(data) { return supabaseFetch('guilds', 'POST', data); },
+        update: function(id, data) { return supabaseFetch('guilds?id=eq.' + id, 'PATCH', data); },
+        delete: function(id) { return supabaseFetch('guilds?id=eq.' + id, 'DELETE'); }
     },
     members: {
-        list: (guildId) => supabaseFetch('members?guild_id=eq.' + guildId + '&select=*&order=real_name.asc'),
-        getByName: (guildId, name) => supabaseFetch('members?guild_id=eq.' + guildId + '&real_name=eq.' + encodeURIComponent(name) + '&select=*'),
-        create: (data) => supabaseFetch('members', 'POST', data),
-        update: (id, data) => supabaseFetch('members?id=eq.' + id, 'PATCH', data),
-        delete: (id) => supabaseFetch('members?id=eq.' + id, 'DELETE')
+        list: function(guildId) { return supabaseFetch('members?guild_id=eq.' + guildId + '&select=*&order=real_name.asc'); },
+        getByName: function(guildId, name) { return supabaseFetch('members?guild_id=eq.' + guildId + '&real_name=eq.' + encodeURIComponent(name) + '&select=*'); },
+        create: function(data) { return supabaseFetch('members', 'POST', data); },
+        update: function(id, data) { return supabaseFetch('members?id=eq.' + id, 'PATCH', data); },
+        delete: function(id) { return supabaseFetch('members?id=eq.' + id, 'DELETE'); }
     },
     tasks: {
-        list: (guildId) => supabaseFetch('tasks?guild_id=eq.' + guildId + '&select=*&order=task_name.asc'),
-        create: (data) => supabaseFetch('tasks', 'POST', data),
-        update: (id, data) => supabaseFetch('tasks?id=eq.' + id, 'PATCH', data),
-        delete: (id) => supabaseFetch('tasks?id=eq.' + id, 'DELETE')
+        list: function(guildId) { return supabaseFetch('tasks?guild_id=eq.' + guildId + '&select=*&order=task_name.asc'); },
+        create: function(data) { return supabaseFetch('tasks', 'POST', data); },
+        update: function(id, data) { return supabaseFetch('tasks?id=eq.' + id, 'PATCH', data); },
+        delete: function(id) { return supabaseFetch('tasks?id=eq.' + id, 'DELETE'); }
     },
     taskMembers: {
-        list: (taskId) => supabaseFetch('task_members?task_id=eq.' + taskId + '&select=*'),
-        listByMember: (memberId) => supabaseFetch('task_members?member_id=eq.' + memberId + '&select=*'),
-        add: (data) => supabaseFetch('task_members', 'POST', data),
-        delete: (id) => supabaseFetch('task_members?id=eq.' + id, 'DELETE'),
-        deleteByTaskAndMember: (taskId, memberId) => supabaseFetch('task_members?task_id=eq.' + taskId + '&member_id=eq.' + memberId, 'DELETE')
+        list: function(taskId) { return supabaseFetch('task_members?task_id=eq.' + taskId + '&select=*'); },
+        listByMember: function(memberId) { return supabaseFetch('task_members?member_id=eq.' + memberId + '&select=*'); },
+        add: function(data) { return supabaseFetch('task_members', 'POST', data); },
+        delete: function(id) { return supabaseFetch('task_members?id=eq.' + id, 'DELETE'); },
+        deleteByTaskAndMember: function(taskId, memberId) { return supabaseFetch('task_members?task_id=eq.' + taskId + '&member_id=eq.' + memberId, 'DELETE'); }
     },
     recommendTargets: {
-        list: (guildId) => supabaseFetch('recommend_targets?guild_id=eq.' + guildId + '&select=*'),
-        upsert: (data) => supabaseFetch('recommend_targets', 'POST', data),
-        delete: (guildId, memberId) => supabaseFetch('recommend_targets?guild_id=eq.' + guildId + '&member_id=eq.' + memberId, 'DELETE')
+        list: function(guildId) { return supabaseFetch('recommend_targets?guild_id=eq.' + guildId + '&select=*'); },
+        upsert: function(data) { return supabaseFetch('recommend_targets', 'POST', data); },
+        delete: function(guildId, memberId) { return supabaseFetch('recommend_targets?guild_id=eq.' + guildId + '&member_id=eq.' + memberId, 'DELETE'); }
     }
 };
 
-const session = {
-    get() {
+var session = {
+    get: function() {
         try { return JSON.parse(sessionStorage.getItem('guild_session')) || null; }
-        catch { return null; }
+        catch (e) { return null; }
     },
-    set(data) { sessionStorage.setItem('guild_session', JSON.stringify(data)); },
-    clear() { sessionStorage.removeItem('guild_session'); }
+    set: function(data) { sessionStorage.setItem('guild_session', JSON.stringify(data)); },
+    clear: function() { sessionStorage.removeItem('guild_session'); }
 };
 
 function rememberCode(code) { localStorage.setItem('guild_remember_code', code); }
 function getRememberedCode() { return localStorage.getItem('guild_remember_code') || ''; }
 
-let timeoutTimer;
+var timeoutTimer;
 function resetTimeout() {
     clearTimeout(timeoutTimer);
-    if (session.get()) timeoutTimer = setTimeout(() => {
-        session.clear();
-        showToast('⏰30分钟无操作，已退出', 'warning');
-        showLoginPage();
-    }, TIMEOUT_MINUTES * 60 * 1000);
+    if (session.get()) {
+        timeoutTimer = setTimeout(function() {
+            session.clear();
+            showToast('⏰30分钟无操作，已退出', 'warning');
+            showLoginPage();
+        }, TIMEOUT_MINUTES * 60 * 1000);
+    }
 }
-['click', 'keydown', 'scroll', 'touchstart', 'input'].forEach(evt => document.addEventListener(evt, resetTimeout));
+document.addEventListener('click', resetTimeout);
+document.addEventListener('keydown', resetTimeout);
+document.addEventListener('scroll', resetTimeout);
+document.addEventListener('touchstart', resetTimeout);
+document.addEventListener('input', resetTimeout);
 
 function showLoginPage() {
     document.getElementById('loginPage').style.display = 'flex';
@@ -709,17 +341,16 @@ function showMainPage() {
     resetTimeout();
 }
 
-let currentGuildId = null, currentRole = null, allGuilds = [], allMembers = [], allTasks = [], allRecommendTargets = [];
-let showSubTag = false;
-let selectedMemberForTasks = null;
-let editingRecommendTarget = null;
+var currentGuildId = null, currentRole = null, allGuilds = [], allMembers = [], allTasks = [], allRecommendTargets = [];
+var showSubTag = false;
+var selectedMemberForTasks = null;
 
 document.getElementById('loginInput').value = getRememberedCode();
 document.getElementById('btnLogin').addEventListener('click', doLogin);
-document.getElementById('loginInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 
 async function doLogin() {
-    const input = document.getElementById('loginInput').value.trim();
+    var input = document.getElementById('loginInput').value.trim();
     if (!input) { showToast('⚠️请输入密钥或邀请码', 'warning'); return; }
     if (input === ADMIN_KEY) {
         session.set({ role: 'admin' });
@@ -732,9 +363,9 @@ async function doLogin() {
     }
     if (/^\d{5}$/.test(input)) {
         try {
-            const guilds = await db.guilds.getByCode(input);
+            var guilds = await db.guilds.getByCode(input);
             if (guilds.length === 0) { showToast('❌邀请码不存在，请核对', 'error'); return; }
-            const guild = guilds[0];
+            var guild = guilds[0];
             session.set({ role: 'member', guildId: guild.id });
             currentRole = 'member';
             currentGuildId = guild.id;
@@ -748,13 +379,13 @@ async function doLogin() {
     showToast('⚠️格式错误', 'warning');
 }
 
-document.getElementById('btnSync').addEventListener('click', async () => {
+document.getElementById('btnSync').addEventListener('click', async function() {
     showToast('🔄正在同步...', 'info');
     try { await db.guilds.list(); showToast('✅同步成功！', 'success'); }
     catch (e) { showToast('❌同步失败', 'error'); }
 });
 
-document.getElementById('btnLogout').addEventListener('click', () => {
+document.getElementById('btnLogout').addEventListener('click', function() {
     if (confirm('确定退出吗？')) { showLoginPage(); showToast('👋已退出', 'info'); }
 });
 
@@ -768,8 +399,7 @@ async function loadAdminPage() {
         { name: '📋任务', id: 'tab-task-mgr' },
         { name: '👥成员', id: 'tab-member-mgr' },
         { name: '🧠推荐', id: 'tab-recommend' },
-        { name: '🏰公会', id: 'tab-guild-mgr' },
-        { name: '⚙️分类规则', id: 'tab-rules' }
+        { name: '🏰公会', id: 'tab-guild-mgr' }
     ]);
     await loadAllGuilds();
 }
@@ -777,22 +407,22 @@ async function loadAdminPage() {
 async function loadAllGuilds() { try { allGuilds = await db.guilds.list(); } catch (e) { allGuilds = []; } }
 
 function setupTabs(tabs) {
-    const tabNav = document.getElementById('tabNav');
-    const tabContent = document.getElementById('tabContent');
+    var tabNav = document.getElementById('tabNav');
+    var tabContent = document.getElementById('tabContent');
     tabNav.innerHTML = '';
     tabContent.innerHTML = '';
-    tabs.forEach((tab, i) => {
-        const btn = document.createElement('div');
+    tabs.forEach(function(tab, i) {
+        var btn = document.createElement('div');
         btn.className = 'tab' + (i === 0 ? ' active' : '');
         btn.textContent = tab.name;
-        btn.addEventListener('click', () => {
-            tabNav.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        btn.addEventListener('click', function() {
+            tabNav.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
             btn.classList.add('active');
-            tabContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tabContent.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
             document.getElementById(tab.id).classList.add('active');
         });
         tabNav.appendChild(btn);
-        const panel = document.createElement('div');
+        var panel = document.createElement('div');
         panel.className = 'tab-content' + (i === 0 ? ' active' : '');
         panel.id = tab.id;
         tabContent.appendChild(panel);
@@ -802,10 +432,11 @@ function setupTabs(tabs) {
     initMemberMgrTab();
     initRecommendTab();
     initGuildMgrTab();
-    initRulesTab();
-}// ===== 查询标签 =====
+}
+
+// ===== 简化版：查询标签 =====
 function initAdminSearchTab() {
-    const p = document.getElementById('tab-search');
+    var p = document.getElementById('tab-search');
     if (!p) return;
     p.innerHTML = `
         <div class="card">
@@ -825,94 +456,72 @@ function initAdminSearchTab() {
             </div>
             <div id="adminTaskResult"></div>
         </div>`;
-    document.getElementById('adminSearchMember').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchMemberForAdmin(); });
+    document.getElementById('adminSearchMember').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchMemberForAdmin(); });
     document.getElementById('btnAdminSearchMember').addEventListener('click', searchMemberForAdmin);
-    document.getElementById('adminSearchTask').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchTaskForAdmin(); });
+    document.getElementById('adminSearchTask').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchTaskForAdmin(); });
     document.getElementById('btnAdminSearchTask').addEventListener('click', searchTaskForAdmin);
 }
 
 async function searchMemberForAdmin() {
-    const q = document.getElementById('adminSearchMember').value.trim();
-    const div = document.getElementById('adminMemberResult');
+    var q = document.getElementById('adminSearchMember').value.trim();
+    var div = document.getElementById('adminMemberResult');
     if (!q || !currentGuildId) {
         div.innerHTML = !currentGuildId ? '<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>' : '';
         return;
     }
     showToast('🔍搜索中...', 'info');
     try {
-        const members = await db.members.list(currentGuildId);
-        const filtered = members.filter(m => m.real_name.includes(q) || (m.alias || '').includes(q));
+        var members = await db.members.list(currentGuildId);
+        var filtered = members.filter(function(m) { return m.real_name.includes(q) || (m.alias || '').includes(q); });
         if (!filtered.length) {
             div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
             return;
         }
-        const memberIds = filtered.map(m => m.id);
-        let allTaskMembers = [];
-        const batchSize = 50;
-        for (let i = 0; i < memberIds.length; i += batchSize) {
-            const batch = memberIds.slice(i, i + batchSize);
-            const ids = batch.join(',');
-            const results = await supabaseFetch(`task_members?member_id=in.(${ids})&select=*`);
-            allTaskMembers = allTaskMembers.concat(results);
-        }
-        const memberTaskMap = {};
-        for (const tm of allTaskMembers) {
-            if (!memberTaskMap[tm.member_id]) memberTaskMap[tm.member_id] = [];
-            memberTaskMap[tm.member_id].push(tm.task_id);
-        }
-
         // 获取推荐目标
-        const recommendTargets = await db.recommendTargets.list(currentGuildId);
-        const targetMap = {};
-        for (const rt of recommendTargets) {
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var targetMap = {};
+        targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
                 selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
             };
-        }
+        });
 
-        let html = '';
-        for (const m of filtered) {
-            const tids = memberTaskMap[m.id] || [];
-            const tasks = allTasks.filter(t => tids.includes(t.id));
-            // 按分数从高到低排序
-            tasks.sort((a, b) => b.score - a.score);
-
-            // 检查是否有推荐目标
-            const target = targetMap[m.id];
-            let priorityTasks = [];
-            let otherTasks = [];
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var m = filtered[i];
+            var tml = await db.taskMembers.listByMember(m.id);
+            var tids = tml.map(function(t) { return t.task_id; });
+            var tasks = allTasks.filter(function(t) { return tids.includes(t.id); });
+            tasks.sort(function(a, b) { return b.score - a.score; });
+            var target = targetMap[m.id];
+            var priorityTasks = [];
+            var otherTasks = [];
             if (target && target.selectedScores.length > 0) {
-                priorityTasks = tasks.filter(t => target.selectedScores.includes(t.score));
-                otherTasks = tasks.filter(t => !target.selectedScores.includes(t.score));
-                // 优先推荐也按分数排序
-                priorityTasks.sort((a, b) => b.score - a.score);
-                otherTasks.sort((a, b) => b.score - a.score);
+                priorityTasks = tasks.filter(function(t) { return target.selectedScores.includes(t.score); });
+                otherTasks = tasks.filter(function(t) { return !target.selectedScores.includes(t.score); });
+                priorityTasks.sort(function(a, b) { return b.score - a.score; });
+                otherTasks.sort(function(a, b) { return b.score - a.score; });
             } else {
                 otherTasks = tasks;
-                otherTasks.sort((a, b) => b.score - a.score);
+                otherTasks.sort(function(a, b) { return b.score - a.score; });
             }
-
-            html += `<div class="card">
-                <div class="card-header"><span class="card-title">👤${m.real_name}</span></div>
-                <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
-                <div style="font-size:11px;color:var(--gold)">📋能做：共 ${tasks.length} 个任务</div>`;
-
+            html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div>';
+            html += '<div style="font-size:11px;color:var(--text2)">别名：' + (m.alias || '无') + '</div>';
+            html += '<div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
             if (priorityTasks.length > 0) {
-                html += `<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（${priorityTasks.length}个）：</div>
-                <div class="member-tags">${priorityTasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('')}</div>
-                <hr style="border-color:var(--border);margin:4px 0;">`;
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（' + priorityTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + priorityTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
+                html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
-
             if (otherTasks.length > 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（${otherTasks.length}个）：</div>
-                <div class="member-tags">${otherTasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('')}</div>`;
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（' + otherTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + otherTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
             }
-
-            html += `</div>`;
+            html += '</div>';
         }
         div.innerHTML = html;
-        showToast(`✅找到${filtered.length}位成员`, 'success');
+        showToast('✅找到' + filtered.length + '位成员', 'success');
     } catch (e) {
         div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
         showToast('❌查询失败', 'error');
@@ -921,77 +530,61 @@ async function searchMemberForAdmin() {
 }
 
 async function searchTaskForAdmin() {
-    const q = document.getElementById('adminSearchTask').value.trim();
-    const div = document.getElementById('adminTaskResult');
+    var q = document.getElementById('adminSearchTask').value.trim();
+    var div = document.getElementById('adminTaskResult');
     if (!q || !currentGuildId) {
         div.innerHTML = !currentGuildId ? '<div class="empty-state"><div class="icon">⚠️</div><div class="text">请先进公会</div></div>' : '';
         return;
     }
     showToast('🔍搜索中...', 'info');
     try {
-        const tasks = await db.tasks.list(currentGuildId);
-        const filtered = tasks.filter(t => t.task_name.includes(q));
+        var tasks = await db.tasks.list(currentGuildId);
+        var filtered = tasks.filter(function(t) { return t.task_name.includes(q); });
         if (!filtered.length) {
             div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
             return;
         }
-
-        // 获取推荐目标
-        const recommendTargets = await db.recommendTargets.list(currentGuildId);
-        const targetMap = {};
-        for (const rt of recommendTargets) {
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var targetMap = {};
+        targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
                 selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
             };
-        }
-
-        let html = '';
-        for (const t of filtered) {
-            const tml = await db.taskMembers.list(t.id);
-            const mids = tml.map(tm => tm.member_id);
-            const allMembersList = await db.members.list(currentGuildId);
-            const members = allMembersList.filter(m => mids.includes(m.id));
-
-            // 分类：最想做的人 vs 其他能做的人
-            let wantMembers = [];
-            let otherMembers = [];
-            for (const m of members) {
-                const target = targetMap[m.id];
+        });
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var t = filtered[i];
+            var tml = await db.taskMembers.list(t.id);
+            var mids = tml.map(function(tm) { return tm.member_id; });
+            var allMembersList = await db.members.list(currentGuildId);
+            var members = allMembersList.filter(function(m) { return mids.includes(m.id); });
+            var wantMembers = [];
+            var otherMembers = [];
+            for (var j = 0; j < members.length; j++) {
+                var m = members[j];
+                var target = targetMap[m.id];
                 if (target && target.selectedScores.includes(t.score) && target.targetScore >= t.score) {
                     wantMembers.push(m);
                 } else {
                     otherMembers.push(m);
                 }
             }
-
-            html += `<div class="card">
-                <div class="card-header">
-                    <span class="card-title">📋${t.task_name}</span>
-                    <span class="tag gold">⭐${t.score}分</span>
-                </div>`;
-
+            html += '<div class="card"><div class="card-header"><span class="card-title">📋' + t.task_name + '</span><span class="tag gold">⭐' + t.score + '分</span></div>';
             if (wantMembers.length > 0) {
-                html += `<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共${wantMembers.length}人）：</div>
-                <div class="member-tags">${wantMembers.map(m => `<span class="member-tag">${m.real_name}</span>`).join('')}</div>`;
-                if (otherMembers.length > 0) {
-                    html += `<hr style="border-color:var(--border);margin:4px 0;">`;
-                }
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共' + wantMembers.length + '人）：</div>';
+                html += '<div class="member-tags">' + wantMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
+                if (otherMembers.length > 0) html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
-
             if (otherMembers.length > 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共${otherMembers.length}人）：</div>
-                <div class="member-tags">${otherMembers.map(m => `<span class="member-tag">${m.real_name}</span>`).join('')}</div>`;
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共' + otherMembers.length + '人）：</div>';
+                html += '<div class="member-tags">' + otherMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
             }
-
-            if (members.length === 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>`;
-            }
-
-            html += `</div>`;
+            if (members.length === 0) html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>';
+            html += '</div>';
         }
         div.innerHTML = html;
-        showToast(`✅找到${filtered.length}个任务`, 'success');
+        showToast('✅找到' + filtered.length + '个任务', 'success');
     } catch (e) {
         div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
         showToast('❌查询失败', 'error');
@@ -1001,7 +594,7 @@ async function searchTaskForAdmin() {
 
 // ===== 任务管理 =====
 function initTaskMgrTab() {
-    const p = document.getElementById('tab-task-mgr');
+    var p = document.getElementById('tab-task-mgr');
     if (!p) return;
     p.innerHTML = `
         <div class="card">
@@ -1013,14 +606,14 @@ function initTaskMgrTab() {
             <div class="form-group">
                 <label>📂主分类</label>
                 <select id="newTaskCategory">
-                    ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+                    ${TASK_CATEGORIES.map(function(c) { return '<option value="' + c.id + '">' + c.icon + ' ' + c.name + '</option>'; }).join('')}
                     <option value="无">📂 无</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>🏷️子标签</label>
                 <select id="newTaskSubTag">
-                    ${SUB_TAGS.map(t => `<option value="${t}">${t}</option>`).join('')}
+                    ${SUB_TAGS.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('')}
                 </select>
             </div>
             <div class="form-group"><label>👤初始能做的人（选填）</label><input type="text" id="newTaskMember" placeholder="输入大名，可留空"></div>
@@ -1094,7 +687,7 @@ function initTaskMgrTab() {
         <div id="taskList"></div>`;
 
     document.getElementById('btnAddTask').addEventListener('click', addTask);
-    document.getElementById('newTaskName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addTask(); });
+    document.getElementById('newTaskName').addEventListener('keydown', function(e) { if (e.key === 'Enter') addTask(); });
     document.getElementById('btnAutoClassify').addEventListener('click', autoClassifyCurrentTask);
     document.getElementById('btnBatchTaskImport').addEventListener('click', batchImportTasks);
     document.getElementById('btnBatchTaskMember').addEventListener('click', batchTaskMemberImport);
@@ -1104,57 +697,54 @@ function initTaskMgrTab() {
     document.getElementById('btnEditPreset').addEventListener('click', editPresetTemplate);
     document.getElementById('btnSelectAll').addEventListener('click', toggleSelectAll);
     document.getElementById('btnBatchDelete').addEventListener('click', batchDeleteTasks);
-    document.getElementById('taskSearchFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') filterTaskList(e.target.value.trim()); });
-    document.getElementById('taskSearchFilter').addEventListener('input', (e) => { filterTaskList(e.target.value.trim()); });
-    
-    // 成员搜索
-    const searchInput = document.getElementById('memberSearchInput');
-    const searchDropdown = document.getElementById('memberSearchDropdown');
-    searchInput.addEventListener('input', () => filterMemberSearch(searchInput, searchDropdown));
-    searchInput.addEventListener('focus', () => { if (searchInput.value.trim()) filterMemberSearch(searchInput, searchDropdown); });
-    document.addEventListener('click', (e) => { if (!e.target.closest('.search-input-wrap')) searchDropdown.classList.remove('show'); });
-    searchInput.addEventListener('keydown', (e) => {
+    document.getElementById('taskSearchFilter').addEventListener('keydown', function(e) { if (e.key === 'Enter') filterTaskList(e.target.value.trim()); });
+    document.getElementById('taskSearchFilter').addEventListener('input', function(e) { filterTaskList(e.target.value.trim()); });
+
+    var searchInput = document.getElementById('memberSearchInput');
+    var searchDropdown = document.getElementById('memberSearchDropdown');
+    searchInput.addEventListener('input', function() { filterMemberSearch(searchInput, searchDropdown); });
+    searchInput.addEventListener('focus', function() { if (searchInput.value.trim()) filterMemberSearch(searchInput, searchDropdown); });
+    document.addEventListener('click', function(e) { if (!e.target.closest('.search-input-wrap')) searchDropdown.classList.remove('show'); });
+    searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            const items = searchDropdown.querySelectorAll('.ms-item');
+            var items = searchDropdown.querySelectorAll('.ms-item');
             if (items.length > 0) items[0].click();
         }
     });
 
     document.getElementById('btnMemberAddTasks').addEventListener('click', memberAddTasks);
-    document.getElementById('btnMemberSelectAllTasks').addEventListener('click', () => {
-        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = true);
+    document.getElementById('btnMemberSelectAllTasks').addEventListener('click', function() {
+        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:not(:disabled)').forEach(function(cb) { cb.checked = true; });
         updateMemberTaskCount();
     });
-    document.getElementById('btnMemberDeselectAllTasks').addEventListener('click', () => {
-        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.getElementById('btnMemberDeselectAllTasks').addEventListener('click', function() {
+        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
         updateMemberTaskCount();
     });
 
     loadTasksToSelect();
     loadTaskList();
-    loadMemberSelect();
 }
 
-// ===== 成员搜索下拉 =====
 async function filterMemberSearch(input, dropdown) {
-    const q = input.value.trim().toLowerCase();
+    var q = input.value.trim().toLowerCase();
     dropdown.innerHTML = '';
     if (!q || !currentGuildId) { dropdown.classList.remove('show'); return; }
     try {
-        const members = await db.members.list(currentGuildId);
-        const filtered = members.filter(m => m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q));
+        var members = await db.members.list(currentGuildId);
+        var filtered = members.filter(function(m) { return m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q); });
         if (!filtered.length) {
             dropdown.innerHTML = '<div class="ms-item" style="color:var(--text2);">未找到</div>';
         } else {
-            filtered.forEach(m => {
-                const item = document.createElement('div');
+            filtered.forEach(function(m) {
+                var item = document.createElement('div');
                 item.className = 'ms-item';
                 item.textContent = m.real_name;
-                item.addEventListener('click', () => {
+                item.addEventListener('click', function() {
                     input.value = m.real_name;
                     dropdown.classList.remove('show');
                     selectedMemberForTasks = m;
-                    document.getElementById('selectedMemberDisplay').innerHTML = `已选成员：<span style="color:var(--text);font-weight:600;">${m.real_name}</span>`;
+                    document.getElementById('selectedMemberDisplay').innerHTML = '已选成员：<span style="color:var(--text);font-weight:600;">' + m.real_name + '</span>';
                     loadMemberTaskChecklistForMember(m.id);
                 });
                 dropdown.appendChild(item);
@@ -1165,31 +755,31 @@ async function filterMemberSearch(input, dropdown) {
 }
 
 async function loadMemberTaskChecklistForMember(memberId) {
-    const container = document.getElementById('memberTaskCheckList');
+    var container = document.getElementById('memberTaskCheckList');
     if (!memberId) {
         container.innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">请先选择成员</div>';
         return;
     }
     try {
-        const tasks = await db.tasks.list(currentGuildId);
+        var tasks = await db.tasks.list(currentGuildId);
         if (!tasks.length) {
             container.innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">⚠️ 暂无任务</div>';
             return;
         }
-        const existing = await db.taskMembers.listByMember(memberId);
-        const existingTaskIds = new Set(existing.map(t => t.task_id));
-        let html = '';
-        for (const t of tasks) {
-            const exists = existingTaskIds.has(t.id);
-            const disabled = exists ? 'disabled' : '';
-            const checked = exists ? 'checked' : '';
-            html += `<div class="task-check-item ${exists ? 'disabled' : ''}">
-                <input type="checkbox" ${checked} ${disabled} data-taskid="${t.id}" data-taskname="${t.task_name}" onchange="updateMemberTaskCount()">
-                <span class="tci-name">${t.task_name}</span>
-                <span class="tci-score">⭐${t.score}分</span>
-                ${exists ? '<span class="tci-existing">✅ 已有</span>' : ''}
-            </div>`;
-        }
+        var existing = await db.taskMembers.listByMember(memberId);
+        var existingTaskIds = new Set(existing.map(function(t) { return t.task_id; }));
+        var html = '';
+        tasks.forEach(function(t) {
+            var exists = existingTaskIds.has(t.id);
+            var disabled = exists ? 'disabled' : '';
+            var checked = exists ? 'checked' : '';
+            html += '<div class="task-check-item ' + (exists ? 'disabled' : '') + '">';
+            html += '<input type="checkbox" ' + checked + ' ' + disabled + ' data-taskid="' + t.id + '" data-taskname="' + t.task_name + '" onchange="updateMemberTaskCount()">';
+            html += '<span class="tci-name">' + t.task_name + '</span>';
+            html += '<span class="tci-score">⭐' + t.score + '分</span>';
+            if (exists) html += '<span class="tci-existing">✅ 已有</span>';
+            html += '</div>';
+        });
         container.innerHTML = html;
         updateMemberTaskCount();
     } catch (e) {
@@ -1199,40 +789,35 @@ async function loadMemberTaskChecklistForMember(memberId) {
 }
 
 function updateMemberTaskCount() {
-    const checked = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)').length;
-    document.getElementById('memberTaskCount').textContent = `已选 ${checked} 个任务`;
+    var checked = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)').length;
+    document.getElementById('memberTaskCount').textContent = '已选 ' + checked + ' 个任务';
 }
 
 async function memberAddTasks() {
     if (!selectedMemberForTasks) { showToast('⚠️请先选择成员', 'warning'); return; }
-    const checkedBoxes = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)');
+    var checkedBoxes = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)');
     if (!checkedBoxes.length) { showToast('⚠️请至少选择一个任务', 'warning'); return; }
-    const taskIds = [];
-    checkedBoxes.forEach(cb => taskIds.push(parseInt(cb.dataset.taskid)));
-    const resultDiv = document.getElementById('memberTaskResult');
+    var taskIds = [];
+    checkedBoxes.forEach(function(cb) { taskIds.push(parseInt(cb.dataset.taskid)); });
+    var resultDiv = document.getElementById('memberTaskResult');
     resultDiv.innerHTML = '<div style="color:var(--text2);">⏳ 处理中...</div>';
-    let added = 0, failed = 0;
-    for (const taskId of taskIds) {
+    var added = 0, failed = 0;
+    for (var i = 0; i < taskIds.length; i++) {
         try {
-            await db.taskMembers.add({ task_id: taskId, member_id: selectedMemberForTasks.id });
+            await db.taskMembers.add({ task_id: taskIds[i], member_id: selectedMemberForTasks.id });
             added++;
         } catch (e) { failed++; }
-        await new Promise(r => setTimeout(r, 80));
+        await new Promise(function(r) { setTimeout(r, 80); });
     }
-    showToast(`✅ 为 "${selectedMemberForTasks.real_name}" 添加了 ${added} 个任务`, 'success');
+    showToast('✅ 为 "' + selectedMemberForTasks.real_name + '" 添加了 ' + added + ' 个任务', 'success');
     resultDiv.innerHTML = '';
     await loadMemberTaskChecklistForMember(selectedMemberForTasks.id);
     await refreshCurrentGuildData();
     loadTaskList();
 }
 
-// ===== 加载成员下拉框（用于其他功能） =====
-async function loadMemberSelect() {
-    // 这个函数现在只用于其他下拉框，人→任务已改为搜索模式
-}
-
-// ===== 自动分类规则库 =====
-const CLASSIFY_RULES = {
+// ===== 自动分类 =====
+var CLASSIFY_RULES = {
     '人才_农': ['丽萍', '白铁匠', '非主流', '唐志强', '渔三哥', '菜雕师', '小燕子', '阿星', '史蒂芬周', '乾隆', '何律师', '一代大侠', '武松', '白素贞', '登山员', '国民男神', '金蝉子'],
     '人才皮肤_农': ['市井烟火', '雀跃欢腾', '食神归位', '重回巅峰', '牛丸乒乓', '黯然销魂', '喜剧之王', '盛世大帝', '遥望盛世', '大明湖畔', '御驾亲征', '闲游雅趣', '文渊圣主', '侵略如火', '水漫金山', '西湖夏憩', '沧海仙梦', '金蕊凝芳'],
     '艺人_农': ['丫蛋儿', '孔慈', '云雪晴', '吕销售', '阿诗玛', '素芬', '英姿', '静静', '葬爱', '顾倾倾', '柳飘飘', '晚蔚', '火鸡姐', '女儿国国王', '枫遥', '小碧', '艺术生'],
@@ -1254,63 +839,63 @@ const CLASSIFY_RULES = {
 
 function autoClassifyTask(taskName) {
     if (!taskName) return { category: '无', subTag: '无' };
-    for (const keyword of CLASSIFY_RULES['守护神_无']) {
-        if (taskName.includes(keyword)) return { category: '守护神', subTag: '无' };
+    for (var i = 0; i < CLASSIFY_RULES['守护神_无'].length; i++) {
+        if (taskName.includes(CLASSIFY_RULES['守护神_无'][i])) return { category: '守护神', subTag: '无' };
     }
     if (taskName.startsWith('觉醒') || taskName.includes('觉醒')) {
-        for (const key of Object.keys(CLASSIFY_RULES)) {
+        for (var key in CLASSIFY_RULES) {
             if (key.startsWith('人才_') || key.startsWith('人才皮肤_')) {
-                const subTag = key.split('_')[1];
-                for (const keyword of CLASSIFY_RULES[key]) {
-                    if (taskName.includes(keyword)) return { category: '人才觉醒', subTag: subTag };
+                var subTag2 = key.split('_')[1];
+                for (var j = 0; j < CLASSIFY_RULES[key].length; j++) {
+                    if (taskName.includes(CLASSIFY_RULES[key][j])) return { category: '人才觉醒', subTag: subTag2 };
                 }
             }
         }
         return { category: '人才觉醒', subTag: '无' };
     }
     if (/^[567]00级/.test(taskName)) {
-        for (const key of Object.keys(CLASSIFY_RULES)) {
-            if (key.startsWith('人才_') || key.startsWith('人才皮肤_')) {
-                const subTag = key.split('_')[1];
-                for (const keyword of CLASSIFY_RULES[key]) {
-                    if (taskName.includes(keyword)) {
-                        const category = key.startsWith('人才皮肤') ? '人才皮肤' : '人才';
-                        return { category: category, subTag: subTag };
+        for (var key2 in CLASSIFY_RULES) {
+            if (key2.startsWith('人才_') || key2.startsWith('人才皮肤_')) {
+                var subTag3 = key2.split('_')[1];
+                for (var k = 0; k < CLASSIFY_RULES[key2].length; k++) {
+                    if (taskName.includes(CLASSIFY_RULES[key2][k])) {
+                        var category = key2.startsWith('人才皮肤') ? '人才皮肤' : '人才';
+                        return { category: category, subTag: subTag3 };
                     }
                 }
             }
         }
         return { category: '人才', subTag: '无' };
     }
-    for (const key of Object.keys(CLASSIFY_RULES)) {
-        if (key.startsWith('人才皮肤_')) {
-            const subTag = key.split('_')[1];
-            for (const keyword of CLASSIFY_RULES[key]) {
-                if (taskName.includes(keyword)) return { category: '人才皮肤', subTag: subTag };
+    for (var key3 in CLASSIFY_RULES) {
+        if (key3.startsWith('人才皮肤_')) {
+            var subTag4 = key3.split('_')[1];
+            for (var l = 0; l < CLASSIFY_RULES[key3].length; l++) {
+                if (taskName.includes(CLASSIFY_RULES[key3][l])) return { category: '人才皮肤', subTag: subTag4 };
             }
         }
     }
-    for (const key of Object.keys(CLASSIFY_RULES)) {
-        if (key.startsWith('艺人皮肤_')) {
-            const subTag = key.split('_')[1];
-            for (const keyword of CLASSIFY_RULES[key]) {
-                if (taskName.includes(keyword)) return { category: '艺人皮肤', subTag: subTag };
+    for (var key4 in CLASSIFY_RULES) {
+        if (key4.startsWith('艺人皮肤_')) {
+            var subTag5 = key4.split('_')[1];
+            for (var m = 0; m < CLASSIFY_RULES[key4].length; m++) {
+                if (taskName.includes(CLASSIFY_RULES[key4][m])) return { category: '艺人皮肤', subTag: subTag5 };
             }
         }
     }
-    for (const key of Object.keys(CLASSIFY_RULES)) {
-        if (key.startsWith('人才_')) {
-            const subTag = key.split('_')[1];
-            for (const keyword of CLASSIFY_RULES[key]) {
-                if (taskName.includes(keyword)) return { category: '人才', subTag: subTag };
+    for (var key5 in CLASSIFY_RULES) {
+        if (key5.startsWith('人才_')) {
+            var subTag6 = key5.split('_')[1];
+            for (var n = 0; n < CLASSIFY_RULES[key5].length; n++) {
+                if (taskName.includes(CLASSIFY_RULES[key5][n])) return { category: '人才', subTag: subTag6 };
             }
         }
     }
-    for (const key of Object.keys(CLASSIFY_RULES)) {
-        if (key.startsWith('艺人_')) {
-            const subTag = key.split('_')[1];
-            for (const keyword of CLASSIFY_RULES[key]) {
-                if (taskName.includes(keyword)) return { category: '艺人', subTag: subTag };
+    for (var key6 in CLASSIFY_RULES) {
+        if (key6.startsWith('艺人_')) {
+            var subTag7 = key6.split('_')[1];
+            for (var o = 0; o < CLASSIFY_RULES[key6].length; o++) {
+                if (taskName.includes(CLASSIFY_RULES[key6][o])) return { category: '艺人', subTag: subTag7 };
             }
         }
     }
@@ -1318,27 +903,27 @@ function autoClassifyTask(taskName) {
 }
 
 function autoClassifyCurrentTask() {
-    const nameInput = document.getElementById('newTaskName');
-    const taskName = nameInput.value.trim();
+    var nameInput = document.getElementById('newTaskName');
+    var taskName = nameInput.value.trim();
     if (!taskName) { showToast('⚠️请先输入任务名称', 'warning'); return; }
-    const result = autoClassifyTask(taskName);
+    var result = autoClassifyTask(taskName);
     document.getElementById('newTaskCategory').value = result.category;
     document.getElementById('newTaskSubTag').value = result.subTag;
-    showToast(`🤖 自动分类：${result.category} - ${result.subTag}`, 'success');
+    showToast('🤖 自动分类：' + result.category + ' - ' + result.subTag, 'success');
 }
 
 async function addTask() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const name = document.getElementById('newTaskName').value.trim();
-    const score = parseInt(document.getElementById('newTaskScore').value) || 0;
-    const category = document.getElementById('newTaskCategory').value || '无';
-    const subTag = document.getElementById('newTaskSubTag').value || '无';
-    const memberName = document.getElementById('newTaskMember').value.trim();
+    var name = document.getElementById('newTaskName').value.trim();
+    var score = parseInt(document.getElementById('newTaskScore').value) || 0;
+    var category = document.getElementById('newTaskCategory').value || '无';
+    var subTag = document.getElementById('newTaskSubTag').value || '无';
+    var memberName = document.getElementById('newTaskMember').value.trim();
     if (!name) { showToast('⚠️请输入任务名称', 'warning'); return; }
     try {
-        const nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
+        var nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
         if (nt.length && memberName) {
-            const m = await db.members.getByName(currentGuildId, memberName);
+            var m = await db.members.getByName(currentGuildId, memberName);
             if (m.length) await db.taskMembers.add({ task_id: nt[0].id, member_id: m[0].id });
         }
         showToast('✅任务添加成功！', 'success');
@@ -1355,22 +940,22 @@ async function addTask() {
 
 async function batchImportTasks() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const text = document.getElementById('batchTaskImport').value.trim();
+    var text = document.getElementById('batchTaskImport').value.trim();
     if (!text) { showToast('⚠️请输入任务数据', 'warning'); return; }
-    const existingTasks = await db.tasks.list(currentGuildId);
-    const existingNames = new Set(existingTasks.map(t => t.task_name));
-    const lines = text.split('\n').filter(l => l.trim());
-    let s = 0, f = 0, skip = 0;
-    const validCategories = TASK_CATEGORIES.map(c => c.id);
-    for (const line of lines) {
-        const parts = line.split(',').map(p => p.trim());
-        const name = parts[0];
+    var existingTasks = await db.tasks.list(currentGuildId);
+    var existingNames = new Set(existingTasks.map(function(t) { return t.task_name; }));
+    var lines = text.split('\n').filter(function(l) { return l.trim(); });
+    var s = 0, f = 0, skip = 0;
+    var validCategories = TASK_CATEGORIES.map(function(c) { return c.id; });
+    for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].split(',').map(function(p) { return p.trim(); });
+        var name = parts[0];
         if (!name) { f++; continue; }
         if (existingNames.has(name)) { skip++; continue; }
-        const score = parseInt(parts[1]) || 0;
-        let category = '无';
+        var score = parseInt(parts[1]) || 0;
+        var category = '无';
         if (parts[2] && validCategories.includes(parts[2])) category = parts[2];
-        let subTag = '无';
+        var subTag = '无';
         if (parts[3] && SUB_TAGS.includes(parts[3])) subTag = parts[3];
         try {
             await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
@@ -1378,9 +963,9 @@ async function batchImportTasks() {
             s++;
         } catch (e) { console.warn('任务导入失败:', name, e.message); f++; }
     }
-    let msg = `✅成功导入${s}个`;
-    if (skip > 0) msg += `，跳过${skip}个重复`;
-    if (f > 0) msg += `，失败${f}个`;
+    var msg = '✅成功导入' + s + '个';
+    if (skip > 0) msg += '，跳过' + skip + '个重复';
+    if (f > 0) msg += '，失败' + f + '个';
     showToast(msg, s > 0 ? 'success' : 'warning');
     document.getElementById('batchTaskImport').value = '';
     loadTasksToSelect();
@@ -1389,33 +974,47 @@ async function batchImportTasks() {
 
 async function batchTaskMemberImport() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const text = document.getElementById('batchTaskMemberInput').value.trim();
+    var text = document.getElementById('batchTaskMemberInput').value.trim();
     if (!text) { showToast('⚠️请输入数据', 'warning'); return; }
-    const resultDiv = document.getElementById('batchTaskMemberResult');
+    var resultDiv = document.getElementById('batchTaskMemberResult');
     resultDiv.innerHTML = '<div style="color:var(--text2);">⏳ 处理中...</div>';
-    const lines = text.split('\n').filter(l => l.trim());
-    let totalAdded = 0, totalSkipped = 0, totalFailed = 0;
-    const allTasks = await db.tasks.list(currentGuildId);
-    const allMembers = await db.members.list(currentGuildId);
+    var lines = text.split('\n').filter(function(l) { return l.trim(); });
+    var totalAdded = 0, totalSkipped = 0, totalFailed = 0;
+    var allTasks = await db.tasks.list(currentGuildId);
+    var allMembers = await db.members.list(currentGuildId);
     if (!allTasks.length) {
         resultDiv.innerHTML = '<div style="color:var(--danger);">⚠️ 请先创建任务！</div>';
         return;
     }
-    for (const line of lines) {
-        const parts = line.split(/[,，、]/).map(s => s.trim()).filter(s => s);
+    for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].split(/[,，、]/).map(function(s) { return s.trim(); }).filter(function(s) { return s; });
         if (parts.length < 2) { totalFailed++; continue; }
-        const taskName = parts[0];
-        const memberNames = parts.slice(1);
-        const matchedTask = allTasks.find(t => t.task_name.includes(taskName) || taskName.includes(t.task_name));
+        var taskName = parts[0];
+        var memberNames = parts.slice(1);
+        var matchedTask = null;
+        for (var j = 0; j < allTasks.length; j++) {
+            if (allTasks[j].task_name.includes(taskName) || taskName.includes(allTasks[j].task_name)) {
+                matchedTask = allTasks[j];
+                break;
+            }
+        }
         if (!matchedTask) { totalFailed++; continue; }
-        const existingRelations = await db.taskMembers.list(matchedTask.id);
-        const existingMemberIds = new Set(existingRelations.map(r => r.member_id));
-        for (const memberName of memberNames) {
-            const matchedMember = allMembers.find(m => m.real_name.includes(memberName) || memberName.includes(m.real_name) || (m.alias && (m.alias.includes(memberName) || memberName.includes(m.alias))));
-            let member = matchedMember;
+        var existingRelations = await db.taskMembers.list(matchedTask.id);
+        var existingMemberIds = new Set(existingRelations.map(function(r) { return r.member_id; }));
+        for (var k = 0; k < memberNames.length; k++) {
+            var memberName = memberNames[k];
+            var matchedMember = null;
+            for (var l = 0; l < allMembers.length; l++) {
+                var m = allMembers[l];
+                if (m.real_name.includes(memberName) || memberName.includes(m.real_name) || (m.alias && (m.alias.includes(memberName) || memberName.includes(m.alias)))) {
+                    matchedMember = m;
+                    break;
+                }
+            }
+            var member = matchedMember;
             if (!member) {
                 try {
-                    const created = await db.members.create({ guild_id: currentGuildId, real_name: memberName, alias: '' });
+                    var created = await db.members.create({ guild_id: currentGuildId, real_name: memberName, alias: '' });
                     if (created && created.length) member = created[0];
                     else { totalFailed++; continue; }
                 } catch (e) { totalFailed++; continue; }
@@ -1428,32 +1027,31 @@ async function batchTaskMemberImport() {
             } catch (e) { totalFailed++; }
         }
     }
-    let summary = `📊 完成！添加 ${totalAdded} 人`;
-    if (totalSkipped > 0) summary += `，跳过 ${totalSkipped} 人（已存在）`;
-    if (totalFailed > 0) summary += `，失败 ${totalFailed} 个操作`;
-    resultDiv.innerHTML = `<div style="font-weight:600;color:var(--text);">${summary}</div>`;
+    var summary = '📊 完成！添加 ' + totalAdded + ' 人';
+    if (totalSkipped > 0) summary += '，跳过 ' + totalSkipped + ' 人（已存在）';
+    if (totalFailed > 0) summary += '，失败 ' + totalFailed + ' 个操作';
+    resultDiv.innerHTML = '<div style="font-weight:600;color:var(--text);">' + summary + '</div>';
     showToast(summary, totalAdded > 0 ? 'success' : 'warning');
     document.getElementById('batchTaskMemberInput').value = '';
-    // 3秒后自动消失
-    setTimeout(() => { resultDiv.innerHTML = ''; }, 3000);
+    setTimeout(function() { resultDiv.innerHTML = ''; }, 3000);
     await refreshCurrentGuildData();
     loadTasksToSelect();
     loadTaskList();
 }
 
 async function loadTasksToSelect() {
-    const sel = document.getElementById('selectTaskForBatch');
+    var sel = document.getElementById('selectTaskForBatch');
     if (!sel || !currentGuildId) return;
     try {
         allTasks = await db.tasks.list(currentGuildId);
         sel.innerHTML = '<option value="">--请选择--</option>';
-        allTasks.forEach(t => { sel.innerHTML += `<option value="${t.id}">${t.task_name} ⭐${t.score}</option>`; });
+        allTasks.forEach(function(t) { sel.innerHTML += '<option value="' + t.id + '">' + t.task_name + ' ⭐' + t.score + '</option>'; });
     } catch (e) {}
 }
 
-// ===== 加载任务列表 =====
+// ===== 任务列表（默认折叠 + 单个任务折叠） =====
 async function loadTaskList() {
-    const div = document.getElementById('taskList');
+    var div = document.getElementById('taskList');
     if (!div || !currentGuildId) return;
     try {
         allTasks = await db.tasks.list(currentGuildId);
@@ -1461,121 +1059,150 @@ async function loadTaskList() {
             div.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';
             return;
         }
-        const taskIds = allTasks.map(t => t.id);
-        let allTaskMembers = [];
-        const batchSize = 50;
-        for (let i = 0; i < taskIds.length; i += batchSize) {
-            const batch = taskIds.slice(i, i + batchSize);
-            const ids = batch.join(',');
-            const results = await supabaseFetch(`task_members?task_id=in.(${ids})&select=*`);
+        var taskIds = allTasks.map(function(t) { return t.id; });
+        var allTaskMembers = [];
+        for (var i = 0; i < taskIds.length; i += 50) {
+            var batch = taskIds.slice(i, i + 50);
+            var ids = batch.join(',');
+            var results = await supabaseFetch('task_members?task_id=in.(' + ids + ')&select=*');
             allTaskMembers = allTaskMembers.concat(results);
         }
-        const taskMemberMap = {};
-        for (const tm of allTaskMembers) {
+        var taskMemberMap = {};
+        for (var j = 0; j < allTaskMembers.length; j++) {
+            var tm = allTaskMembers[j];
             if (!taskMemberMap[tm.task_id]) taskMemberMap[tm.task_id] = [];
             taskMemberMap[tm.task_id].push(tm.member_id);
         }
 
-        const categorized = {};
-        for (const cat of TASK_CATEGORIES) categorized[cat.id] = [];
+        var categorized = {};
+        for (var k = 0; k < TASK_CATEGORIES.length; k++) {
+            categorized[TASK_CATEGORIES[k].id] = [];
+        }
         categorized['无'] = [];
-        for (const t of allTasks) {
-            let cat = t.category;
-            if (!cat || !TASK_CATEGORIES.some(c => c.id === cat)) cat = '无';
+        for (var l = 0; l < allTasks.length; l++) {
+            var t = allTasks[l];
+            var cat = t.category;
+            if (!cat || !TASK_CATEGORIES.some(function(c) { return c.id === cat; })) cat = '无';
             if (!categorized[cat]) categorized[cat] = [];
             categorized[cat].push(t);
         }
 
-        // 恢复折叠状态
-        let html = '';
-        html += `<div class="sub-tag-filter">
-            <input type="checkbox" id="showSubTagCheck" ${showSubTag ? 'checked' : ''} onchange="toggleSubTag()">
-            <label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>
-        </div>`;
+        var html = '';
+        html += '<div class="sub-tag-filter">';
+        html += '<input type="checkbox" id="showSubTagCheck" ' + (showSubTag ? 'checked' : '') + ' onchange="toggleSubTag()">';
+        html += '<label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>';
+        html += '</div>';
 
-        for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) {
-            const tasks = categorized[cat.id] || [];
+        var allCats = TASK_CATEGORIES.concat([{ id: '无', icon: '📂', name: '无' }]);
+        for (var m = 0; m < allCats.length; m++) {
+            var catInfo = allCats[m];
+            var tasks = categorized[catInfo.id] || [];
             if (!tasks.length) continue;
-            const catChecked = tasks.every(t => selectedTasks.has(t.id));
-            const catCheckedCount = tasks.filter(t => selectedTasks.has(t.id)).length;
-            const isOpen = sessionStorage.getItem('cat_open_' + cat.id) !== 'closed';
-            html += `<div class="card" style="padding:8px 12px;">`;
-            html += `<div class="collapse-header" onclick="toggleCategory('${cat.id}')" style="display:flex;justify-content:space-between;align-items:center;">`;
-            html += `<div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:14px;">${cat.icon}</span>
-                <span style="font-weight:600;font-size:13px;">${cat.name}</span>
-                <span class="category-count">(${tasks.length}个任务)</span>
-                <span style="font-size:11px;color:var(--text2);">${catChecked ? '☑️' : `☐ ${catCheckedCount}/${tasks.length}`}</span>
-            </div>`;
-            html += `<span class="arrow ${isOpen ? 'open' : ''}" id="arrow_${cat.id}">▶</span>`;
-            html += `</div>`;
-            html += `<div class="collapse-body ${isOpen ? 'open' : ''}" id="body_${cat.id}">`;
+            var catChecked = tasks.every(function(tt) { return selectedTasks.has(tt.id); });
+            var catCheckedCount = tasks.filter(function(tt) { return selectedTasks.has(tt.id); }).length;
+            var isOpen = sessionStorage.getItem('cat_open_' + catInfo.id) !== 'closed';
+
+            html += '<div class="card" style="padding:8px 12px;">';
+            html += '<div class="collapse-header" onclick="toggleCategory(\'' + catInfo.id + '\')" style="display:flex;justify-content:space-between;align-items:center;">';
+            html += '<div style="display:flex;align-items:center;gap:6px;">';
+            html += '<span style="font-size:14px;">' + catInfo.icon + '</span>';
+            html += '<span style="font-weight:600;font-size:13px;">' + catInfo.name + '</span>';
+            html += '<span class="category-count">(' + tasks.length + '个任务)</span>';
+            html += '<span style="font-size:11px;color:var(--text2);">' + (catChecked ? '☑️' : '☐ ' + catCheckedCount + '/' + tasks.length) + '</span>';
+            html += '</div>';
+            html += '<span class="arrow ' + (isOpen ? 'open' : '') + '" id="arrow_' + catInfo.id + '">▶</span>';
+            html += '</div>';
+            html += '<div class="collapse-body ' + (isOpen ? 'open' : '') + '" id="body_' + catInfo.id + '">';
 
             if (showSubTag) {
-                const subTagGroups = {};
-                for (const sub of SUB_TAGS) subTagGroups[sub] = [];
-                for (const t of tasks) {
-                    let sub = t.sub_tag || '无';
+                var subTagGroups = {};
+                for (var n = 0; n < SUB_TAGS.length; n++) subTagGroups[SUB_TAGS[n]] = [];
+                for (var o = 0; o < tasks.length; o++) {
+                    var tt = tasks[o];
+                    var sub = tt.sub_tag || '无';
                     if (!subTagGroups[sub]) subTagGroups[sub] = [];
-                    subTagGroups[sub].push(t);
+                    subTagGroups[sub].push(tt);
                 }
-                for (const sub of SUB_TAGS) {
-                    const subTasks = subTagGroups[sub] || [];
+                for (var p = 0; p < SUB_TAGS.length; p++) {
+                    var subName = SUB_TAGS[p];
+                    var subTasks = subTagGroups[subName] || [];
                     if (!subTasks.length) continue;
-                    const subChecked = subTasks.every(t => selectedTasks.has(t.id));
-                    const subCheckedCount = subTasks.filter(t => selectedTasks.has(t.id)).length;
-                    html += `<div style="padding-left:12px;margin-bottom:4px;">
-                        <div class="collapse-header" onclick="toggleSubCategory('${cat.id}_${sub}')" style="padding:4px 4px;font-size:12px;">
-                            <span>📂 ${sub} (${subTasks.length}个) ${subChecked ? '☑️' : `☐ ${subCheckedCount}/${subTasks.length}`}</span>
-                            <span class="arrow open" id="arrow_${cat.id}_${sub}">▶</span>
-                        </div>
-                        <div class="collapse-body open" id="body_${cat.id}_${sub}">
-                            <div class="task-grid">`;
-                    for (const t of subTasks) {
-                        const mids = taskMemberMap[t.id] || [];
-                        const members = allMembers.filter(m => mids.includes(m.id));
-                        const checked = selectedTasks.has(t.id) ? 'checked' : '';
-                        html += `<div class="task-item" style="flex-wrap:wrap;">
-                            <div style="display:flex;align-items:center;gap:6px;width:100%;">
-                                <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-                                <span class="task-name">${t.task_name}</span>
-                                <span class="task-score">⭐${t.score}分</span>
-                                <span style="font-size:9px;color:var(--text2);">👥${members.length}人</span>
-                                <div class="task-actions">
-                                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-                                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
-                                </div>
-                            </div>
-                            ${members.length ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;padding-left:20px;">${members.map(m => `<span class="person-tag">${m.real_name}<span class="remove-person" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('')}</div>` : ''}
-                        </div>`;
+                    var subChecked = subTasks.every(function(tt) { return selectedTasks.has(tt.id); });
+                    var subCheckedCount = subTasks.filter(function(tt) { return selectedTasks.has(tt.id); }).length;
+                    html += '<div style="padding-left:12px;margin-bottom:4px;">';
+                    html += '<div class="collapse-header" onclick="toggleSubCategory(\'' + catInfo.id + '_' + subName + '\')" style="padding:4px 4px;font-size:12px;">';
+                    html += '<span>📂 ' + subName + ' (' + subTasks.length + '个) ' + (subChecked ? '☑️' : '☐ ' + subCheckedCount + '/' + subTasks.length) + '</span>';
+                    html += '<span class="arrow open" id="arrow_' + catInfo.id + '_' + subName + '">▶</span>';
+                    html += '</div>';
+                    html += '<div class="collapse-body open" id="body_' + catInfo.id + '_' + subName + '">';
+                    html += '<div class="task-grid">';
+                    for (var q = 0; q < subTasks.length; q++) {
+                        var task = subTasks[q];
+                        var mids = taskMemberMap[task.id] || [];
+                        var members = allMembers.filter(function(mm) { return mids.includes(mm.id); });
+                        var checked = selectedTasks.has(task.id) ? 'checked' : '';
+                        var isTaskOpen = sessionStorage.getItem('task_open_' + task.id) !== 'closed';
+                        html += '<div class="task-item" onclick="toggleTaskPeople(' + task.id + ')">';
+                        html += '<div class="task-main">';
+                        html += '<span class="toggle-icon ' + (isTaskOpen ? 'open' : '') + '" id="tog_' + task.id + '">▶</span>';
+                        html += '<input type="checkbox" ' + checked + ' onchange="toggleSelectTask(' + task.id + ')" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;" onclick="event.stopPropagation();">';
+                        html += '<span class="task-name">' + task.task_name + '</span>';
+                        html += '<span class="task-score">⭐' + task.score + '分</span>';
+                        html += '<span style="font-size:9px;color:var(--text2);">👥' + members.length + '人</span>';
+                        html += '<div class="task-actions" onclick="event.stopPropagation();">';
+                        html += '<button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(' + task.id + ',\'' + task.task_name.replace(/'/g, "\\'") + '\',' + task.score + ')">✏️</button>';
+                        html += '<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(' + task.id + ')">✕</button>';
+                        html += '</div>';
+                        html += '</div>';
+                        html += '<div class="task-people ' + (isTaskOpen ? 'open' : '') + '" id="people_' + task.id + '">';
+                        if (members.length) {
+                            for (var r = 0; r < members.length; r++) {
+                                html += '<span class="person-tag">' + members[r].real_name + '<span class="remove-person" onclick="event.stopPropagation();removeTaskMember(' + task.id + ',' + members[r].id + ')">✕</span></span>';
+                            }
+                        } else {
+                            html += '<span style="font-size:11px;color:var(--text2);">暂无成员</span>';
+                        }
+                        html += '</div>';
+                        html += '</div>';
                     }
-                    html += `</div></div></div>`;
+                    html += '</div></div></div>';
                 }
             } else {
-                html += `<div class="task-grid">`;
-                for (const t of tasks) {
-                    const mids = taskMemberMap[t.id] || [];
-                    const members = allMembers.filter(m => mids.includes(m.id));
-                    const checked = selectedTasks.has(t.id) ? 'checked' : '';
-                    const subTagDisplay = t.sub_tag && t.sub_tag !== '无' ? `<span class="tag sub-tag">${t.sub_tag}</span>` : '';
-                    html += `<div class="task-item" style="flex-wrap:wrap;">
-                        <div style="display:flex;align-items:center;gap:6px;width:100%;">
-                            <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-                            <span class="task-name">${t.task_name}</span>
-                            ${subTagDisplay}
-                            <span class="task-score">⭐${t.score}分</span>
-                            <span style="font-size:9px;color:var(--text2);">👥${members.length}人</span>
-                            <div class="task-actions">
-                                <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-                                <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
-                            </div>
-                        </div>
-                        ${members.length ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;padding-left:20px;">${members.map(m => `<span class="person-tag">${m.real_name}<span class="remove-person" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('')}</div>` : ''}
-                    </div>`;
+                html += '<div class="task-grid">';
+                for (var s = 0; s < tasks.length; s++) {
+                    var task2 = tasks[s];
+                    var mids2 = taskMemberMap[task2.id] || [];
+                    var members2 = allMembers.filter(function(mm) { return mids2.includes(mm.id); });
+                    var checked2 = selectedTasks.has(task2.id) ? 'checked' : '';
+                    var subTagDisplay = task2.sub_tag && task2.sub_tag !== '无' ? '<span class="tag sub-tag">' + task2.sub_tag + '</span>' : '';
+                    var isTaskOpen2 = sessionStorage.getItem('task_open_' + task2.id) !== 'closed';
+                    html += '<div class="task-item" onclick="toggleTaskPeople(' + task2.id + ')">';
+                    html += '<div class="task-main">';
+                    html += '<span class="toggle-icon ' + (isTaskOpen2 ? 'open' : '') + '" id="tog_' + task2.id + '">▶</span>';
+                    html += '<input type="checkbox" ' + checked2 + ' onchange="toggleSelectTask(' + task2.id + ')" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;" onclick="event.stopPropagation();">';
+                    html += '<span class="task-name">' + task2.task_name + '</span>';
+                    html += subTagDisplay;
+                    html += '<span class="task-score">⭐' + task2.score + '分</span>';
+                    html += '<span style="font-size:9px;color:var(--text2);">👥' + members2.length + '人</span>';
+                    html += '<div class="task-actions" onclick="event.stopPropagation();">';
+                    html += '<button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(' + task2.id + ',\'' + task2.task_name.replace(/'/g, "\\'") + '\',' + task2.score + ')">✏️</button>';
+                    html += '<button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(' + task2.id + ')">✕</button>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="task-people ' + (isTaskOpen2 ? 'open' : '') + '" id="people_' + task2.id + '">';
+                    if (members2.length) {
+                        for (var t = 0; t < members2.length; t++) {
+                            html += '<span class="person-tag">' + members2[t].real_name + '<span class="remove-person" onclick="event.stopPropagation();removeTaskMember(' + task2.id + ',' + members2[t].id + ')">✕</span></span>';
+                        }
+                    } else {
+                        html += '<span style="font-size:11px;color:var(--text2);">暂无成员</span>';
+                    }
+                    html += '</div>';
+                    html += '</div>';
                 }
-                html += `</div>`;
+                html += '</div>';
             }
-            html += `</div></div>`;
+            html += '</div></div>';
         }
         div.innerHTML = html;
     } catch (e) {
@@ -1584,9 +1211,24 @@ async function loadTaskList() {
     }
 }
 
+function toggleTaskPeople(taskId) {
+    var people = document.getElementById('people_' + taskId);
+    var tog = document.getElementById('tog_' + taskId);
+    if (!people) return;
+    if (people.classList.contains('open')) {
+        people.classList.remove('open');
+        if (tog) tog.classList.remove('open');
+        sessionStorage.setItem('task_open_' + taskId, 'closed');
+    } else {
+        people.classList.add('open');
+        if (tog) tog.classList.add('open');
+        sessionStorage.setItem('task_open_' + taskId, 'open');
+    }
+}
+
 function toggleCategory(catId) {
-    const body = document.getElementById('body_' + catId);
-    const arrow = document.getElementById('arrow_' + catId);
+    var body = document.getElementById('body_' + catId);
+    var arrow = document.getElementById('arrow_' + catId);
     if (!body) return;
     if (body.classList.contains('open')) {
         body.classList.remove('open');
@@ -1607,8 +1249,8 @@ function toggleSubTag() {
 }
 
 function toggleSubCategory(id) {
-    const body = document.getElementById('body_' + id);
-    const arrow = document.getElementById('arrow_' + id);
+    var body = document.getElementById('body_' + id);
+    var arrow = document.getElementById('arrow_' + id);
     if (!body) return;
     if (body.classList.contains('open')) {
         body.classList.remove('open');
@@ -1622,41 +1264,43 @@ function toggleSubCategory(id) {
 }
 
 async function editTask(id, oldName, oldScore) {
-    const overlay = document.createElement('div');
+    var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    const currentTask = allTasks.find(t => t.id === id);
-    const currentSubTag = currentTask?.sub_tag || '无';
-    const currentCategory = currentTask?.category || '无';
-    const dialog = document.createElement('div');
+    var currentTask = allTasks.find(function(t) { return t.id === id; });
+    var currentSubTag = currentTask ? currentTask.sub_tag || '无' : '无';
+    var currentCategory = currentTask ? currentTask.category || '无' : '无';
+    var dialog = document.createElement('div');
     dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:420px;width:90%;';
-    dialog.innerHTML = `
-        <div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>
-        <div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label><input id="editTaskNameInput" type="text" value="${oldName.replace(/"/g, '&quot;')}" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>
-        <div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label><input id="editTaskScoreInput" type="number" value="${oldScore}" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>
-        <div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 主分类</label><select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}<option value="无">📂 无</option></select></div>
-        <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">🏷️ 子标签</label><select id="editTaskSubTagInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">${SUB_TAGS.map(t => `<option value="${t}">${t}</option>`).join('')}</select></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;"><button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button><button id="editTaskConfirmBtn" style="padding:6px 18px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">确认</button></div>
-    `;
+    dialog.innerHTML = '<div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>';
+    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label><input id="editTaskNameInput" type="text" value="' + oldName.replace(/"/g, '&quot;') + '" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>';
+    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label><input id="editTaskScoreInput" type="number" value="' + oldScore + '" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>';
+    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 主分类</label><select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">';
+    TASK_CATEGORIES.forEach(function(c) { dialog.innerHTML += '<option value="' + c.id + '">' + c.icon + ' ' + c.name + '</option>'; });
+    dialog.innerHTML += '<option value="无">📂 无</option></select></div>';
+    dialog.innerHTML += '<div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">🏷️ 子标签</label><select id="editTaskSubTagInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">';
+    SUB_TAGS.forEach(function(t) { dialog.innerHTML += '<option value="' + t + '">' + t + '</option>'; });
+    dialog.innerHTML += '</select></div>';
+    dialog.innerHTML += '<div style="display:flex;gap:8px;justify-content:flex-end;"><button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button><button id="editTaskConfirmBtn" style="padding:6px 18px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">确认</button></div>';
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
-    const catSel = document.getElementById('editTaskCategoryInput');
+    var catSel = document.getElementById('editTaskCategoryInput');
     if (catSel && currentCategory) catSel.value = currentCategory;
-    const subSel = document.getElementById('editTaskSubTagInput');
+    var subSel = document.getElementById('editTaskSubTagInput');
     if (subSel && currentSubTag) subSel.value = currentSubTag;
-    setTimeout(() => { const nameInput = document.getElementById('editTaskNameInput'); if (nameInput) nameInput.focus(); }, 100);
-    return new Promise((resolve) => {
-        const nameInput = document.getElementById('editTaskNameInput');
-        const scoreInput = document.getElementById('editTaskScoreInput');
-        const catInput = document.getElementById('editTaskCategoryInput');
-        const subInput = document.getElementById('editTaskSubTagInput');
-        const confirmBtn = document.getElementById('editTaskConfirmBtn');
-        const cancelBtn = document.getElementById('editTaskCancelBtn');
+    setTimeout(function() { var ni = document.getElementById('editTaskNameInput'); if (ni) ni.focus(); }, 100);
+    return new Promise(function(resolve) {
+        var nameInput = document.getElementById('editTaskNameInput');
+        var scoreInput = document.getElementById('editTaskScoreInput');
+        var catInput = document.getElementById('editTaskCategoryInput');
+        var subInput = document.getElementById('editTaskSubTagInput');
+        var confirmBtn = document.getElementById('editTaskConfirmBtn');
+        var cancelBtn = document.getElementById('editTaskCancelBtn');
         function closeDialog() { if (overlay.parentNode) overlay.remove(); resolve(); }
         function handleConfirm() {
-            const newName = nameInput.value.trim();
-            const newScore = parseInt(scoreInput.value);
-            const newCategory = catInput ? catInput.value : '无';
-            const newSubTag = subInput ? subInput.value : '无';
+            var newName = nameInput.value.trim();
+            var newScore = parseInt(scoreInput.value);
+            var newCategory = catInput ? catInput.value : '无';
+            var newSubTag = subInput ? subInput.value : '无';
             if (!newName) { showToast('⚠️请输入任务名称', 'warning'); return; }
             if (isNaN(newScore) || newScore < 0) { showToast('⚠️请输入有效的分数（大于等于0）', 'warning'); return; }
             closeDialog();
@@ -1664,9 +1308,9 @@ async function editTask(id, oldName, oldScore) {
         }
         confirmBtn.addEventListener('click', handleConfirm);
         cancelBtn.addEventListener('click', closeDialog);
-        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
-        scoreInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDialog(); });
+        nameInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleConfirm(); });
+        scoreInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleConfirm(); });
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) closeDialog(); });
     });
 }
 
@@ -1696,44 +1340,46 @@ async function removeTaskMember(taskId, memberId) {
 
 function filterTaskList(q) {
     if (!q) { loadTaskList(); return; }
-    const filtered = allTasks.filter(t => t.task_name.toLowerCase().includes(q.toLowerCase()));
-    const div = document.getElementById('taskList');
+    var filtered = allTasks.filter(function(t) { return t.task_name.toLowerCase().includes(q.toLowerCase()); });
+    var div = document.getElementById('taskList');
     if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配任务</div></div>'; return; }
-    const categorized = {};
-    for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) categorized[cat.id] = [];
-    for (const t of filtered) {
-        let cat = t.category;
-        if (!cat || !TASK_CATEGORIES.some(c => c.id === cat)) cat = '无';
+    var categorized = {};
+    var allCats = TASK_CATEGORIES.concat([{ id: '无', icon: '📂', name: '无' }]);
+    for (var i = 0; i < allCats.length; i++) categorized[allCats[i].id] = [];
+    for (var j = 0; j < filtered.length; j++) {
+        var t = filtered[j];
+        var cat = t.category;
+        if (!cat || !TASK_CATEGORIES.some(function(c) { return c.id === cat; })) cat = '无';
         if (!categorized[cat]) categorized[cat] = [];
         categorized[cat].push(t);
     }
-    let html = '';
-    html += `<div class="sub-tag-filter"><input type="checkbox" id="showSubTagCheck" ${showSubTag ? 'checked' : ''} onchange="toggleSubTag()"><label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label></div>`;
-    for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) {
-        const tasks = categorized[cat.id] || [];
+    var html = '';
+    html += '<div class="sub-tag-filter"><input type="checkbox" id="showSubTagCheck" ' + (showSubTag ? 'checked' : '') + ' onchange="toggleSubTag()"><label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label></div>';
+    for (var k = 0; k < allCats.length; k++) {
+        var tasks = categorized[allCats[k].id] || [];
         if (!tasks.length) continue;
-        html += `<div class="card" style="padding:8px 12px;"><div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;"><span style="font-weight:600;font-size:13px;">${cat.icon} ${cat.name} (${tasks.length}个)</span></div><div class="task-grid">`;
-        for (const t of tasks) {
-            const checked = selectedTasks.has(t.id) ? 'checked' : '';
-            const subTagDisplay = t.sub_tag && t.sub_tag !== '无' ? `<span class="tag sub-tag">${t.sub_tag}</span>` : '';
-            html += `<div class="task-item" style="flex-wrap:wrap;">
-                <div style="display:flex;align-items:center;gap:6px;width:100%;">
-                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-                    <span class="task-name">${t.task_name}</span>
-                    ${subTagDisplay}
-                    <span class="task-score">⭐${t.score}分</span>
-                    <div class="task-actions"><button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button><button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button></div>
-                </div>
-            </div>`;
+        html += '<div class="card" style="padding:8px 12px;"><div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;"><span style="font-weight:600;font-size:13px;">' + allCats[k].icon + ' ' + allCats[k].name + ' (' + tasks.length + '个)</span></div><div class="task-grid">';
+        for (var l = 0; l < tasks.length; l++) {
+            var t2 = tasks[l];
+            var checked = selectedTasks.has(t2.id) ? 'checked' : '';
+            var subTagDisplay2 = t2.sub_tag && t2.sub_tag !== '无' ? '<span class="tag sub-tag">' + t2.sub_tag + '</span>' : '';
+            html += '<div class="task-item" style="cursor:default;">';
+            html += '<div class="task-main">';
+            html += '<input type="checkbox" ' + checked + ' onchange="toggleSelectTask(' + t2.id + ')" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">';
+            html += '<span class="task-name">' + t2.task_name + '</span>';
+            html += subTagDisplay2;
+            html += '<span class="task-score">⭐' + t2.score + '分</span>';
+            html += '<div class="task-actions"><button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(' + t2.id + ',\'' + t2.task_name.replace(/'/g, "\\'") + '\',' + t2.score + ')">✏️</button><button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(' + t2.id + ')">✕</button></div>';
+            html += '</div></div>';
         }
-        html += `</div></div>`;
+        html += '</div></div>';
     }
     div.innerHTML = html;
 }
 
 // ===== 成员管理 =====
 function initMemberMgrTab() {
-    const p = document.getElementById('tab-member-mgr');
+    var p = document.getElementById('tab-member-mgr');
     if (!p) return;
     p.innerHTML = `
         <div class="card">
@@ -1757,18 +1403,18 @@ function initMemberMgrTab() {
         <div class="section-title">👥所有成员 <span id="memberCount" style="font-size:10px;color:var(--text2)"></span></div>
         <div id="memberList"></div>`;
     document.getElementById('btnAddMember').addEventListener('click', addMember);
-    document.getElementById('newMemberName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addMember(); });
+    document.getElementById('newMemberName').addEventListener('keydown', function(e) { if (e.key === 'Enter') addMember(); });
     document.getElementById('btnBatchImport').addEventListener('click', batchImportMembers);
-    document.getElementById('memberSearchFilter').addEventListener('keydown', (e) => { loadMemberList(e.target.value.trim()); });
-    document.getElementById('memberSearchFilter').addEventListener('input', (e) => { loadMemberList(e.target.value.trim()); });
-    document.getElementById('btnClearMemberSearch').addEventListener('click', () => { document.getElementById('memberSearchFilter').value = ''; loadMemberList(); });
+    document.getElementById('memberSearchFilter').addEventListener('keydown', function(e) { loadMemberList(e.target.value.trim()); });
+    document.getElementById('memberSearchFilter').addEventListener('input', function(e) { loadMemberList(e.target.value.trim()); });
+    document.getElementById('btnClearMemberSearch').addEventListener('click', function() { document.getElementById('memberSearchFilter').value = ''; loadMemberList(); });
     loadMemberList();
 }
 
 async function addMember() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const name = document.getElementById('newMemberName').value.trim();
-    const alias = document.getElementById('newMemberAlias').value.trim();
+    var name = document.getElementById('newMemberName').value.trim();
+    var alias = document.getElementById('newMemberAlias').value.trim();
     if (!name) { showToast('⚠️请输入大名', 'warning'); return; }
     try {
         await db.members.create({ guild_id: currentGuildId, real_name: name, alias: alias });
@@ -1782,16 +1428,16 @@ async function addMember() {
 
 async function batchImportMembers() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const text = document.getElementById('batchMemberImport').value.trim();
+    var text = document.getElementById('batchMemberImport').value.trim();
     if (!text) { showToast('⚠️请输入成员数据', 'warning'); return; }
-    const lines = text.split('\n').filter(l => l.trim());
-    let created = 0, updated = 0, fail = 0;
-    for (const line of lines) {
-        const parts = line.split(',').map(s => s.trim());
-        const name = parts[0], alias = parts.slice(1).join(',');
+    var lines = text.split('\n').filter(function(l) { return l.trim(); });
+    var created = 0, updated = 0, fail = 0;
+    for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].split(',').map(function(s) { return s.trim(); });
+        var name = parts[0], alias = parts.slice(1).join(',');
         if (!name) { fail++; continue; }
         try {
-            const existing = await db.members.getByName(currentGuildId, name);
+            var existing = await db.members.getByName(currentGuildId, name);
             if (existing.length) {
                 await db.members.update(existing[0].id, { alias: alias });
                 updated++;
@@ -1801,44 +1447,36 @@ async function batchImportMembers() {
             }
         } catch (e) { console.warn('导入失败:', name, e.message); fail++; }
     }
-    let msg = `✅新增${created}人`;
-    if (updated > 0) msg += `，更新${updated}人`;
-    if (fail > 0) msg += `，失败${fail}人（F12查看）`;
+    var msg = '✅新增' + created + '人';
+    if (updated > 0) msg += '，更新' + updated + '人';
+    if (fail > 0) msg += '，失败' + fail + '人（F12查看）';
     showToast(msg, 'success');
     document.getElementById('batchMemberImport').value = '';
     await refreshCurrentGuildData();
     loadMemberList();
 }
 
-async function loadMemberList(filterQuery = '') {
-    const div = document.getElementById('memberList');
+async function loadMemberList(filterQuery) {
+    filterQuery = filterQuery || '';
+    var div = document.getElementById('memberList');
     if (!div || !currentGuildId) return;
     try {
         allMembers = await db.members.list(currentGuildId);
-        let filtered = allMembers;
+        var filtered = allMembers;
         if (filterQuery) {
-            const q = filterQuery.toLowerCase();
-            filtered = allMembers.filter(m => m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q));
+            var q = filterQuery.toLowerCase();
+            filtered = allMembers.filter(function(m) { return m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q); });
         }
-        const ce = document.getElementById('memberCount');
-        if (ce) ce.textContent = `（${filtered.length}/${allMembers.length}人）`;
+        var ce = document.getElementById('memberCount');
+        if (ce) ce.textContent = '（' + filtered.length + '/' + allMembers.length + '人）';
         if (!filtered.length) {
             div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
             return;
         }
-        let html = '';
-        for (const m of filtered) {
-            html += `<div class="card">
-                <button class="btn-close" onclick="deleteMember(${m.id})">✕</button>
-                <div class="card-header">
-                    <span class="card-title">👤${m.real_name}</span>
-                    <div style="display:flex;gap:2px">
-                        <button class="btn btn-outline btn-xs" onclick="editMemberName(${m.id},'${m.real_name.replace(/'/g, "\\'")}')">✏️改大名</button>
-                        <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g, "\\'")}','${(m.alias || '').replace(/'/g, "\\'")}')">✏️改别名</button>
-                    </div>
-                </div>
-                <div style="font-size:11px;color:var(--text2)">🏷️别名：${m.alias ? m.alias.replace(/,/g, '、') : '无'}</div>
-            </div>`;
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var m = filtered[i];
+            html += '<div class="card"><button class="btn-close" onclick="deleteMember(' + m.id + ')">✕</button><div class="card-header"><span class="card-title">👤' + m.real_name + '</span><div style="display:flex;gap:2px"><button class="btn btn-outline btn-xs" onclick="editMemberName(' + m.id + ',\'' + m.real_name.replace(/'/g, "\\'") + '\')">✏️改大名</button><button class="btn btn-outline btn-xs" onclick="editAlias(' + m.id + ',\'' + m.real_name.replace(/'/g, "\\'") + '\',\'' + (m.alias || '').replace(/'/g, "\\'") + '\')">✏️改别名</button></div></div><div style="font-size:11px;color:var(--text2);">🏷️别名：' + (m.alias ? m.alias.replace(/,/g, '、') : '无') + '</div></div>';
         }
         div.innerHTML = html;
     } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; }
@@ -1856,7 +1494,7 @@ async function deleteMember(id) {
 }
 
 async function editMemberName(memberId, currentName) {
-    const newName = prompt(`✏️修改「${currentName}」的大名`, currentName);
+    var newName = prompt('✏️修改「' + currentName + '」的大名', currentName);
     if (!newName || newName.trim() === '' || newName.trim() === currentName) return;
     try {
         await db.members.update(memberId, { real_name: newName.trim() });
@@ -1867,7 +1505,7 @@ async function editMemberName(memberId, currentName) {
 }
 
 async function editAlias(memberId, name, currentAlias) {
-    const newAlias = prompt(`✏️编辑「${name}」的别名\n（逗号或顿号分隔多个别名）`, currentAlias);
+    var newAlias = prompt('✏️编辑「' + name + '」的别名\n（逗号或顿号分隔多个别名）', currentAlias);
     if (newAlias === null) return;
     try {
         await db.members.update(memberId, { alias: newAlias.trim() });
@@ -1879,7 +1517,7 @@ async function editAlias(memberId, name, currentAlias) {
 
 // ===== 推荐页面 =====
 function initRecommendTab() {
-    const p = document.getElementById('tab-recommend');
+    var p = document.getElementById('tab-recommend');
     if (!p) return;
     p.innerHTML = `
         <div class="card">
@@ -1894,13 +1532,13 @@ function initRecommendTab() {
                 <label>🎯 目标档位</label>
                 <select id="recommendTargetSelect">
                     <option value="0">-- 请选择目标 --</option>
-                    ${ACHIEVEMENT_TIERS.map(t => `<option value="${t.score}">${t.name} ${t.score}分</option>`).join('')}
+                    ${ACHIEVEMENT_TIERS.map(function(t) { return '<option value="' + t.score + '">' + t.name + ' ' + t.score + '分</option>'; }).join('')}
                 </select>
             </div>
             <div class="form-group">
                 <label>📊 选择分数档位（可多选）</label>
                 <div class="score-filter-group" id="recommendScoreFilters">
-                    ${SCORE_FILTERS.map(s => `<label class="score-filter-label" data-score="${s}"><input type="checkbox" value="${s}">${s}分</label>`).join('')}
+                    ${SCORE_FILTERS.map(function(s) { return '<label class="score-filter-label" data-score="' + s + '"><input type="checkbox" value="' + s + '">' + s + '分</label>'; }).join('')}
                 </div>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1921,9 +1559,9 @@ function initRecommendTab() {
     loadRecommendMembers();
     loadRecommendCards();
 
-    document.querySelectorAll('.score-filter-label').forEach(label => {
+    document.querySelectorAll('.score-filter-label').forEach(function(label) {
         label.addEventListener('click', function(e) {
-            const cb = this.querySelector('input[type="checkbox"]');
+            var cb = this.querySelector('input[type="checkbox"]');
             cb.checked = !cb.checked;
             this.classList.toggle('checked', cb.checked);
         });
@@ -1935,27 +1573,27 @@ function initRecommendTab() {
 }
 
 async function loadRecommendMembers() {
-    const sel = document.getElementById('recommendMemberSelect');
+    var sel = document.getElementById('recommendMemberSelect');
     if (!sel || !currentGuildId) return;
     try {
-        const members = await db.members.list(currentGuildId);
+        var members = await db.members.list(currentGuildId);
         sel.innerHTML = '<option value="">-- 请选择成员 --</option>';
-        members.forEach(m => {
-            sel.innerHTML += `<option value="${m.id}">${m.real_name}</option>`;
+        members.forEach(function(m) {
+            sel.innerHTML += '<option value="' + m.id + '">' + m.real_name + '</option>';
         });
     } catch (e) {}
 }
 
 async function loadMemberRecommendData() {
-    const memberId = document.getElementById('recommendMemberSelect').value;
+    var memberId = document.getElementById('recommendMemberSelect').value;
     if (!memberId) return;
     try {
-        const targets = await db.recommendTargets.list(currentGuildId);
-        const target = targets.find(t => t.member_id == memberId);
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var target = targets.find(function(t) { return t.member_id == memberId; });
         if (target) {
             document.getElementById('recommendTargetSelect').value = target.target_score || 0;
-            const scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
-            document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(cb => {
+            var scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
+            document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(function(cb) {
                 cb.checked = scores.includes(parseInt(cb.value));
                 cb.closest('.score-filter-label').classList.toggle('checked', cb.checked);
             });
@@ -1967,100 +1605,88 @@ async function loadMemberRecommendData() {
 function clearRecommendForm() {
     document.getElementById('recommendMemberSelect').value = '';
     document.getElementById('recommendTargetSelect').value = '0';
-    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(cb => {
+    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(function(cb) {
         cb.checked = false;
         cb.closest('.score-filter-label').classList.remove('checked');
     });
     document.getElementById('recommendSaveResult').innerHTML = '';
-    editingRecommendTarget = null;
     showToast('🧹 已清空表单', 'info');
 }
 
 async function saveRecommendTarget() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const memberId = document.getElementById('recommendMemberSelect').value;
-    const targetScore = parseInt(document.getElementById('recommendTargetSelect').value) || 0;
-    const checkedScores = [];
-    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]:checked').forEach(cb => {
+    var memberId = document.getElementById('recommendMemberSelect').value;
+    var targetScore = parseInt(document.getElementById('recommendTargetSelect').value) || 0;
+    var checkedScores = [];
+    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]:checked').forEach(function(cb) {
         checkedScores.push(parseInt(cb.value));
     });
     if (!memberId) { showToast('⚠️请选择成员', 'warning'); return; }
     if (!targetScore) { showToast('⚠️请选择目标档位', 'warning'); return; }
     if (!checkedScores.length) { showToast('⚠️请至少选择一个分数档位', 'warning'); return; }
 
-    const data = {
-        guild_id: currentGuildId,
-        member_id: parseInt(memberId),
-        target_score: targetScore,
-        selected_scores: checkedScores.join(',')
-    };
-
     try {
-        // 先删除已有记录再插入（upsert方式）
+        // 先删后插
         await db.recommendTargets.delete(currentGuildId, parseInt(memberId));
-        await db.recommendTargets.upsert(data);
+        await db.recommendTargets.upsert({
+            guild_id: currentGuildId,
+            member_id: parseInt(memberId),
+            target_score: targetScore,
+            selected_scores: checkedScores.join(',')
+        });
         showToast('✅ 目标已保存！', 'success');
         document.getElementById('recommendSaveResult').innerHTML = '<div style="color:var(--success);font-size:13px;">✅ 保存成功！</div>';
-        setTimeout(() => { document.getElementById('recommendSaveResult').innerHTML = ''; }, 3000);
+        setTimeout(function() { document.getElementById('recommendSaveResult').innerHTML = ''; }, 3000);
         await loadRecommendCards();
-        // 刷新查询页面的缓存
         await refreshCurrentGuildData();
-        // 如果搜索标签已初始化，刷新搜索结果
-        const searchTab = document.getElementById('tab-search');
-        if (searchTab && searchTab.classList.contains('active')) {
-            const searchMemberInput = document.getElementById('adminSearchMember');
-            if (searchMemberInput && searchMemberInput.value.trim()) {
-                searchMemberForAdmin();
-            }
-            const searchTaskInput = document.getElementById('adminSearchTask');
-            if (searchTaskInput && searchTaskInput.value.trim()) {
-                searchTaskForAdmin();
-            }
-        }
     } catch (e) {
-        showToast('❌ 保存失败', 'error');
+        showToast('❌ 保存失败：' + (e.message || '未知错误'), 'error');
         console.error(e);
     }
 }
 
 async function loadRecommendCards() {
-    const container = document.getElementById('recommendCardContainer');
+    var container = document.getElementById('recommendCardContainer');
     if (!container || !currentGuildId) return;
     try {
-        const targets = await db.recommendTargets.list(currentGuildId);
+        var targets = await db.recommendTargets.list(currentGuildId);
         if (!targets.length) {
             container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无成员保存目标</div></div>';
             return;
         }
-        const members = await db.members.list(currentGuildId);
-        const allTasks = await db.tasks.list(currentGuildId);
-        let html = '<div class="recommend-card-grid">';
-        for (const target of targets) {
-            const member = members.find(m => m.id === target.member_id);
+        var members = await db.members.list(currentGuildId);
+        var allTasks = await db.tasks.list(currentGuildId);
+        var html = '<div class="recommend-card-grid">';
+        for (var i = 0; i < targets.length; i++) {
+            var target = targets[i];
+            var member = members.find(function(m) { return m.id === target.member_id; });
             if (!member) continue;
-            const scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
-            // 计算该成员选中的任务数
-            const memberTasks = await db.taskMembers.listByMember(member.id);
-            const taskIds = memberTasks.map(t => t.task_id);
-            const availableTasks = allTasks.filter(t => taskIds.includes(t.id));
-            const selectedTasks = availableTasks.filter(t => scores.includes(t.score));
-            const totalAvailable = availableTasks.length;
+            var scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
+            var memberTasks = await db.taskMembers.listByMember(member.id);
+            var taskIds = memberTasks.map(function(t) { return t.task_id; });
+            var availableTasks = allTasks.filter(function(t) { return taskIds.includes(t.id); });
+            var selectedTasks2 = availableTasks.filter(function(t) { return scores.includes(t.score); });
+            var totalAvailable = availableTasks.length;
 
-            html += `
-                <div class="recommend-card" data-memberid="${member.id}">
-                    <button class="rc-delete" onclick="deleteRecommendTarget(${member.id})" title="删除目标">✕</button>
-                    <div class="rc-name">${member.real_name}</div>
-                    <div class="rc-target">🎯 ${target.target_score}分</div>
-                    <div class="rc-scores">📊 ${scores.join('、')}分</div>
-                    <div class="rc-count">📋 可做 ${selectedTasks.length} 个任务（共${totalAvailable}个）</div>
-                    <button class="rc-edit" onclick="editRecommendTarget(${member.id})">✏️ 修改</button>
-                    <div class="rc-body" id="rc_body_${member.id}">
-                        <div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 目标任务：</div>
-                        ${selectedTasks.length ? selectedTasks.map(t => `<div class="task-item" style="font-size:11px;padding:2px 4px;">${t.task_name} ⭐${t.score}</div>`).join('') : '<div style="font-size:11px;color:var(--text2);">暂无匹配任务</div>'}
-                    </div>
-                    <div style="font-size:11px;color:var(--text2);margin-top:4px;cursor:pointer;" onclick="toggleRecommendCard(${member.id})">▼ 展开</div>
-                </div>
-            `;
+            html += '<div class="recommend-card" data-memberid="' + member.id + '">';
+            html += '<button class="rc-delete" onclick="deleteRecommendTarget(' + member.id + ')" title="删除目标">✕</button>';
+            html += '<div class="rc-name">' + member.real_name + '</div>';
+            html += '<div class="rc-target">🎯 ' + target.target_score + '分</div>';
+            html += '<div class="rc-scores">📊 ' + scores.join('、') + '分</div>';
+            html += '<div class="rc-count">📋 可做 ' + selectedTasks2.length + ' 个任务（共' + totalAvailable + '个）</div>';
+            html += '<button class="rc-edit" onclick="editRecommendTarget(' + member.id + ')">✏️ 修改</button>';
+            html += '<div class="rc-body" id="rc_body_' + member.id + '">';
+            if (selectedTasks2.length) {
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 目标任务：</div>';
+                selectedTasks2.forEach(function(t) {
+                    html += '<div class="task-item" style="font-size:11px;padding:2px 4px;cursor:default;">' + t.task_name + ' ⭐' + t.score + '</div>';
+                });
+            } else {
+                html += '<div style="font-size:11px;color:var(--text2);">暂无匹配任务</div>';
+            }
+            html += '</div>';
+            html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;cursor:pointer;" onclick="toggleRecommendCard(' + member.id + ')">▼ 展开</div>';
+            html += '</div>';
         }
         html += '</div>';
         container.innerHTML = html;
@@ -2071,11 +1697,11 @@ async function loadRecommendCards() {
 }
 
 function toggleRecommendCard(memberId) {
-    const body = document.getElementById('rc_body_' + memberId);
+    var body = document.getElementById('rc_body_' + memberId);
     if (!body) return;
     body.classList.toggle('open');
-    const parent = body.closest('.recommend-card');
-    const toggleText = parent.querySelector('.rc-body ~ div');
+    var parent = body.closest('.recommend-card');
+    var toggleText = parent.querySelector('.rc-body ~ div');
     if (toggleText) {
         toggleText.textContent = body.classList.contains('open') ? '▲ 收起' : '▼ 展开';
     }
@@ -2096,18 +1722,17 @@ async function deleteRecommendTarget(memberId) {
 
 async function editRecommendTarget(memberId) {
     try {
-        const targets = await db.recommendTargets.list(currentGuildId);
-        const target = targets.find(t => t.member_id == memberId);
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var target = targets.find(function(t) { return t.member_id == memberId; });
         if (!target) { showToast('⚠️ 未找到该成员的目标', 'warning'); return; }
         document.getElementById('recommendMemberSelect').value = memberId;
         document.getElementById('recommendTargetSelect').value = target.target_score || 0;
-        const scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
-        document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(cb => {
+        var scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
+        document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]').forEach(function(cb) {
             cb.checked = scores.includes(parseInt(cb.value));
             cb.closest('.score-filter-label').classList.toggle('checked', cb.checked);
         });
         showToast('✏️ 已加载该成员数据，修改后点击保存', 'info');
-        // 滚动到表单
         document.querySelector('#tab-recommend .card').scrollIntoView({ behavior: 'smooth' });
     } catch (e) {
         showToast('❌ 加载失败', 'error');
@@ -2117,38 +1742,27 @@ async function editRecommendTarget(memberId) {
 
 // ===== 公会管理 =====
 function initGuildMgrTab() {
-    const p = document.getElementById('tab-guild-mgr');
+    var p = document.getElementById('tab-guild-mgr');
     if (!p) return;
-    p.innerHTML = `
-        <div class="card">
-            <div class="section-title">🏰创建新公会</div>
-            <div class="form-row">
-                <div class="form-group"><label>📛公会名称</label><input type="text" id="newGuildName" placeholder="例如：战神联盟"></div>
-                <div class="form-group"><label>📝我的备注</label><input type="text" id="newGuildNote" placeholder="仅自己可见"></div>
-            </div>
-            <button class="btn btn-accent btn-sm" id="btnCreateGuild">🎉创建公会</button>
-        </div>
-        <hr class="divider">
-        <div class="section-title">📋所有公会</div>
-        <div id="guildList"></div>`;
+    p.innerHTML = '<div class="card"><div class="section-title">🏰创建新公会</div><div class="form-row"><div class="form-group"><label>📛公会名称</label><input type="text" id="newGuildName" placeholder="例如：战神联盟"></div><div class="form-group"><label>📝我的备注</label><input type="text" id="newGuildNote" placeholder="仅自己可见"></div></div><button class="btn btn-accent btn-sm" id="btnCreateGuild">🎉创建公会</button></div><hr class="divider"><div class="section-title">📋所有公会</div><div id="guildList"></div>';
     document.getElementById('btnCreateGuild').addEventListener('click', createGuild);
-    document.getElementById('newGuildName').addEventListener('keydown', (e) => { if (e.key === 'Enter') createGuild(); });
+    document.getElementById('newGuildName').addEventListener('keydown', function(e) { if (e.key === 'Enter') createGuild(); });
     loadGuildList();
 }
 
 async function createGuild() {
-    const name = document.getElementById('newGuildName').value.trim() || '新公会';
-    const note = document.getElementById('newGuildNote').value.trim();
-    let code;
-    let exists = true;
+    var name = document.getElementById('newGuildName').value.trim() || '新公会';
+    var note = document.getElementById('newGuildNote').value.trim();
+    var code;
+    var exists = true;
     while (exists) {
         code = String(Math.floor(10000 + Math.random() * 90000));
-        const ex = await db.guilds.getByCode(code);
+        var ex = await db.guilds.getByCode(code);
         exists = ex.length > 0;
     }
     try {
-        await db.guilds.create({ name, invite_code: code, admin_note: note });
-        showToast(`🎉创建成功！邀请码：${code}`, 'success');
+        await db.guilds.create({ name: name, invite_code: code, admin_note: note });
+        showToast('🎉创建成功！邀请码：' + code, 'success');
         document.getElementById('newGuildName').value = '';
         document.getElementById('newGuildNote').value = '';
         await loadAllGuilds();
@@ -2157,54 +1771,45 @@ async function createGuild() {
 }
 
 async function loadGuildList() {
-    const div = document.getElementById('guildList');
+    var div = document.getElementById('guildList');
     if (!div) return;
     await loadAllGuilds();
     if (!allGuilds.length) {
         div.innerHTML = '<div class="empty-state"><div class="icon">🏰</div><div class="text">还没有公会</div></div>';
         return;
     }
-    const countMap = {};
-    await Promise.all(allGuilds.map(async (g) => {
-        try { const m = await db.members.list(g.id); countMap[g.id] = m.length; }
+    var countMap = {};
+    await Promise.all(allGuilds.map(async function(g) {
+        try { var m = await db.members.list(g.id); countMap[g.id] = m.length; }
         catch (e) { countMap[g.id] = '?'; }
     }));
-    let html = '';
-    for (const g of allGuilds) {
-        html += `<div class="card guild-card">
-            <div class="info-row"><span class="label">🏰公会名称：</span><span class="value">${g.name}</span></div>
-            <div class="info-row"><span class="label">🔑邀请码：</span><span class="value" style="color:var(--gold);font-size:15px;font-weight:700">${g.invite_code}</span></div>
-            <div class="info-row"><span class="label">👥人数：</span><span class="value">${countMap[g.id] !== undefined ? countMap[g.id] : '...'}人</span></div>
-            <div class="info-row"><span class="label">📝我的备注：</span><span class="note-highlight">${g.admin_note || '无'}</span></div>
-            <div class="guild-actions">
-                <button class="btn btn-accent btn-sm" onclick="enterGuild(${g.id})">🚀进入公会</button>
-                <button class="btn btn-outline btn-sm" onclick="viewGuild(${g.id})">👀查看</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteGuild(${g.id},'${g.invite_code}')">🗑️删除</button>
-            </div>
-        </div>`;
+    var html = '';
+    for (var i = 0; i < allGuilds.length; i++) {
+        var g = allGuilds[i];
+        html += '<div class="card guild-card"><div class="info-row"><span class="label">🏰公会名称：</span><span class="value">' + g.name + '</span></div><div class="info-row"><span class="label">🔑邀请码：</span><span class="value" style="color:var(--gold);font-size:15px;font-weight:700">' + g.invite_code + '</span></div><div class="info-row"><span class="label">👥人数：</span><span class="value">' + (countMap[g.id] !== undefined ? countMap[g.id] : '...') + '人</span></div><div class="info-row"><span class="label">📝我的备注：</span><span class="note-highlight">' + (g.admin_note || '无') + '</span></div><div class="guild-actions"><button class="btn btn-accent btn-sm" onclick="enterGuild(' + g.id + ')">🚀进入公会</button><button class="btn btn-outline btn-sm" onclick="viewGuild(' + g.id + ')">👀查看</button><button class="btn btn-danger btn-sm" onclick="deleteGuild(' + g.id + ',\'' + g.invite_code + '\')">🗑️删除</button></div></div>';
     }
     div.innerHTML = html;
 }
 
 async function enterGuild(guildId) {
     currentGuildId = guildId;
-    const guild = allGuilds.find(g => g.id === guildId);
-    document.getElementById('headerTitle').textContent = `🏰${guild.name}`;
+    var guild = allGuilds.find(function(g) { return g.id === guildId; });
+    document.getElementById('headerTitle').textContent = '🏰' + guild.name;
     document.getElementById('headerBadge').textContent = '管理员模式';
-    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:4px">↩返回</button>`;
+    document.getElementById('headerInfo').innerHTML = '邀请码：' + guild.invite_code + ' <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:4px">↩返回</button>';
     await refreshCurrentGuildData();
     initAdminSearchTab();
     initTaskMgrTab();
     initMemberMgrTab();
     initRecommendTab();
-    const tabs = document.querySelectorAll('.tab');
-    const panels = document.querySelectorAll('.tab-content');
-    tabs.forEach(t => t.classList.remove('active'));
-    panels.forEach(p => p.classList.remove('active'));
+    var tabs = document.querySelectorAll('.tab');
+    var panels = document.querySelectorAll('.tab-content');
+    tabs.forEach(function(t) { t.classList.remove('active'); });
+    panels.forEach(function(p) { p.classList.remove('active'); });
     if (tabs[0]) tabs[0].classList.add('active');
-    const p0 = document.getElementById('tab-search');
+    var p0 = document.getElementById('tab-search');
     if (p0) p0.classList.add('active');
-    showToast(`✅已进入「${guild.name}」`, 'success');
+    showToast('✅已进入「' + guild.name + '」', 'success');
 }
 
 async function backToAdmin() {
@@ -2218,25 +1823,24 @@ async function backToAdmin() {
         { name: '📋任务', id: 'tab-task-mgr' },
         { name: '👥成员', id: 'tab-member-mgr' },
         { name: '🧠推荐', id: 'tab-recommend' },
-        { name: '🏰公会', id: 'tab-guild-mgr' },
-        { name: '⚙️分类规则', id: 'tab-rules' }
+        { name: '🏰公会', id: 'tab-guild-mgr' }
     ]);
     showToast('↩已返回管理员后台', 'info');
 }
 
 async function viewGuild(guildId) {
-    const guild = allGuilds.find(g => g.id === guildId);
-    const members = await db.members.list(guildId);
-    const tasks = await db.tasks.list(guildId);
-    let msg = `🏰${guild.name}\n🔑邀请码：${guild.invite_code}\n\n👥成员（${members.length}人）：\n`;
-    members.forEach(m => { msg += `  - ${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}\n`; });
-    msg += `\n📋任务（${tasks.length}个）：\n`;
-    tasks.forEach(t => { msg += `  - ${t.task_name} ⭐${t.score}分\n`; });
+    var guild = allGuilds.find(function(g) { return g.id === guildId; });
+    var members = await db.members.list(guildId);
+    var tasks = await db.tasks.list(guildId);
+    var msg = '🏰' + guild.name + '\n🔑邀请码：' + guild.invite_code + '\n\n👥成员（' + members.length + '人）：\n';
+    members.forEach(function(m) { msg += '  - ' + m.real_name + (m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : '') + '\n'; });
+    msg += '\n📋任务（' + tasks.length + '个）：\n';
+    tasks.forEach(function(t) { msg += '  - ' + t.task_name + ' ⭐' + t.score + '分\n'; });
     alert(msg);
 }
 
 async function deleteGuild(guildId, code) {
-    if (!confirm(`⚠️确定删除该公会吗？\n邀请码：${code}\n\n所有数据不可恢复，用户将被强制退出！`)) return;
+    if (!confirm('⚠️确定删除该公会吗？\n邀请码：' + code + '\n\n所有数据不可恢复，用户将被强制退出！')) return;
     try {
         await db.guilds.delete(guildId);
         showToast('🗑️已删除', 'success');
@@ -2253,11 +1857,11 @@ async function deleteGuild(guildId, code) {
 // ===== 公会成员页面 =====
 async function loadMemberPage(guild) {
     currentGuildId = guild.id;
-    document.getElementById('headerTitle').textContent = `🏰${guild.name}`;
+    document.getElementById('headerTitle').textContent = '🏰' + guild.name;
     document.getElementById('headerBadge').textContent = '公会成员';
-    let memberCount = 0;
-    try { const m = await db.members.list(currentGuildId); memberCount = m.length; } catch (e) {}
-    document.getElementById('headerInfo').innerHTML = `👥${memberCount}人 | 邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:4px">✏️改名</button>`;
+    var memberCount = 0;
+    try { var m = await db.members.list(currentGuildId); memberCount = m.length; } catch (e) {}
+    document.getElementById('headerInfo').innerHTML = '👥' + memberCount + '人 | 邀请码：' + guild.invite_code + ' <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:4px">✏️改名</button>';
     await refreshCurrentGuildData();
     setupTabs([
         { name: '🔍查询', id: 'tab-search' },
@@ -2271,48 +1875,23 @@ async function loadMemberPage(guild) {
 async function renameGuild() {
     if (!currentGuildId) return;
     try {
-        const g = await db.guilds.get(currentGuildId);
+        var g = await db.guilds.get(currentGuildId);
         if (!g.length) return;
-        const n = prompt('✏️修改公会名称', g[0].name);
+        var n = prompt('✏️修改公会名称', g[0].name);
         if (!n || !n.trim()) return;
         await db.guilds.update(currentGuildId, { name: n.trim() });
-        document.getElementById('headerTitle').textContent = `🏰${n.trim()}`;
+        document.getElementById('headerTitle').textContent = '🏰' + n.trim();
         showToast('✅名称已更新', 'success');
     } catch (e) { showToast('❌修改失败', 'error'); }
 }
 
 function initMemberSearchTab() {
-    const p = document.getElementById('tab-search');
+    var p = document.getElementById('tab-search');
     if (!p) return;
-    p.innerHTML = `
-        <div class="card">
-            <div class="section-title">👤查成员能做什么任务</div>
-            <div class="search-box">
-                <input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索...">
-                <button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button>
-            </div>
-            <div id="memberMemberResult"></div>
-        </div>
-        <hr class="divider">
-        <div class="card">
-            <div class="section-title">📋查任务有谁能做</div>
-            <div class="search-box">
-                <input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索...">
-                <button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button>
-            </div>
-            <div id="memberTaskResult"></div>
-            <div id="addSelfBox" style="display:none;margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
-                <div class="section-title">🙋添加自己到这个任务</div>
-                <div class="form-row">
-                    <div class="form-group"><label>👤大名（必填）</label><input type="text" id="addSelfName"></div>
-                    <div class="form-group"><label>🏷️别名（选填，逗号分隔）</label><input type="text" id="addSelfAlias"></div>
-                </div>
-                <button class="btn btn-success btn-sm" id="btnAddSelf">✅确认添加</button>
-            </div>
-        </div>`;
-    document.getElementById('memberSearchMember').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchMemberForMember(); });
+    p.innerHTML = '<div class="card"><div class="section-title">👤查成员能做什么任务</div><div class="search-box"><input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button></div><div id="memberMemberResult"></div></div><hr class="divider"><div class="card"><div class="section-title">📋查任务有谁能做</div><div class="search-box"><input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button></div><div id="memberTaskResult"></div><div id="addSelfBox" style="display:none;margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)"><div class="section-title">🙋添加自己到这个任务</div><div class="form-row"><div class="form-group"><label>👤大名（必填）</label><input type="text" id="addSelfName"></div><div class="form-group"><label>🏷️别名（选填，逗号分隔）</label><input type="text" id="addSelfAlias"></div></div><button class="btn btn-success btn-sm" id="btnAddSelf">✅确认添加</button></div></div>';
+    document.getElementById('memberSearchMember').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchMemberForMember(); });
     document.getElementById('btnMemberSearchMember').addEventListener('click', searchMemberForMember);
-    document.getElementById('memberSearchTask').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchTaskForMember(); });
+    document.getElementById('memberSearchTask').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchTaskForMember(); });
     document.getElementById('btnMemberSearchTask').addEventListener('click', searchTaskForMember);
     document.getElementById('btnAddSelf').addEventListener('click', addSelfToTask);
     window._memberTaskResultCallback = function(taskId) {
@@ -2322,118 +1901,102 @@ function initMemberSearchTab() {
 }
 
 async function searchMemberForMember() {
-    const q = document.getElementById('memberSearchMember').value.trim();
-    const div = document.getElementById('memberMemberResult');
+    var q = document.getElementById('memberSearchMember').value.trim();
+    var div = document.getElementById('memberMemberResult');
     if (!q) { div.innerHTML = ''; return; }
     try {
-        const members = await db.members.list(currentGuildId);
-        const filtered = members.filter(m => m.real_name.includes(q) || (m.alias || '').includes(q));
+        var members = await db.members.list(currentGuildId);
+        var filtered = members.filter(function(m) { return m.real_name.includes(q) || (m.alias || '').includes(q); });
         if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>'; return; }
-        // 获取推荐目标
-        const recommendTargets = await db.recommendTargets.list(currentGuildId);
-        const targetMap = {};
-        for (const rt of recommendTargets) {
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var targetMap = {};
+        targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
                 selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
             };
-        }
-        let html = '';
-        for (const m of filtered) {
-            const tml = await db.taskMembers.listByMember(m.id);
-            const tids = tml.map(t => t.task_id);
-            const tasks = allTasks.filter(t => tids.includes(t.id));
-            tasks.sort((a, b) => b.score - a.score);
-            const target = targetMap[m.id];
-            let priorityTasks = [];
-            let otherTasks = [];
+        });
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var m = filtered[i];
+            var tml = await db.taskMembers.listByMember(m.id);
+            var tids = tml.map(function(t) { return t.task_id; });
+            var tasks = allTasks.filter(function(t) { return tids.includes(t.id); });
+            tasks.sort(function(a, b) { return b.score - a.score; });
+            var target = targetMap[m.id];
+            var priorityTasks = [];
+            var otherTasks = [];
             if (target && target.selectedScores.length > 0) {
-                priorityTasks = tasks.filter(t => target.selectedScores.includes(t.score));
-                otherTasks = tasks.filter(t => !target.selectedScores.includes(t.score));
-                priorityTasks.sort((a, b) => b.score - a.score);
-                otherTasks.sort((a, b) => b.score - a.score);
+                priorityTasks = tasks.filter(function(t) { return target.selectedScores.includes(t.score); });
+                otherTasks = tasks.filter(function(t) { return !target.selectedScores.includes(t.score); });
+                priorityTasks.sort(function(a, b) { return b.score - a.score; });
+                otherTasks.sort(function(a, b) { return b.score - a.score; });
             } else {
                 otherTasks = tasks;
-                otherTasks.sort((a, b) => b.score - a.score);
+                otherTasks.sort(function(a, b) { return b.score - a.score; });
             }
-            html += `<div class="card">
-                <div class="card-header"><span class="card-title">👤${m.real_name}</span></div>
-                <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
-                <div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ${tasks.length} 个任务</div>`;
+            html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div><div style="font-size:11px;color:var(--text2);">别名：' + (m.alias || '无') + '</div><div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
             if (priorityTasks.length > 0) {
-                html += `<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（${priorityTasks.length}个）：</div>
-                <div class="member-tags">${priorityTasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('')}</div>
-                <hr style="border-color:var(--border);margin:4px 0;">`;
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（' + priorityTasks.length + '个）：</div><div class="member-tags">' + priorityTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div><hr style="border-color:var(--border);margin:4px 0;">';
             }
             if (otherTasks.length > 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（${otherTasks.length}个）：</div>
-                <div class="member-tags">${otherTasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('')}</div>`;
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（' + otherTasks.length + '个）：</div><div class="member-tags">' + otherTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
             }
-            html += `</div>`;
+            html += '</div>';
         }
         div.innerHTML = html;
     } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'; }
 }
 
 async function searchTaskForMember() {
-    const q = document.getElementById('memberSearchTask').value.trim();
-    const div = document.getElementById('memberTaskResult');
+    var q = document.getElementById('memberSearchTask').value.trim();
+    var div = document.getElementById('memberTaskResult');
     if (!q) { div.innerHTML = ''; return; }
     showToast('🔍搜索中...', 'info');
     try {
-        const tasks = await db.tasks.list(currentGuildId);
-        const filtered = tasks.filter(t => t.task_name.includes(q));
-        if (!filtered.length) {
-            div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
-            return;
-        }
-        // 获取推荐目标
-        const recommendTargets = await db.recommendTargets.list(currentGuildId);
-        const targetMap = {};
-        for (const rt of recommendTargets) {
+        var tasks = await db.tasks.list(currentGuildId);
+        var filtered = tasks.filter(function(t) { return t.task_name.includes(q); });
+        if (!filtered.length) { div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>'; return; }
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var targetMap = {};
+        targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
                 selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
             };
-        }
-        let html = '';
-        for (const t of filtered) {
-            const tml = await db.taskMembers.list(t.id);
-            const mids = tml.map(tm => tm.member_id);
-            const allMembersList = await db.members.list(currentGuildId);
-            const members = allMembersList.filter(m => mids.includes(m.id));
-            let wantMembers = [];
-            let otherMembers = [];
-            for (const m of members) {
-                const target = targetMap[m.id];
+        });
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var t = filtered[i];
+            var tml = await db.taskMembers.list(t.id);
+            var mids = tml.map(function(tm) { return tm.member_id; });
+            var allMembersList = await db.members.list(currentGuildId);
+            var members = allMembersList.filter(function(m) { return mids.includes(m.id); });
+            var wantMembers = [];
+            var otherMembers = [];
+            for (var j = 0; j < members.length; j++) {
+                var m = members[j];
+                var target = targetMap[m.id];
                 if (target && target.selectedScores.includes(t.score) && target.targetScore >= t.score) {
                     wantMembers.push(m);
                 } else {
                     otherMembers.push(m);
                 }
             }
-            html += `<div class="card">
-                <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>`;
+            html += '<div class="card"><div class="card-header"><span class="card-title">📋' + t.task_name + '</span><span class="tag gold">⭐' + t.score + '分</span></div>';
             if (wantMembers.length > 0) {
-                html += `<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共${wantMembers.length}人）：</div>
-                <div class="member-tags">${wantMembers.map(m => `<span class="member-tag">${m.real_name}</span>`).join('')}</div>`;
-                if (otherMembers.length > 0) {
-                    html += `<hr style="border-color:var(--border);margin:4px 0;">`;
-                }
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共' + wantMembers.length + '人）：</div><div class="member-tags">' + wantMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
+                if (otherMembers.length > 0) html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
             if (otherMembers.length > 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共${otherMembers.length}人）：</div>
-                <div class="member-tags">${otherMembers.map(m => `<span class="member-tag">${m.real_name}</span>`).join('')}</div>`;
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共' + otherMembers.length + '人）：</div><div class="member-tags">' + otherMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
             }
-            if (members.length === 0) {
-                html += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>`;
-            }
-            html += `<button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="window._memberTaskResultCallback(${t.id})">🙋我也能做！</button>`;
-            html += `</div>`;
+            if (members.length === 0) html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>';
+            html += '<button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="window._memberTaskResultCallback(' + t.id + ')">🙋我也能做！</button></div>';
         }
         div.innerHTML = html;
         document.getElementById('addSelfBox').style.display = 'none';
-        showToast(`✅找到${filtered.length}个任务`, 'success');
+        showToast('✅找到' + filtered.length + '个任务', 'success');
     } catch (e) {
         div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
         showToast('❌查询失败', 'error');
@@ -2442,16 +2005,16 @@ async function searchTaskForMember() {
 }
 
 async function addSelfToTask() {
-    const taskId = window._currentTaskId;
+    var taskId = window._currentTaskId;
     if (!taskId) { showToast('⚠️请先搜索任务', 'warning'); return; }
-    const name = document.getElementById('addSelfName').value.trim();
-    const alias = document.getElementById('addSelfAlias').value.trim();
+    var name = document.getElementById('addSelfName').value.trim();
+    var alias = document.getElementById('addSelfAlias').value.trim();
     if (!name) { showToast('⚠️请输入大名', 'warning'); return; }
     try {
-        let member;
-        const ex = await db.members.getByName(currentGuildId, name);
+        var member;
+        var ex = await db.members.getByName(currentGuildId, name);
         if (ex.length) member = ex[0];
-        else { const created = await db.members.create({ guild_id: currentGuildId, real_name: name, alias: alias }); member = created[0]; }
+        else { var created = await db.members.create({ guild_id: currentGuildId, real_name: name, alias: alias }); member = created[0]; }
         await db.taskMembers.add({ task_id: taskId, member_id: member.id });
         showToast('✅已添加到任务！', 'success');
         document.getElementById('addSelfName').value = '';
@@ -2472,10 +2035,10 @@ async function refreshCurrentGuildData() {
 }
 
 // ===== 批量任务操作 =====
-let selectedTasks = new Set();
+var selectedTasks = new Set();
 function toggleSelectAll() {
     if (selectedTasks.size === allTasks.length) { selectedTasks.clear(); }
-    else { allTasks.forEach(t => selectedTasks.add(t.id)); }
+    else { allTasks.forEach(function(t) { selectedTasks.add(t.id); }); }
     loadTaskList();
 }
 function toggleSelectTask(id) {
@@ -2484,19 +2047,19 @@ function toggleSelectTask(id) {
 }
 async function batchDeleteTasks() {
     if (!selectedTasks.size) { showToast('⚠️请先勾选任务', 'warning'); return; }
-    if (!confirm(`确定删除${selectedTasks.size}个任务吗？`)) return;
-    let s = 0, f = 0;
-    for (const id of selectedTasks) {
+    if (!confirm('确定删除' + selectedTasks.size + '个任务吗？')) return;
+    var s = 0, f = 0;
+    for (var id of selectedTasks) {
         try { await db.tasks.delete(id); s++; } catch (e) { f++; }
     }
     selectedTasks.clear();
-    showToast(`✅删除${s}个${f > 0 ? '，失败' + f + '个' : ''}`, 'success');
+    showToast('✅删除' + s + '个' + (f > 0 ? '，失败' + f + '个' : ''), 'success');
     loadTasksToSelect();
     loadTaskList();
 }
 
-// ===== 预设模板（186个任务） =====
-const PRESET_TEMPLATE = {
+// ===== 预设模板 =====
+var PRESET_TEMPLATE = {
     '人才': [
         ['500级丽萍', 14, '农'], ['600级白素贞', 16, '农'], ['600级武松', 16, '农'], ['600级乾隆', 23, '农'], ['500级国民男神', 25, '农'],
         ['600级聂小倩', 16, '商'], ['600级张良', 21, '商'], ['600级青丘神女', 23, '商'], ['750级高启强', 25, '商'], ['500级姜子牙', 27, '商'],
@@ -2534,24 +2097,28 @@ const PRESET_TEMPLATE = {
 
 async function usePresetTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const totalCount = Object.values(PRESET_TEMPLATE).reduce((sum, arr) => sum + arr.length, 0);
-    if (!confirm(`⚠️将导入预设模板（${totalCount}个任务），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
+    var totalCount = Object.values(PRESET_TEMPLATE).reduce(function(sum, arr) { return sum + arr.length; }, 0);
+    if (!confirm('⚠️将导入预设模板（' + totalCount + '个任务），\n已存在的同名任务会跳过。\n确定继续吗？')) return;
     showToast('⏳正在导入模板...', 'info');
     try {
-        const existingTasks = await db.tasks.list(currentGuildId);
-        const existingNames = new Set(existingTasks.map(t => t.task_name));
-        let s = 0, skip = 0;
-        for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
-            for (const [name, score, subTag] of tasks) {
+        var existingTasks = await db.tasks.list(currentGuildId);
+        var existingNames = new Set(existingTasks.map(function(t) { return t.task_name; }));
+        var s = 0, skip = 0;
+        for (var category in PRESET_TEMPLATE) {
+            var tasks = PRESET_TEMPLATE[category];
+            for (var i = 0; i < tasks.length; i++) {
+                var name = tasks[i][0];
+                var score = tasks[i][1];
+                var subTag = tasks[i][2] || '无';
                 if (existingNames.has(name)) { skip++; continue; }
                 try {
-                    await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag || '无' });
+                    await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
                     existingNames.add(name);
                     s++;
                 } catch (e) { console.warn('导入失败:', name, e.message); }
             }
         }
-        showToast(`✅成功导入${s}个${skip > 0 ? '，跳过' + skip + '个已有任务' : ''}`, 'success');
+        showToast('✅成功导入' + s + '个' + (skip > 0 ? '，跳过' + skip + '个已有任务' : ''), 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
@@ -2560,30 +2127,30 @@ async function usePresetTemplate() {
 
 function saveMyTemplate() {
     if (!allTasks.length) { showToast('⚠️当前没有任务可保存', 'warning'); return; }
-    const data = allTasks.map(t => `${t.task_name},${t.score},${t.category || '无'},${t.sub_tag || '无'}`).join('\n');
+    var data = allTasks.map(function(t) { return t.task_name + ',' + t.score + ',' + (t.category || '无') + ',' + (t.sub_tag || '无'); }).join('\n');
     localStorage.setItem('guild_my_template', data);
-    showToast(`💾已保存${allTasks.length}个任务为模板`, 'success');
+    showToast('💾已保存' + allTasks.length + '个任务为模板', 'success');
 }
 
 async function loadMyTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const data = localStorage.getItem('guild_my_template');
+    var data = localStorage.getItem('guild_my_template');
     if (!data) { showToast('⚠️没有已保存的模板', 'warning'); return; }
-    const lines = data.split('\n').filter(l => l.trim());
-    if (!confirm(`📂加载我的模板（${lines.length}个任务），确定导入吗？`)) return;
+    var lines = data.split('\n').filter(function(l) { return l.trim(); });
+    if (!confirm('📂加载我的模板（' + lines.length + '个任务），确定导入吗？')) return;
     showToast('⏳正在导入...', 'info');
     try {
-        const existingTasks = await db.tasks.list(currentGuildId);
-        const existingNames = new Set(existingTasks.map(t => t.task_name));
-        const validCategories = TASK_CATEGORIES.map(c => c.id);
-        let s = 0, skip = 0;
-        for (const line of lines) {
-            const parts = line.split(',').map(p => p.trim());
+        var existingTasks = await db.tasks.list(currentGuildId);
+        var existingNames = new Set(existingTasks.map(function(t) { return t.task_name; }));
+        var validCategories = TASK_CATEGORIES.map(function(c) { return c.id; });
+        var s = 0, skip = 0;
+        for (var i = 0; i < lines.length; i++) {
+            var parts = lines[i].split(',').map(function(p) { return p.trim(); });
             if (!parts[0]) continue;
             if (existingNames.has(parts[0])) { skip++; continue; }
-            let category = '无';
+            var category = '无';
             if (parts[2] && validCategories.includes(parts[2])) category = parts[2];
-            let subTag = '无';
+            var subTag = '无';
             if (parts[3] && SUB_TAGS.includes(parts[3])) subTag = parts[3];
             try {
                 await db.tasks.create({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0, category: category, sub_tag: subTag });
@@ -2591,7 +2158,7 @@ async function loadMyTemplate() {
                 s++;
             } catch (e) { console.warn('导入失败:', parts[0], e.message); }
         }
-        showToast(`✅导入${s}个${skip > 0 ? '，跳过' + skip + '个' : ''}`, 'success');
+        showToast('✅导入' + s + '个' + (skip > 0 ? '，跳过' + skip + '个' : ''), 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
@@ -2599,76 +2166,44 @@ async function loadMyTemplate() {
 }
 
 function editPresetTemplate() {
-    const lines = [];
-    for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
-        for (const [name, score, subTag] of tasks) {
-            lines.push(`${name},${score},${category},${subTag || '无'}`);
+    var lines = [];
+    for (var category in PRESET_TEMPLATE) {
+        var tasks = PRESET_TEMPLATE[category];
+        for (var i = 0; i < tasks.length; i++) {
+            lines.push(tasks[i][0] + ',' + tasks[i][1] + ',' + category + ',' + (tasks[i][2] || '无'));
         }
     }
-    const current = lines.join('\n');
-    const newData = prompt('✏️编辑预设模板（每行：任务名,分数,主分类,子标签）\n主分类：人才 / 人才觉醒 / 人才皮肤 / 艺人 / 艺人皮肤 / 守护神\n子标签：农 / 商 / 文 / 娱 / 无', current);
+    var current = lines.join('\n');
+    var newData = prompt('✏️编辑预设模板（每行：任务名,分数,主分类,子标签）\n主分类：人才 / 人才觉醒 / 人才皮肤 / 艺人 / 艺人皮肤 / 守护神\n子标签：农 / 商 / 文 / 娱 / 无', current);
     if (newData === null) return;
-    const newLines = newData.split('\n').filter(l => l.trim());
-    const newTemplate = {};
-    for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) newTemplate[cat.id] = [];
-    const validCategories = TASK_CATEGORIES.map(c => c.id);
-    for (const line of newLines) {
-        const parts = line.split(',').map(p => p.trim());
-        if (!parts[0]) continue;
-        let category = '无';
-        if (parts[2] && validCategories.includes(parts[2])) category = parts[2];
-        let subTag = '无';
-        if (parts[3] && SUB_TAGS.includes(parts[3])) subTag = parts[3];
-        if (!newTemplate[category]) newTemplate[category] = [];
-        newTemplate[category].push([parts[0], parseInt(parts[1]) || 0, subTag]);
+    var newLines = newData.split('\n').filter(function(l) { return l.trim(); });
+    var newTemplate = {};
+    var allCats = TASK_CATEGORIES.concat([{ id: '无', icon: '📂', name: '无' }]);
+    for (var j = 0; j < allCats.length; j++) newTemplate[allCats[j].id] = [];
+    var validCategories2 = TASK_CATEGORIES.map(function(c) { return c.id; });
+    for (var k = 0; k < newLines.length; k++) {
+        var parts2 = newLines[k].split(',').map(function(p) { return p.trim(); });
+        if (!parts2[0]) continue;
+        var category2 = '无';
+        if (parts2[2] && validCategories2.includes(parts2[2])) category2 = parts2[2];
+        var subTag2 = '无';
+        if (parts2[3] && SUB_TAGS.includes(parts2[3])) subTag2 = parts2[3];
+        if (!newTemplate[category2]) newTemplate[category2] = [];
+        newTemplate[category2].push([parts2[0], parseInt(parts2[1]) || 0, subTag2]);
     }
-    Object.keys(PRESET_TEMPLATE).forEach(key => delete PRESET_TEMPLATE[key]);
-    for (const [key, val] of Object.entries(newTemplate)) {
-        if (val.length) PRESET_TEMPLATE[key] = val;
+    Object.keys(PRESET_TEMPLATE).forEach(function(key) { delete PRESET_TEMPLATE[key]; });
+    for (var key in newTemplate) {
+        if (newTemplate[key].length) PRESET_TEMPLATE[key] = newTemplate[key];
     }
-    const total = Object.values(PRESET_TEMPLATE).reduce((s, arr) => s + arr.length, 0);
-    showToast(`✅预设模板已更新（${total}个任务）`, 'success');
-}
-
-// ===== 分类规则管理 =====
-function initRulesTab() {
-    const p = document.getElementById('tab-rules');
-    if (!p) return;
-    let html = `<div class="card config-card"><div class="section-title">📋 关键词分类规则</div><div style="font-size:12px;color:var(--text2);margin-bottom:8px;">新增任务时，系统根据任务名包含的关键词自动匹配主分类和子标签。</div><hr class="divider" style="margin:8px 0;">`;
-    for (const [key, keywords] of Object.entries(CLASSIFY_RULES)) {
-        const parts = key.split('_');
-        const category = parts[0];
-        const subTag = parts[1] || '无';
-        const icon = TASK_CATEGORIES.find(c => c.id === category)?.icon || '📂';
-        html += `<div style="margin-bottom:6px;padding:6px 8px;background:var(--bg);border-radius:4px;border:1px solid var(--border);">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;"><span style="font-weight:600;font-size:12px;">${icon} ${category}</span><span class="tag-rule subtag">${subTag}</span><span style="font-size:10px;color:var(--text2);">(${keywords.length}个关键词)</span></div>
-            <div style="display:flex;flex-wrap:wrap;gap:3px;">${keywords.map(k => `<span class="tag-rule category">${k}</span>`).join('')}</div>
-        </div>`;
-    }
-    html += `</div><div class="card"><div class="section-title">➕ 新增分类规则</div><div class="form-row"><div class="form-group"><label>关键词</label><input type="text" id="newRuleKeyword" placeholder="例如：白素贞"></div><div class="form-group"><label>主分类</label><select id="newRuleCategory">${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}<option value="无">📂 无</option></select></div><div class="form-group"><label>子标签</label><select id="newRuleSubTag">${SUB_TAGS.map(t => `<option value="${t}">${t}</option>`).join('')}</select></div></div><button class="btn btn-accent btn-sm" id="btnAddRule">➕ 添加规则</button><span style="font-size:10px;color:var(--text2);margin-left:8px;">💡 规则保存在本地，重启后恢复默认</span></div>`;
-    p.innerHTML = html;
-    document.getElementById('btnAddRule').addEventListener('click', addRule);
-}
-
-function addRule() {
-    const keyword = document.getElementById('newRuleKeyword').value.trim();
-    const category = document.getElementById('newRuleCategory').value;
-    const subTag = document.getElementById('newRuleSubTag').value;
-    if (!keyword) { showToast('⚠️请输入关键词', 'warning'); return; }
-    const key = category + '_' + subTag;
-    if (!CLASSIFY_RULES[key]) CLASSIFY_RULES[key] = [];
-    if (CLASSIFY_RULES[key].includes(keyword)) { showToast('⚠️该关键词已存在', 'warning'); return; }
-    CLASSIFY_RULES[key].push(keyword);
-    document.getElementById('newRuleKeyword').value = '';
-    showToast(`✅已添加规则：${keyword} → ${category} - ${subTag}`, 'success');
-    initRulesTab();
+    var total = Object.values(PRESET_TEMPLATE).reduce(function(sum, arr) { return sum + arr.length; }, 0);
+    showToast('✅预设模板已更新（' + total + '个任务）', 'success');
 }
 
 // ===== 启动 =====
 (async function init() {
-    const rememberedCode = getRememberedCode();
+    var rememberedCode = getRememberedCode();
     if (rememberedCode) document.getElementById('loginInput').value = rememberedCode;
-    const sess = session.get();
+    var sess = session.get();
     if (sess) {
         if (sess.role === 'admin') {
             currentRole = 'admin';
@@ -2678,7 +2213,7 @@ function addRule() {
             currentRole = 'member';
             currentGuildId = sess.guildId;
             try {
-                const guilds = await db.guilds.get(sess.guildId);
+                var guilds = await db.guilds.get(sess.guildId);
                 if (guilds.length) {
                     showMainPage();
                     await loadMemberPage(guilds[0]);

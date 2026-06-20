@@ -442,9 +442,7 @@ function setupTabs(tabs) {
     initMemberMgrTab();
     initRecommendTab();
     initGuildMgrTab();
-}
-
-// ===== 查询标签 =====
+}// ===== 查询标签 =====
 function initAdminSearchTab() {
     var p = document.getElementById('tab-search');
     if (!p) return;
@@ -492,7 +490,8 @@ async function searchMemberForAdmin() {
         targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
-                selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
+                selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : [],
+                starTasks: rt.star_tasks ? rt.star_tasks.split(',').map(Number) : []
             };
         });
         var html = '';
@@ -505,27 +504,43 @@ async function searchMemberForAdmin() {
             var target = targetMap[m.id];
             var priorityTasks = [];
             var otherTasks = [];
+            var starTasks = [];
             if (target && target.selectedScores.length > 0) {
                 priorityTasks = tasks.filter(function(t) { return target.selectedScores.includes(t.score); });
                 otherTasks = tasks.filter(function(t) { return !target.selectedScores.includes(t.score); });
                 priorityTasks.sort(function(a, b) { return b.score - a.score; });
                 otherTasks.sort(function(a, b) { return b.score - a.score; });
+                if (target.starTasks && target.starTasks.length > 0) {
+                    starTasks = priorityTasks.filter(function(t) { return target.starTasks.includes(t.id); });
+                    priorityTasks = priorityTasks.filter(function(t) { return !target.starTasks.includes(t.id); });
+                    starTasks.sort(function(a, b) { return b.score - a.score; });
+                }
             } else {
                 otherTasks = tasks;
                 otherTasks.sort(function(a, b) { return b.score - a.score; });
             }
+
             html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div>';
             html += '<div style="font-size:11px;color:var(--text2);">别名：' + (m.alias || '无') + '</div>';
             html += '<div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
+
+            if (starTasks.length > 0) {
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做（' + starTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + starTasks.map(function(t) { return '<span class="tag gold">⭐' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
+                html += '<hr style="border-color:var(--border);margin:4px 0;">';
+            }
+
             if (priorityTasks.length > 0) {
-                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（' + priorityTasks.length + '个）：</div>';
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📌 优先推荐（' + priorityTasks.length + '个）：</div>';
                 html += '<div class="member-tags">' + priorityTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
                 html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
+
             if (otherTasks.length > 0) {
-                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（' + otherTasks.length + '个）：</div>';
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 其他能做的任务（' + otherTasks.length + '个）：</div>';
                 html += '<div class="member-tags">' + otherTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
             }
+
             html += '</div>';
         }
         div.innerHTML = html;
@@ -1534,9 +1549,7 @@ async function editAlias(memberId, name, currentAlias) {
         await refreshCurrentGuildData();
         loadMemberList();
     } catch (e) { showToast('❌更新失败', 'error'); }
-}
-
-// ===== 推荐页面 =====
+}// ===== 推荐页面 =====
 function initRecommendTab() {
     var p = document.getElementById('tab-recommend');
     if (!p) return;
@@ -1581,7 +1594,6 @@ function initRecommendTab() {
     loadRecommendMembers();
     loadRecommendCards();
 
-    // 分数档位点击事件
     document.querySelectorAll('.score-filter-label').forEach(function(label) {
         label.addEventListener('click', function(e) {
             var cb = this.querySelector('input[type="checkbox"]');
@@ -1600,10 +1612,8 @@ function initRecommendTab() {
     document.getElementById('btnSaveRecommend').addEventListener('click', saveRecommendTarget);
     document.getElementById('btnClearRecommend').addEventListener('click', clearRecommendForm);
 
-    // 监听标签切换，自动折叠所有卡片
     document.querySelectorAll('.tab').forEach(function(tab) {
         tab.addEventListener('click', function() {
-            // 延迟执行，等待标签切换完成
             setTimeout(function() {
                 document.querySelectorAll('.recommend-card .rc-body').forEach(function(body) {
                     body.classList.remove('open');
@@ -1682,7 +1692,6 @@ async function updateRecommendPreview() {
             return;
         }
 
-        // 从保存的目标中获取星标任务
         var targets = await db.recommendTargets.list(currentGuildId);
         var target = targets.find(function(t) { return t.member_id == memberId; });
         var starTaskIds = [];
@@ -1707,7 +1716,6 @@ async function updateRecommendPreview() {
 function toggleStarPreview(taskId) {
     var memberId = document.getElementById('recommendMemberSelect').value;
     if (!memberId) return;
-    // 重新获取保存的目标，更新星标列表
     (async function() {
         try {
             var targets = await db.recommendTargets.list(currentGuildId);
@@ -1722,7 +1730,6 @@ function toggleStarPreview(taskId) {
             } else {
                 starTaskIds.push(taskId);
             }
-            // 更新目标
             var data = {
                 guild_id: currentGuildId,
                 member_id: parseInt(memberId),
@@ -1755,7 +1762,6 @@ async function saveRecommendTarget() {
     if (!targetScore) { showToast('⚠️请选择目标档位', 'warning'); return; }
     if (!checkedScores.length) { showToast('⚠️请至少选择一个分数档位', 'warning'); return; }
 
-    // 获取星标任务
     var targets = await db.recommendTargets.list(currentGuildId);
     var target = targets.find(function(t) { return t.member_id == memberId; });
     var starTaskIds = [];
@@ -1775,7 +1781,6 @@ async function saveRecommendTarget() {
         showToast('✅ 目标已保存！', 'success');
         document.getElementById('recommendSaveResult').innerHTML = '<div style="color:var(--success);font-size:13px;">✅ 保存成功！</div>';
         setTimeout(function() { document.getElementById('recommendSaveResult').innerHTML = ''; }, 3000);
-        // 清空表单
         clearRecommendForm();
         await loadRecommendCards();
         await refreshCurrentGuildData();
@@ -1809,7 +1814,6 @@ async function loadRecommendCards() {
             var selectedTasks2 = availableTasks.filter(function(t) { return scores.includes(t.score); });
             var totalAvailable = availableTasks.length;
 
-            // 分类：星标任务 vs 普通任务
             var starTasks = selectedTasks2.filter(function(t) { return starTaskIds.includes(t.id); });
             var normalTasks = selectedTasks2.filter(function(t) { return !starTaskIds.includes(t.id); });
 
@@ -1822,14 +1826,12 @@ async function loadRecommendCards() {
             html += '<button class="rc-edit" onclick="editRecommendTarget(' + member.id + ')">✏️ 修改</button>';
             html += '<div class="rc-body" id="rc_body_' + member.id + '">';
             if (selectedTasks2.length) {
-                // 星标任务
                 if (starTasks.length > 0) {
                     html += '<div class="rc-task-section">⭐ 最想做（' + starTasks.length + '个）：</div>';
                     starTasks.forEach(function(t) {
                         html += '<div class="task-item" style="font-size:11px;padding:2px 4px;cursor:default;">⭐ ' + t.task_name + ' ⭐' + t.score + '</div>';
                     });
                 }
-                // 普通任务
                 if (normalTasks.length > 0) {
                     if (starTasks.length > 0) html += '<div style="margin-top:4px;"></div>';
                     html += '<div class="rc-task-section">📋 其他（' + normalTasks.length + '个）：</div>';
@@ -2070,7 +2072,8 @@ async function searchMemberForMember() {
         targets.forEach(function(rt) {
             targetMap[rt.member_id] = {
                 targetScore: rt.target_score,
-                selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
+                selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : [],
+                starTasks: rt.star_tasks ? rt.star_tasks.split(',').map(Number) : []
             };
         });
         var html = '';
@@ -2083,22 +2086,43 @@ async function searchMemberForMember() {
             var target = targetMap[m.id];
             var priorityTasks = [];
             var otherTasks = [];
+            var starTasks = [];
             if (target && target.selectedScores.length > 0) {
                 priorityTasks = tasks.filter(function(t) { return target.selectedScores.includes(t.score); });
                 otherTasks = tasks.filter(function(t) { return !target.selectedScores.includes(t.score); });
                 priorityTasks.sort(function(a, b) { return b.score - a.score; });
                 otherTasks.sort(function(a, b) { return b.score - a.score; });
+                if (target.starTasks && target.starTasks.length > 0) {
+                    starTasks = priorityTasks.filter(function(t) { return target.starTasks.includes(t.id); });
+                    priorityTasks = priorityTasks.filter(function(t) { return !target.starTasks.includes(t.id); });
+                    starTasks.sort(function(a, b) { return b.score - a.score; });
+                }
             } else {
                 otherTasks = tasks;
                 otherTasks.sort(function(a, b) { return b.score - a.score; });
             }
-            html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div><div style="font-size:11px;color:var(--text2);">别名：' + (m.alias || '无') + '</div><div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
+
+            html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div>';
+            html += '<div style="font-size:11px;color:var(--text2);">别名：' + (m.alias || '无') + '</div>';
+            html += '<div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
+
+            if (starTasks.length > 0) {
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做（' + starTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + starTasks.map(function(t) { return '<span class="tag gold">⭐' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
+                html += '<hr style="border-color:var(--border);margin:4px 0;">';
+            }
+
             if (priorityTasks.length > 0) {
-                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（' + priorityTasks.length + '个）：</div><div class="member-tags">' + priorityTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div><hr style="border-color:var(--border);margin:4px 0;">';
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📌 优先推荐（' + priorityTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + priorityTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
+                html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
+
             if (otherTasks.length > 0) {
-                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 所有能做的任务（' + otherTasks.length + '个）：</div><div class="member-tags">' + otherTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 其他能做的任务（' + otherTasks.length + '个）：</div>';
+                html += '<div class="member-tags">' + otherTasks.map(function(t) { return '<span class="tag gold">' + t.task_name + ' ⭐' + t.score + '</span>'; }).join('') + '</div>';
             }
+
             html += '</div>';
         }
         div.innerHTML = html;
@@ -2142,11 +2166,13 @@ async function searchTaskForMember() {
             }
             html += '<div class="card"><div class="card-header"><span class="card-title">📋' + t.task_name + '</span><span class="tag gold">⭐' + t.score + '分</span></div>';
             if (wantMembers.length > 0) {
-                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共' + wantMembers.length + '人）：</div><div class="member-tags">' + wantMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
+                html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 最想做这个任务的人（共' + wantMembers.length + '人）：</div>';
+                html += '<div class="member-tags">' + wantMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
                 if (otherMembers.length > 0) html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
             if (otherMembers.length > 0) {
-                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共' + otherMembers.length + '人）：</div><div class="member-tags">' + otherMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
+                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（共' + otherMembers.length + '人）：</div>';
+                html += '<div class="member-tags">' + otherMembers.map(function(m) { return '<span class="member-tag">' + m.real_name + '</span>'; }).join('') + '</div>';
             }
             if (members.length === 0) html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>';
             html += '<button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="window._memberTaskResultCallback(' + t.id + ')">🙋我也能做！</button></div>';

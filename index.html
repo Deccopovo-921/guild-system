@@ -912,15 +912,90 @@ async function loadTaskList() {
 
 // 🚀 修复：编辑任务同时修改名称和分数
 async function editTask(id, oldName, oldScore) {
-    const newName = prompt('✏️修改任务名称', oldName);
-    if (newName === null || newName.trim() === '') return;
-    const newScore = prompt('⭐修改分数（当前：' + oldScore + '分）', oldScore);
-    if (newScore === null || newScore.trim() === '') return;
-    const scoreNum = parseInt(newScore);
-    if (isNaN(scoreNum) || scoreNum < 0) {
-        showToast('⚠️请输入有效的分数（大于等于0）', 'warning');
-        return;
+    // 创建自定义对话框
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:380px;width:90%;';
+    dialog.innerHTML = `
+        <div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>
+        <div style="margin-bottom:10px;">
+            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label>
+            <input id="editTaskNameInput" type="text" value="${oldName.replace(/"/g, '&quot;')}" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label>
+            <input id="editTaskScoreInput" type="number" value="${oldScore}" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+            <button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button>
+            <button id="editTaskConfirmBtn" style="padding:6px 18px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">确认</button>
+        </div>
+    `;
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    // 聚焦到名称输入框
+    setTimeout(() => {
+        const nameInput = document.getElementById('editTaskNameInput');
+        if (nameInput) nameInput.focus();
+    }, 100);
+    
+    return new Promise((resolve) => {
+        const nameInput = document.getElementById('editTaskNameInput');
+        const scoreInput = document.getElementById('editTaskScoreInput');
+        const confirmBtn = document.getElementById('editTaskConfirmBtn');
+        const cancelBtn = document.getElementById('editTaskCancelBtn');
+        
+        function closeDialog() {
+            if (overlay.parentNode) overlay.remove();
+            resolve();
+        }
+        
+        function handleConfirm() {
+            const newName = nameInput.value.trim();
+            const newScore = parseInt(scoreInput.value);
+            if (!newName) {
+                showToast('⚠️请输入任务名称', 'warning');
+                return;
+            }
+            if (isNaN(newScore) || newScore < 0) {
+                showToast('⚠️请输入有效的分数（大于等于0）', 'warning');
+                return;
+            }
+            closeDialog();
+            // 执行更新
+            doUpdateTask(id, newName, newScore);
+        }
+        
+        confirmBtn.addEventListener('click', handleConfirm);
+        cancelBtn.addEventListener('click', closeDialog);
+        
+        // 回车键确认
+        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
+        scoreInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
+        
+        // 点击遮罩关闭
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeDialog();
+        });
+    });
+}
+
+// 新增：执行更新的函数
+async function doUpdateTask(id, newName, newScore) {
+    try {
+        await db.tasks.update(id, { task_name: newName, score: newScore });
+        showToast('✅任务已更新', 'success');
+        await refreshCurrentGuildData();
+        loadTasksToSelect();
+        loadTaskList();
+    } catch (e) { 
+        showToast('❌修改失败', 'error');
+        console.error(e);
     }
+}
     try {
         await db.tasks.update(id, { task_name: newName.trim(), score: scoreNum });
         showToast('✅任务已更新', 'success');

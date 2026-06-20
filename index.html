@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏆 公会竞标赛任务系统</title>
-    <style>
         :root {
             --bg: #0d1117;
             --card: #161b22;
@@ -118,47 +111,48 @@
         }
         .login-card .btn-sync:hover { background: var(--hover); }
         .login-card .hint { font-size: 11px; color: var(--text2); margin-top: 12px; }
-        .login-card .maker { font-size: 11px; color: #555; margin-top: 16px; }
-        .main-wrap { display: none; min-height: 100vh; padding-top: 110px; }
+        .login-card .maker { font-size: 11px; color: #555; margin-top: 16px; }        .main-wrap { display: none; min-height: 100vh; padding-top: 100px; }
         .header {
             background: var(--card);
             border-bottom: 1px solid var(--border);
-            padding: 10px 16px;
+            padding: 8px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 200;
+            min-height: 48px;
         }
-        .header .title-area { display: flex; align-items: center; gap: 8px; }
-        .header .title { font-size: 15px; font-weight: 700; color: #fff; }
-        .header .guild-info { font-size: 11px; color: var(--text2); display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
-        .header .badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; background: var(--tag-bg); color: var(--accent); }
+        .header .title-area { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .header .title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; }
+        .header .guild-info { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 35%; }
+        .header .badge { font-size: 9px; padding: 2px 6px; border-radius: 10px; background: var(--tag-bg); color: var(--accent); white-space: nowrap; }
         .btn-logout {
             background: transparent;
             border: 1px solid var(--danger);
             color: var(--danger);
-            padding: 5px 12px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .btn-logout:hover { background: var(--danger); color: #fff; }
-        .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 5px; }
+        .btn-xs { padding: 2px 6px; font-size: 10px; border-radius: 4px; }
         .tabs {
             display: flex;
-            gap: 4px;
-            padding: 8px 12px;
+            gap: 3px;
+            padding: 6px 10px;
             overflow-x: auto;
             background: var(--card);
             border-bottom: 1px solid var(--border);
             position: fixed;
-            top: 55px;
+            top: 48px;
             left: 0;
             right: 0;
             z-index: 199;
@@ -166,9 +160,9 @@
         }
         .tabs::-webkit-scrollbar { height: 0; }
         .tab {
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 11px;
             white-space: nowrap;
             cursor: pointer;
             transition: all .2s;
@@ -180,33 +174,33 @@
         }
         .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
         .tab:hover:not(.active) { background: var(--hover); }
-        .content { padding: 14px; max-width: 900px; margin: 0 auto; }
+        .content { padding: 12px; max-width: 900px; margin: 0 auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .card {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 14px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
             position: relative;
             transition: border .2s;
         }
         .card:hover { border-color: #4a5568; }
-        .card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 6px; flex-wrap: wrap; }
-        .card .card-title { font-size: 14px; font-weight: 600; color: #fff; }
+        .card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px; flex-wrap: wrap; }
+        .card .card-title { font-size: 13px; font-weight: 600; color: #fff; }
         .card .btn-close {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 22px;
-            height: 22px;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             border: none;
             background: transparent;
             color: var(--text2);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -215,37 +209,37 @@
             z-index: 2;
         }
         .card .btn-close:hover { background: var(--danger); color: #fff; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 3px; }
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 2px; }
         .form-group input, .form-group textarea, .form-group select {
             width: 100%;
-            padding: 9px 10px;
+            padding: 7px 8px;
             background: var(--bg);
             border: 1px solid var(--border);
             color: var(--text);
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 6px;
+            font-size: 12px;
             outline: none;
             transition: border .2s;
             font-family: inherit;
         }
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
-        .form-group textarea { resize: vertical; min-height: 70px; }
-        .form-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .form-row .form-group { flex: 1; min-width: 100px; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+        .form-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 80px; }
         select { appearance: none; -webkit-appearance: none; cursor: pointer; }
         select option { background: var(--card); color: var(--text); }
         .btn {
-            padding: 7px 14px;
+            padding: 6px 10px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             transition: all .2s;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
         .btn-accent { background: var(--accent); color: #fff; }
         .btn-accent:hover { background: #4090e0; }
@@ -255,22 +249,22 @@
         .btn-success:hover { background: #35a044; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-outline:hover { background: var(--tag-bg); }
-        .btn-sm { padding: 4px 8px; font-size: 11px; border-radius: 6px; }
+        .btn-sm { padding: 3px 6px; font-size: 10px; border-radius: 4px; }
         .btn-gold { background: var(--gold); color: #000; }
-        .search-box { display: flex; gap: 6px; margin-bottom: 10px; }
+        .search-box { display: flex; gap: 4px; margin-bottom: 8px; }
         .search-box input { flex: 1; }
-        .tag { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; background: var(--tag-bg); color: var(--text); margin: 2px 3px 2px 0; }
+        .tag { display: inline-block; padding: 2px 6px; border-radius: 8px; font-size: 10px; background: var(--tag-bg); color: var(--text); margin: 1px 2px 1px 0; }
         .tag.gold { background: #2a2010; color: var(--gold); }
         .tag.accent { background: #102040; color: var(--accent); }
-        .member-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-        .member-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-size: 12px; background: var(--tag-bg); border: 1px solid var(--border); }
-        .member-tag .remove { cursor: pointer; color: var(--text2); font-size: 14px; line-height: 1; transition: color .2s; margin-left: 2px; }
+        .member-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+        .member-tag { display: inline-flex; align-items: center; gap: 3px; padding: 3px 6px; border-radius: 4px; font-size: 11px; background: var(--tag-bg); border: 1px solid var(--border); }
+        .member-tag .remove { cursor: pointer; color: var(--text2); font-size: 12px; line-height: 1; transition: color .2s; margin-left: 1px; }
         .member-tag .remove:hover { color: var(--danger); }
-        .guild-card .info-row { font-size: 12px; margin-bottom: 3px; }
+        .guild-card .info-row { font-size: 11px; margin-bottom: 2px; }
         .guild-card .info-row .label { color: var(--text2); }
-        .guild-card .info-row .value { color: var(--text); margin-left: 3px; }
-        .guild-card .note-highlight { color: var(--gold); font-size: 11px; }
-        .guild-card .guild-actions { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+        .guild-card .info-row .value { color: var(--text); margin-left: 2px; }
+        .guild-card .note-highlight { color: var(--gold); font-size: 10px; }
+        .guild-card .guild-actions { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
         .dropdown-wrap { position: relative; }
         .dropdown-menu {
             position: absolute;
@@ -280,65 +274,49 @@
             z-index: 50;
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            max-height: 180px;
+            border-radius: 6px;
+            max-height: 150px;
             overflow-y: auto;
             display: none;
-            box-shadow: 0 8px 24px rgba(0,0,0,.5);
+            box-shadow: 0 6px 16px rgba(0,0,0,.5);
         }
         .dropdown-menu.show { display: block; }
-        .dropdown-item { padding: 9px 12px; cursor: pointer; font-size: 13px; transition: background .2s; }
+        .dropdown-item { padding: 7px 10px; cursor: pointer; font-size: 12px; transition: background .2s; }
         .dropdown-item:hover { background: var(--hover); }
-        .empty-state { text-align: center; padding: 30px 16px; color: var(--text2); }
-        .empty-state .icon { font-size: 40px; margin-bottom: 8px; }
-        .empty-state .text { font-size: 13px; }
-        .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-        .section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-        .score-big { font-size: 24px; font-weight: 700; color: var(--gold); }
-        .highlight-box { background: var(--tag-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 8px 0; }
+        .empty-state { text-align: center; padding: 20px 12px; color: var(--text2); }
+        .empty-state .icon { font-size: 32px; margin-bottom: 6px; }
+        .empty-state .text { font-size: 12px; }
+        .divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+        .section-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .score-big { font-size: 20px; font-weight: 700; color: var(--gold); }
+        .highlight-box { background: var(--tag-bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0; }
         .diamond-toggle {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 14px;
             cursor: pointer;
             background: var(--tag-bg);
             border: 1px solid var(--border);
-            font-size: 12px;
+            font-size: 10px;
             user-select: none;
         }
         .diamond-toggle.on { background: #2a2010; border-color: var(--gold); color: var(--gold); }
         .tier-btn {
-            padding: 6px 10px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
             border: 1px solid var(--border);
             background: var(--tag-bg);
             color: var(--text2);
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             transition: all .2s;
         }
         .tier-btn.active, .tier-btn.gold-active { background: #2a2010; color: var(--gold); border-color: var(--gold); }
-        .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
-        .collapse-body { display: none; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 8px; }
-        .collapse-body.open { display: block; }
-        @media (max-width: 600px) {
-            .header { padding: 8px 12px; }
-            .header .title { font-size: 13px; }
-            .content { padding: 10px; }
-            .card { padding: 10px; }
-            .tabs { padding: 6px 8px; gap: 2px; }
-            .tab { padding: 5px 10px; font-size: 11px; }
-            .form-row { flex-direction: column; gap: 0; }
-            .search-box { flex-direction: column; }
-            .login-card { padding: 20px 16px; }
-            .guild-card .guild-actions { flex-direction: column; }
-            .guild-card .guild-actions .btn { width: 100%; justify-content: center; }
-            .main-wrap { padding-top: 110px; }
-            .tabs { top: 60px; }
-        }
-    </style>
+        .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+        .collapse-body { display: none; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 6px; }
+        .collapse-body.open { display: block; }    </style>
 </head>
 <body>
 <div class="toast-container" id="toastContainer"></div>
@@ -567,8 +545,7 @@ function setupTabs(tabs) {
     initMemberMgrTab();
     initRecommendTab();
     initGuildMgrTab();
-}
-// ===== 查询标签 =====
+}// ===== 查询标签 =====
 function initAdminSearchTab() {
     const p = document.getElementById('tab-search');
     if (!p) return;
@@ -616,9 +593,9 @@ async function searchMemberForAdmin() {
         const tasks = allTasks.filter(t => tids.includes(t.id));
         html += `<div class="card">
             <div class="card-header"><span class="card-title">👤${m.real_name}</span></div>
-            <div style="font-size:12px;color:var(--text2)">别名：${m.alias || '无'}</div>
-            <div style="font-size:12px;color:var(--gold)">📋能做：</div>
-            <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
+            <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
+            <div style="font-size:11px;color:var(--gold)">📋能做：</div>
+            <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
         </div>`;
     }
     div.innerHTML = html;
@@ -643,9 +620,15 @@ async function searchTaskForAdmin() {
         const mids = tml.map(tm => tm.member_id);
         const members = allMembers.filter(m => mids.includes(m.id));
         html += `<div class="card">
-            <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
-            <div style="font-size:12px;color:var(--text2)">👥能做的人：</div>
-            <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
+            <div class="card-header">
+    <span class="card-title">📋${t.task_name}</span>
+    <div style="display:flex;gap:3px;align-items:center">
+        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+        <span class="tag gold">⭐${t.score}分</span>
+    </div>
+</div>
+            <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
+            <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
         </div>`;
     }
     div.innerHTML = html;
@@ -673,12 +656,12 @@ function initTaskMgrTab() {
         <hr class="divider">
         <div class="card">
             <div class="section-title">📦任务模板</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
                 <button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板</button>
                 <button class="btn btn-outline btn-sm" id="btnSaveTemplate">💾保存当前为模板</button>
                 <button class="btn btn-outline btn-sm" id="btnLoadTemplate">📂加载我的模板</button>
                 <button class="btn btn-outline btn-sm" id="btnEditPreset">✏️编辑预设模板</button>
-                <span style="font-size:11px;color:var(--text2)">（约160个任务）</span>
+                <span style="font-size:10px;color:var(--text2)">（168个任务）</span>
             </div>
         </div>
         <hr class="divider">
@@ -697,10 +680,10 @@ function initTaskMgrTab() {
             <button class="btn btn-accent btn-sm" id="btnBatchAdd">➕添加到任务</button>
         </div>
         <hr class="divider">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px">
             <div class="section-title" style="margin:0">📋所有任务</div>
-            <div style="display:flex;gap:4px;align-items:center">
-                <input type="text" id="taskSearchFilter" placeholder="🔍搜索..." style="width:100px;padding:4px 6px;font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;outline:none">
+            <div style="display:flex;gap:3px;align-items:center">
+                <input type="text" id="taskSearchFilter" placeholder="🔍搜索..." style="width:80px;padding:3px 5px;font-size:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;outline:none">
                 <button class="btn btn-outline btn-sm" id="btnSelectAll">☑️全选</button>
                 <button class="btn btn-danger btn-sm" id="btnBatchDelete">🗑️批量删除</button>
             </div>
@@ -844,13 +827,19 @@ async function loadTaskList() {
             const members = allMembers.filter(m => mids.includes(m.id));
             const checked = selectedTasks.has(t.id) ? 'checked' : '';
             html += `<div class="card">
-                <div style="display:flex;align-items:flex-start;gap:6px">
-                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:15px;height:15px;cursor:pointer">
+                <div style="display:flex;align-items:flex-start;gap:4px">
+                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:14px;height:14px;cursor:pointer">
                     <div style="flex:1">
                         <button class="btn-close" onclick="deleteTask(${t.id})" title="删除任务">✕</button>
-                        <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
-                        <div style="font-size:12px;color:var(--text2)">👥能做的人：</div>
-                        <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
+                        <div class="card-header">
+    <span class="card-title">📋${t.task_name}</span>
+    <div style="display:flex;gap:3px;align-items:center">
+        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+        <span class="tag gold">⭐${t.score}分</span>
+    </div>
+</div>
+                        <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
+                        <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
                     </div>
                 </div>
             </div>`;
@@ -858,7 +847,17 @@ async function loadTaskList() {
         div.innerHTML = html;
     } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; }
 }
-
+async function editTask(id, oldName, oldScore) {
+    const newName = prompt('✏️修改任务名称', oldName);
+    if (newName === null || newName.trim() === '') return;
+    const newScore = prompt('⭐修改分数', oldScore);
+    if (newScore === null || newScore.trim() === '') return;
+    try {
+        await db.tasks.update(id, { task_name: newName.trim(), score: parseInt(newScore) || 0 });
+        showToast('✅任务已更新', 'success');
+        loadTaskList();
+    } catch (e) { showToast('❌修改失败', 'error'); }
+}
 async function deleteTask(id) {
     if (!confirm('确定删除整个任务吗？')) return;
     try { await db.tasks.delete(id); showToast('🗑️已删除', 'success'); loadTaskList(); }
@@ -882,18 +881,23 @@ function filterTaskList(q) {
     for (const t of filtered) {
         const checked = selectedTasks.has(t.id) ? 'checked' : '';
         html += `<div class="card">
-            <div style="display:flex;align-items:flex-start;gap:6px">
-                <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:15px;height:15px;cursor:pointer">
+            <div style="display:flex;align-items:flex-start;gap:4px">
+                <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:14px;height:14px;cursor:pointer">
                 <div style="flex:1">
                     <button class="btn-close" onclick="deleteTask(${t.id})">✕</button>
-                    <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
+                    <div class="card-header">
+    <span class="card-title">📋${t.task_name}</span>
+    <div style="display:flex;gap:3px;align-items:center">
+        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+        <span class="tag gold">⭐${t.score}分</span>
+    </div>
+</div>
                 </div>
             </div>
         </div>`;
     }
     div.innerHTML = html;
-}
-// ===== 成员管理 =====
+}// ===== 成员管理 =====
 function initMemberMgrTab() {
     const p = document.getElementById('tab-member-mgr');
     if (!p) return;
@@ -916,7 +920,7 @@ function initMemberMgrTab() {
             <input type="text" id="memberSearchFilter" placeholder="🔍搜索成员大名或别名...">
             <button class="btn btn-accent btn-sm" id="btnClearMemberSearch">✕</button>
         </div>
-        <div class="section-title">👥所有成员 <span id="memberCount" style="font-size:11px;color:var(--text2)"></span></div>
+        <div class="section-title">👥所有成员 <span id="memberCount" style="font-size:10px;color:var(--text2)"></span></div>
         <div id="memberList"></div>`;
     document.getElementById('btnAddMember').addEventListener('click', addMember);
     document.getElementById('newMemberName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addMember(); });
@@ -993,12 +997,12 @@ async function loadMemberList(filterQuery = '') {
                 <button class="btn-close" onclick="deleteMember(${m.id})">✕</button>
                 <div class="card-header">
                     <span class="card-title">👤${m.real_name}</span>
-                    <div style="display:flex;gap:3px">
+                    <div style="display:flex;gap:2px">
                         <button class="btn btn-outline btn-xs" onclick="editMemberName(${m.id},'${m.real_name.replace(/'/g, "\\'")}')">✏️改大名</button>
                         <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g, "\\'")}','${(m.alias || '').replace(/'/g, "\\'")}')">✏️改别名</button>
                     </div>
                 </div>
-                <div style="font-size:12px;color:var(--text2)">🏷️别名：${m.alias ? m.alias.replace(/,/g, '、') : '无'}</div>
+                <div style="font-size:11px;color:var(--text2)">🏷️别名：${m.alias ? m.alias.replace(/,/g, '、') : '无'}</div>
             </div>`;
         }
         div.innerHTML = html;
@@ -1036,8 +1040,7 @@ async function editAlias(memberId, name, currentAlias) {
         await refreshCurrentGuildData();
         loadMemberList();
     } catch (e) { showToast('❌更新失败', 'error'); }
-}
-// ===== 智能推荐 =====
+}// ===== 智能推荐 =====
 let memberTargets = {};
 
 function initRecommendTab() {
@@ -1048,10 +1051,10 @@ function initRecommendTab() {
             <div class="section-title">🎯设置我的目标档位</div>
             <div class="form-row">
                 <div class="form-group"><label>👤选择成员</label><select id="recommendMember"><option value="">--请选择成员--</option></select></div>
-                <div class="form-group"><label>🎯目标档位</label><div style="display:flex;gap:4px;flex-wrap:wrap" id="tierBtns"></div></div>
+                <div class="form-group"><label>🎯目标档位</label><div style="display:flex;gap:3px;flex-wrap:wrap" id="tierBtns"></div></div>
             </div>
-            <div id="tierDetail" style="display:none;margin-bottom:8px;padding:8px;background:var(--tag-bg);border-radius:8px;font-size:12px;color:var(--gold)"></div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <div id="tierDetail" style="display:none;margin-bottom:6px;padding:6px;background:var(--tag-bg);border-radius:6px;font-size:11px;color:var(--gold)"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
                 <span class="diamond-toggle" id="diamondToggle" onclick="toggleDiamond()">💎已花1200钻（18→24任务）</span>
             </div>
             <button class="btn btn-accent btn-sm" id="btnSetTarget">💾保存目标</button>
@@ -1148,8 +1151,8 @@ async function saveMemberTarget() {
         if (diff > 0) html += `<br>⚠️还差<b style="color:var(--danger)">${diff}</b>分，即使全做也达不到目标`;
         else html += `<br>✅可以达到目标！`;
         html += `</div><div class="section-title">📋推荐任务（按分数排序）</div>`;
-        if (!topTasks.length) html += '<span style="color:var(--text2);font-size:12px">暂无任务</span>';
-        else topTasks.forEach((t, i) => { html += `<div class="member-tag" style="margin:3px">${i + 1}.${t.task_name} ⭐${t.score}</div>`; });
+        if (!topTasks.length) html += '<span style="color:var(--text2);font-size:11px">暂无任务</span>';
+        else topTasks.forEach((t, i) => { html += `<div class="member-tag" style="margin:2px">${i + 1}.${t.task_name} ⭐${t.score}</div>`; });
         html += '</div>';
         document.getElementById('personalRecommend').innerHTML = html;
         showToast('💾目标已保存', 'success');
@@ -1191,13 +1194,13 @@ async function loadAllMembersPlan() {
             tierPlans.forEach((p, i) => {
                 const diff = p.target - p.totalScore;
                 const top18Score = p.topTasks.reduce((s, t) => s + t.score, 0);
-                html += `<div class="card" style="background:var(--bg);margin-bottom:4px">
+                html += `<div class="card" style="background:var(--bg);margin-bottom:3px">
                     <div class="collapse-header" onclick="toggleCollapse(this)">
                         <span><b>👤${p.real_name}</b> ⭐能做${p.totalScore}分 ${diff > 0 ? `<span style="color:var(--danger)">还差${diff}分</span>` : '<span style="color:var(--success)">可达标✅</span>'}</span>
-                        <span style="font-size:11px;color:var(--text2)">展开▶</span>
+                        <span style="font-size:10px;color:var(--text2)">展开▶</span>
                     </div>
                     <div class="collapse-body">
-                        <div style="font-size:12px;color:var(--text2)">📋能做${p.taskCount}个任务 | 18任务最高${top18Score}分</div>
+                        <div style="font-size:11px;color:var(--text2)">📋能做${p.taskCount}个任务 | 18任务最高${top18Score}分</div>
                         <div class="member-tags">${p.topTasks.map((t, j) => `<span class="member-tag">${j + 1}.${t.task_name} ⭐${t.score}</span>`).join('')}</div>
                     </div>
                 </div>`;
@@ -1219,8 +1222,7 @@ function toggleCollapse(header) {
         body.classList.add('open');
         arrow.textContent = '收起▲';
     }
-}
-// ===== 公会管理 =====
+}// ===== 公会管理 =====
 function initGuildMgrTab() {
     const p = document.getElementById('tab-guild-mgr');
     if (!p) return;
@@ -1278,7 +1280,7 @@ async function loadGuildList() {
     for (const g of allGuilds) {
         html += `<div class="card guild-card">
             <div class="info-row"><span class="label">🏰公会名称：</span><span class="value">${g.name}</span></div>
-            <div class="info-row"><span class="label">🔑邀请码：</span><span class="value" style="color:var(--gold);font-size:16px;font-weight:700">${g.invite_code}</span></div>
+            <div class="info-row"><span class="label">🔑邀请码：</span><span class="value" style="color:var(--gold);font-size:15px;font-weight:700">${g.invite_code}</span></div>
             <div class="info-row"><span class="label">👥人数：</span><span class="value">${countMap[g.id] !== undefined ? countMap[g.id] : '...'}人</span></div>
             <div class="info-row"><span class="label">📝我的备注：</span><span class="note-highlight">${g.admin_note || '无'}</span></div>
             <div class="guild-actions">
@@ -1296,7 +1298,7 @@ async function enterGuild(guildId) {
     const guild = allGuilds.find(g => g.id === guildId);
     document.getElementById('headerTitle').textContent = `🏰${guild.name}`;
     document.getElementById('headerBadge').textContent = '管理员模式';
-    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:6px">↩返回</button>`;
+    document.getElementById('headerInfo').innerHTML = `邀请码：${guild.invite_code} <button class="btn btn-xs btn-accent" onclick="backToAdmin()" style="margin-left:4px">↩返回</button>`;
     await refreshCurrentGuildData();
     initAdminSearchTab();
     initTaskMgrTab();
@@ -1361,7 +1363,7 @@ async function loadMemberPage(guild) {
     document.getElementById('headerBadge').textContent = '公会成员';
     let memberCount = 0;
     try { const m = await db.members.list(currentGuildId); memberCount = m.length; } catch (e) {}
-    document.getElementById('headerInfo').innerHTML = `👥${memberCount}人 | 邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:6px">✏️改名</button>`;
+    document.getElementById('headerInfo').innerHTML = `👥${memberCount}人 | 邀请码：${guild.invite_code} <button class="btn btn-xs btn-outline" onclick="renameGuild()" style="margin-left:4px">✏️改名</button>`;
     await refreshCurrentGuildData();
     setupTabs([
         { name: '🔍查询', id: 'tab-search' },
@@ -1405,7 +1407,7 @@ function initMemberSearchTab() {
                 <button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button>
             </div>
             <div id="memberTaskResult"></div>
-            <div id="addSelfBox" style="display:none;margin-top:10px;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+            <div id="addSelfBox" style="display:none;margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)">
                 <div class="section-title">🙋添加自己到这个任务</div>
                 <div class="form-row">
                     <div class="form-group"><label>👤大名（必填）</label><input type="text" id="addSelfName"></div>
@@ -1443,9 +1445,9 @@ async function searchMemberForMember() {
                     <span class="card-title">👤${m.real_name}</span>
                     <button class="btn btn-outline btn-xs" onclick="editAlias(${m.id},'${m.real_name.replace(/'/g, "\\'")}','${(m.alias || '').replace(/'/g, "\\'")}')">✏️编辑别名</button>
                 </div>
-                <div style="font-size:12px;color:var(--text2)">别名：${m.alias || '无'}</div>
-                <div style="font-size:12px;color:var(--gold)">📋能做：</div>
-                <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
+                <div style="font-size:11px;color:var(--text2)">别名：${m.alias || '无'}</div>
+                <div style="font-size:11px;color:var(--gold)">📋能做：</div>
+                <div class="member-tags">${tasks.length ? tasks.map(t => `<span class="tag gold">${t.task_name} ⭐${t.score}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
             </div>`;
         }
         div.innerHTML = html;
@@ -1467,9 +1469,9 @@ async function searchTaskForMember() {
             const members = allMembers.filter(m => mids.includes(m.id));
             html += `<div class="card">
                 <div class="card-header"><span class="card-title">📋${t.task_name}</span><span class="tag gold">⭐${t.score}分</span></div>
-                <div style="font-size:12px;color:var(--text2)">👥能做的人：</div>
-                <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:11px">暂无</span>'}</div>
-                <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="window._memberTaskResultCallback(${t.id})">🙋我也能做！</button>
+                <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
+                <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}</span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
+                <button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="window._memberTaskResultCallback(${t.id})">🙋我也能做！</button>
             </div>`;
         }
         div.innerHTML = html;

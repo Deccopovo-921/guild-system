@@ -188,14 +188,16 @@
         .recommend-preview .task-item .star-btn.active { color: var(--gold); }
         .rc-task-section { font-size: 11px; color: var(--text2); margin: 4px 0 2px 0; }
         .total-tasks-badge { background: var(--accent); color: #fff; font-size: 11px; border-radius: 12px; padding: 1px 10px; font-weight: 600; margin-left: 6px; }
-        .add-self-box { margin-top: 6px; padding: 8px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border); display: none; }
-        .add-self-box .search-input-wrap { position: relative; }
-        .add-self-box .member-search-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--card); border: 1px solid var(--border); border-radius: 6px; max-height: 120px; overflow-y: auto; display: none; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
-        .add-self-box .member-search-dropdown.show { display: block; }
-        .add-self-box .member-search-dropdown .ms-item { padding: 5px 10px; cursor: pointer; font-size: 12px; transition: background .2s; }
-        .add-self-box .member-search-dropdown .ms-item:hover { background: var(--hover); }
-        .add-self-box .selected-member-display { font-size: 12px; color: var(--text2); margin-top: 4px; }
-        .add-self-box .selected-member-display .name { color: var(--text); font-weight: 600; }
+        .add-self-form { margin-top: 6px; padding: 8px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border); display: none; }
+        .add-self-form .search-input-wrap { position: relative; }
+        .add-self-form .member-search-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: var(--card); border: 1px solid var(--border); border-radius: 6px; max-height: 120px; overflow-y: auto; display: none; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
+        .add-self-form .member-search-dropdown.show { display: block; }
+        .add-self-form .member-search-dropdown .ms-item { padding: 5px 10px; cursor: pointer; font-size: 12px; transition: background .2s; }
+        .add-self-form .member-search-dropdown .ms-item:hover { background: var(--hover); }
+        .add-self-form .selected-display { font-size: 12px; color: var(--text2); margin-top: 4px; }
+        .add-self-form .selected-display .name { color: var(--text); font-weight: 600; }
+        .add-self-form .form-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .add-self-form .form-row .form-group { flex: 1; min-width: 100px; }
         .priority-tag { font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
         .priority-tag.star { background: #2a2010; color: var(--gold); }
         .priority-tag.priority { background: #102040; color: var(--accent); }
@@ -456,7 +458,7 @@ function setupTabs(tabs) {
     initGuildMgrTab();
 }
 
-// ===== 查询标签 =====
+// ===== 管理员查询标签 =====
 function initAdminSearchTab() {
     var p = document.getElementById('tab-search');
     if (!p) return;
@@ -484,7 +486,7 @@ function initAdminSearchTab() {
     document.getElementById('btnAdminSearchTask').addEventListener('click', searchTaskForAdmin);
 }
 
-// ===== 查成员能做什么任务（按推荐优先级排序） =====
+// ===== 查成员（管理员） =====
 async function searchMemberForAdmin() {
     var q = document.getElementById('adminSearchMember').value.trim();
     var div = document.getElementById('adminMemberResult');
@@ -565,7 +567,7 @@ async function searchMemberForAdmin() {
     }
 }
 
-// ===== 查任务有谁能做（按推荐优先级排序，显示成员列表，支持删除，支持"我也能做"） =====
+// ===== 查任务（管理员 - 带"我也能做"表单） =====
 async function searchTaskForAdmin() {
     var q = document.getElementById('adminSearchTask').value.trim();
     var div = document.getElementById('adminTaskResult');
@@ -635,6 +637,8 @@ async function searchTaskForAdmin() {
                 }
             }
             
+            var totalPeople = allTaskMembersList.length;
+            
             html += '<div class="card" style="padding:10px 12px;">';
             html += '<div class="card-header">';
             html += '<span class="card-title">📋' + t.task_name + '</span>';
@@ -643,8 +647,6 @@ async function searchTaskForAdmin() {
             if (t.sub_tag && t.sub_tag !== '无') {
                 html += '<span class="tag sub-tag">' + t.sub_tag + '</span>';
             }
-            
-            var totalPeople = allTaskMembersList.length;
             html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 共 ' + totalPeople + ' 人</div>';
             
             if (starMembers.length > 0) {
@@ -680,39 +682,51 @@ async function searchTaskForAdmin() {
                 html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>';
             }
             
-            html += '<button class="btn btn-outline btn-sm" style="margin-top:6px;" onclick="toggleSearchAddSelf(' + t.id + ')">🙋 我也能做！</button>';
-            
-            html += '<div class="add-self-box" id="search_add_self_' + t.id + '" style="display:none;margin-top:6px;padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border);">';
-            html += '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">🙋 添加自己到这个任务</div>';
+            // "我也能做" 表单（始终显示）
+            html += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);">';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">🙋 我也能做</div>';
+            html += '<div class="add-self-form" id="admin_add_self_' + t.id + '" style="display:block;margin-top:4px;padding:6px 8px;background:var(--bg);border-radius:6px;border:1px solid var(--border);">';
+            html += '<div class="form-row">';
+            html += '<div class="form-group" style="flex:2;">';
+            html += '<label style="font-size:10px;color:var(--text2);">大名（搜索已存在成员）</label>';
             html += '<div class="search-input-wrap" style="position:relative;">';
-            html += '<input type="text" class="search-member-input" id="search_self_input_' + t.id + '" placeholder="输入大名或别名搜索..." style="width:100%;padding:6px 8px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:12px;outline:none;">';
-            html += '<div class="member-search-dropdown" id="search_self_dropdown_' + t.id + '" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:6px;max-height:120px;overflow-y:auto;display:none;box-shadow:0 6px 16px rgba(0,0,0,.5);"></div>';
+            html += '<input type="text" class="search-member-input" id="admin_self_input_' + t.id + '" placeholder="输入大名搜索..." style="width:100%;padding:5px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;outline:none;">';
+            html += '<div class="member-search-dropdown" id="admin_self_dropdown_' + t.id + '" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:4px;max-height:100px;overflow-y:auto;display:none;box-shadow:0 4px 12px rgba(0,0,0,.5);"></div>';
             html += '</div>';
-            html += '<div class="selected-member-display" id="search_self_selected_' + t.id + '" style="font-size:12px;color:var(--text2);margin-top:4px;">请搜索并选择成员</div>';
-            html += '<button class="btn btn-success btn-sm" style="margin-top:6px;" onclick="confirmSearchAddSelf(' + t.id + ')">✅ 确认添加</button>';
-            html += '<button class="btn btn-outline btn-sm" style="margin-top:6px;margin-left:4px;" onclick="cancelSearchAddSelf(' + t.id + ')">取消</button>';
+            html += '</div>';
+            html += '<div class="form-group" style="flex:1;">';
+            html += '<label style="font-size:10px;color:var(--text2);">别名（选填）</label>';
+            html += '<input type="text" id="admin_self_alias_' + t.id + '" placeholder="别名" style="width:100%;padding:5px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;outline:none;">';
+            html += '</div>';
+            html += '<div class="form-group" style="flex:0 0 auto;display:flex;align-items:flex-end;">';
+            html += '<button class="btn btn-success btn-sm" onclick="confirmAdminAddSelf(' + t.id + ')" style="padding:5px 12px;">✅ 添加</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="selected-display" id="admin_self_selected_' + t.id + '" style="font-size:11px;color:var(--text2);margin-top:2px;">请搜索并选择成员</div>';
+            html += '</div>';
             html += '</div>';
             
             html += '</div>';
         }
         div.innerHTML = html;
         
+        // 绑定搜索事件
         for (var n = 0; n < filtered.length; n++) {
             var taskId = filtered[n].id;
-            var input = document.getElementById('search_self_input_' + taskId);
+            var input = document.getElementById('admin_self_input_' + taskId);
             if (input) {
                 input._taskId = taskId;
                 input.addEventListener('input', function(e) {
-                    filterSearchMemberForTask(e.target, document.getElementById('search_self_dropdown_' + this._taskId));
+                    filterMemberForTask(e.target, document.getElementById('admin_self_dropdown_' + this._taskId), 'admin');
                 });
                 input.addEventListener('focus', function(e) {
                     if (this.value.trim()) {
-                        filterSearchMemberForTask(this, document.getElementById('search_self_dropdown_' + this._taskId));
+                        filterMemberForTask(this, document.getElementById('admin_self_dropdown_' + this._taskId), 'admin');
                     }
                 });
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
-                        var items = document.getElementById('search_self_dropdown_' + this._taskId).querySelectorAll('.ms-item');
+                        var items = document.getElementById('admin_self_dropdown_' + this._taskId).querySelectorAll('.ms-item');
                         if (items.length > 0) items[0].click();
                     }
                 });
@@ -732,22 +746,8 @@ async function searchTaskForAdmin() {
     }
 }
 
-function toggleSearchAddSelf(taskId) {
-    var box = document.getElementById('search_add_self_' + taskId);
-    if (!box) return;
-    document.querySelectorAll('.add-self-box').forEach(function(el) {
-        if (el.id !== 'search_add_self_' + taskId) {
-            el.style.display = 'none';
-        }
-    });
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    if (box.style.display === 'block') {
-        var input = document.getElementById('search_self_input_' + taskId);
-        if (input) { input.focus(); }
-    }
-}
-
-async function filterSearchMemberForTask(input, dropdown) {
+// ===== 通用：搜索成员（用于"我也能做"表单） =====
+async function filterMemberForTask(input, dropdown, mode) {
     var q = input.value.trim().toLowerCase();
     dropdown.innerHTML = '';
     if (!q || !currentGuildId) { dropdown.classList.remove('show'); return; }
@@ -757,17 +757,19 @@ async function filterSearchMemberForTask(input, dropdown) {
             return m.real_name.toLowerCase().includes(q) || (m.alias || '').toLowerCase().includes(q);
         });
         if (!filtered.length) {
-            dropdown.innerHTML = '<div class="ms-item" style="color:var(--text2);">未找到匹配成员</div>';
+            dropdown.innerHTML = '<div class="ms-item" style="color:var(--text2);padding:4px 8px;font-size:12px;">未找到匹配成员</div>';
         } else {
             filtered.forEach(function(m) {
                 var item = document.createElement('div');
                 item.className = 'ms-item';
                 item.textContent = m.real_name;
+                item.style.cssText = 'padding:4px 8px;cursor:pointer;font-size:12px;transition:background .2s;';
                 item.addEventListener('click', function() {
                     input.value = m.real_name;
                     dropdown.classList.remove('show');
-                    var taskId = input._taskId || parseInt(input.id.replace('search_self_input_', ''));
-                    var display = document.getElementById('search_self_selected_' + taskId);
+                    var taskId = input._taskId || parseInt(input.id.replace(/^admin_self_input_/, '').replace(/^member_self_input_/, ''));
+                    var prefix = mode === 'admin' ? 'admin' : 'member';
+                    var display = document.getElementById(prefix + '_self_selected_' + taskId);
                     if (display) {
                         display.innerHTML = '已选成员：<span class="name">' + m.real_name + '</span>';
                         display._selectedMemberId = m.id;
@@ -780,13 +782,16 @@ async function filterSearchMemberForTask(input, dropdown) {
     } catch (e) { console.error(e); }
 }
 
-async function confirmSearchAddSelf(taskId) {
-    var display = document.getElementById('search_self_selected_' + taskId);
+// ===== 管理员：确认添加自己到任务 =====
+async function confirmAdminAddSelf(taskId) {
+    var display = document.getElementById('admin_self_selected_' + taskId);
     if (!display || !display._selectedMemberId) {
         showToast('⚠️请先搜索并选择成员', 'warning');
         return;
     }
     var memberId = display._selectedMemberId;
+    var aliasInput = document.getElementById('admin_self_alias_' + taskId);
+    var alias = aliasInput ? aliasInput.value.trim() : '';
     try {
         var existing = await db.taskMembers.list(taskId);
         var exists = existing.some(function(tm) { return tm.member_id === memberId; });
@@ -795,8 +800,20 @@ async function confirmSearchAddSelf(taskId) {
             return;
         }
         await db.taskMembers.add({ task_id: taskId, member_id: memberId });
+        // 如果有别名，更新成员别名
+        if (alias) {
+            try {
+                await db.members.update(memberId, { alias: alias });
+            } catch (e) {}
+        }
         showToast('✅已添加到任务！', 'success');
-        document.getElementById('search_add_self_' + taskId).style.display = 'none';
+        // 清空表单
+        var input = document.getElementById('admin_self_input_' + taskId);
+        if (input) input.value = '';
+        if (aliasInput) aliasInput.value = '';
+        display.innerHTML = '请搜索并选择成员';
+        display._selectedMemberId = null;
+        // 刷新搜索结果
         searchTaskForAdmin();
     } catch (e) {
         showToast('❌添加失败', 'error');
@@ -804,17 +821,7 @@ async function confirmSearchAddSelf(taskId) {
     }
 }
 
-function cancelSearchAddSelf(taskId) {
-    document.getElementById('search_add_self_' + taskId).style.display = 'none';
-    var input = document.getElementById('search_self_input_' + taskId);
-    if (input) input.value = '';
-    var display = document.getElementById('search_self_selected_' + taskId);
-    if (display) {
-        display.innerHTML = '请搜索并选择成员';
-        display._selectedMemberId = null;
-    }
-}
-
+// ===== 从搜索任务中删除成员（管理员） =====
 async function removeSearchTaskMember(taskId, memberId) {
     if (!confirm('确定从该任务中移除该成员吗？')) return;
     try {
@@ -1305,7 +1312,7 @@ async function loadTasksToSelect() {
     } catch (e) {}
 }
 
-// ===== 任务列表（修复搜索功能） =====
+// ===== 任务列表 =====
 async function loadTaskList() {
     var div = document.getElementById('taskList');
     if (!div || !currentGuildId) return;
@@ -1637,14 +1644,13 @@ async function removeTaskMember(taskId, memberId) {
     } catch (e) { showToast('❌移除失败', 'error'); }
 }
 
-// ===== 修复：所有任务页面搜索功能 =====
+// ===== 所有任务页面搜索 =====
 function filterTaskList(q) {
     var div = document.getElementById('taskList');
     if (!q) { 
         loadTaskList(); 
         return; 
     }
-    // 直接重新加载并过滤显示
     (async function() {
         try {
             allTasks = await db.tasks.list(currentGuildId);
@@ -1655,7 +1661,6 @@ function filterTaskList(q) {
                 div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配任务</div></div>';
                 return;
             }
-            // 使用 filtered 渲染任务列表
             renderFilteredTaskList(filtered, div);
         } catch (e) {
             div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">搜索失败</div></div>';
@@ -1665,7 +1670,6 @@ function filterTaskList(q) {
 }
 
 async function renderFilteredTaskList(filteredTasks, div) {
-    // 获取成员关系
     var taskIds = filteredTasks.map(function(t) { return t.id; });
     var allTaskMembers = [];
     for (var i = 0; i < taskIds.length; i += 50) {
@@ -1689,7 +1693,6 @@ async function renderFilteredTaskList(filteredTasks, div) {
     html += '<label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>';
     html += '</div>';
     
-    // 按分类分组
     var categorized = {};
     for (var k = 0; k < TASK_CATEGORIES.length; k++) {
         categorized[TASK_CATEGORIES[k].id] = [];
@@ -2370,16 +2373,35 @@ async function renameGuild() {
     } catch (e) { showToast('❌修改失败', 'error'); }
 }
 
+// ===== 成员视角：查询标签 =====
 function initMemberSearchTab() {
     var p = document.getElementById('tab-search');
     if (!p) return;
-    p.innerHTML = '<div class="card"><div class="section-title">👤查成员能做什么任务</div><div class="search-box"><input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button></div><div id="memberMemberResult"></div></div><hr class="divider"><div class="card"><div class="section-title">📋查任务有谁能做</div><div class="search-box"><input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索..."><button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button></div><div id="memberTaskResult"></div></div>';
+    p.innerHTML = `
+        <div class="card">
+            <div class="section-title">👤查成员能做什么任务</div>
+            <div class="search-box">
+                <input type="text" id="memberSearchMember" placeholder="输入大名或别名，回车搜索...">
+                <button class="btn btn-accent btn-sm" id="btnMemberSearchMember">🔍</button>
+            </div>
+            <div id="memberMemberResult"></div>
+        </div>
+        <hr class="divider">
+        <div class="card">
+            <div class="section-title">📋查任务有谁能做</div>
+            <div class="search-box">
+                <input type="text" id="memberSearchTask" placeholder="输入任务名，回车搜索...">
+                <button class="btn btn-accent btn-sm" id="btnMemberSearchTask">🔍</button>
+            </div>
+            <div id="memberTaskResult"></div>
+        </div>`;
     document.getElementById('memberSearchMember').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchMemberForMember(); });
     document.getElementById('btnMemberSearchMember').addEventListener('click', searchMemberForMember);
     document.getElementById('memberSearchTask').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchTaskForMember(); });
     document.getElementById('btnMemberSearchTask').addEventListener('click', searchTaskForMember);
 }
 
+// ===== 成员视角：查成员能做什么 =====
 async function searchMemberForMember() {
     var q = document.getElementById('memberSearchMember').value.trim();
     var div = document.getElementById('memberMemberResult');
@@ -2445,6 +2467,7 @@ async function searchMemberForMember() {
     } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>'; }
 }
 
+// ===== 成员视角：查任务有谁能做（带"我也能做"表单） =====
 async function searchTaskForMember() {
     var q = document.getElementById('memberSearchTask').value.trim();
     var div = document.getElementById('memberTaskResult');
@@ -2508,6 +2531,8 @@ async function searchTaskForMember() {
                 }
             }
             
+            var totalPeople = allTaskMembersList.length;
+            
             html += '<div class="card" style="padding:10px 12px;">';
             html += '<div class="card-header">';
             html += '<span class="card-title">📋' + t.task_name + '</span>';
@@ -2516,8 +2541,6 @@ async function searchTaskForMember() {
             if (t.sub_tag && t.sub_tag !== '无') {
                 html += '<span class="tag sub-tag">' + t.sub_tag + '</span>';
             }
-            
-            var totalPeople = allTaskMembersList.length;
             html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 共 ' + totalPeople + ' 人</div>';
             
             if (starMembers.length > 0) {
@@ -2525,25 +2548,113 @@ async function searchTaskForMember() {
                 html += '<div class="member-tags">' + starMembers.map(function(mm) { return '<span class="member-tag">' + mm.real_name + '</span>'; }).join('') + '</div>';
                 if (priorityMembers.length > 0 || otherMembers.length > 0) html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
+            
             if (priorityMembers.length > 0) {
                 html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">📌 优先推荐（' + priorityMembers.length + '人）：</div>';
                 html += '<div class="member-tags">' + priorityMembers.map(function(mm) { return '<span class="member-tag">' + mm.real_name + '</span>'; }).join('') + '</div>';
                 if (otherMembers.length > 0) html += '<hr style="border-color:var(--border);margin:4px 0;">';
             }
+            
             if (otherMembers.length > 0) {
                 html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">👥 其他能做的人（' + otherMembers.length + '人）：</div>';
                 html += '<div class="member-tags">' + otherMembers.map(function(mm) { return '<span class="member-tag">' + mm.real_name + '</span>'; }).join('') + '</div>';
             }
+            
             if (allTaskMembersList.length === 0) {
                 html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">暂无成员能做</div>';
             }
+            
+            // ===== "我也能做" 表单（始终显示，每个任务独立） =====
+            html += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);">';
+            html += '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">🙋 我也能做</div>';
+            html += '<div class="add-self-form" id="member_add_self_' + t.id + '" style="display:block;margin-top:4px;padding:6px 8px;background:var(--bg);border-radius:6px;border:1px solid var(--border);">';
+            html += '<div class="form-row">';
+            html += '<div class="form-group" style="flex:2;">';
+            html += '<label style="font-size:10px;color:var(--text2);">大名（搜索已存在成员）</label>';
+            html += '<div class="search-input-wrap" style="position:relative;">';
+            html += '<input type="text" class="search-member-input" id="member_self_input_' + t.id + '" placeholder="输入大名搜索..." style="width:100%;padding:5px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;outline:none;">';
+            html += '<div class="member-search-dropdown" id="member_self_dropdown_' + t.id + '" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--card);border:1px solid var(--border);border-radius:4px;max-height:100px;overflow-y:auto;display:none;box-shadow:0 4px 12px rgba(0,0,0,.5);"></div>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="form-group" style="flex:1;">';
+            html += '<label style="font-size:10px;color:var(--text2);">别名（选填）</label>';
+            html += '<input type="text" id="member_self_alias_' + t.id + '" placeholder="别名" style="width:100%;padding:5px 6px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;outline:none;">';
+            html += '</div>';
+            html += '<div class="form-group" style="flex:0 0 auto;display:flex;align-items:flex-end;">';
+            html += '<button class="btn btn-success btn-sm" onclick="confirmMemberAddSelf(' + t.id + ')" style="padding:5px 12px;">✅ 添加</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '<div class="selected-display" id="member_self_selected_' + t.id + '" style="font-size:11px;color:var(--text2);margin-top:2px;">请搜索并选择成员</div>';
+            html += '</div>';
+            html += '</div>';
+            
             html += '</div>';
         }
         div.innerHTML = html;
+        
+        // 绑定搜索事件（成员视角）
+        for (var n = 0; n < filtered.length; n++) {
+            var taskId = filtered[n].id;
+            var input = document.getElementById('member_self_input_' + taskId);
+            if (input) {
+                input._taskId = taskId;
+                input.addEventListener('input', function(e) {
+                    filterMemberForTask(e.target, document.getElementById('member_self_dropdown_' + this._taskId), 'member');
+                });
+                input.addEventListener('focus', function(e) {
+                    if (this.value.trim()) {
+                        filterMemberForTask(this, document.getElementById('member_self_dropdown_' + this._taskId), 'member');
+                    }
+                });
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        var items = document.getElementById('member_self_dropdown_' + this._taskId).querySelectorAll('.ms-item');
+                        if (items.length > 0) items[0].click();
+                    }
+                });
+            }
+        }
+        
         showToast('✅找到' + filtered.length + '个任务', 'success');
     } catch (e) {
         div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">查询失败</div></div>';
         showToast('❌查询失败', 'error');
+        console.error(e);
+    }
+}
+
+// ===== 成员视角：确认添加自己到任务 =====
+async function confirmMemberAddSelf(taskId) {
+    var display = document.getElementById('member_self_selected_' + taskId);
+    if (!display || !display._selectedMemberId) {
+        showToast('⚠️请先搜索并选择成员', 'warning');
+        return;
+    }
+    var memberId = display._selectedMemberId;
+    var aliasInput = document.getElementById('member_self_alias_' + taskId);
+    var alias = aliasInput ? aliasInput.value.trim() : '';
+    try {
+        var existing = await db.taskMembers.list(taskId);
+        var exists = existing.some(function(tm) { return tm.member_id === memberId; });
+        if (exists) {
+            showToast('⚠️该成员已在此任务中', 'warning');
+            return;
+        }
+        await db.taskMembers.add({ task_id: taskId, member_id: memberId });
+        if (alias) {
+            try {
+                await db.members.update(memberId, { alias: alias });
+            } catch (e) {}
+        }
+        showToast('✅已添加到任务！', 'success');
+        var input = document.getElementById('member_self_input_' + taskId);
+        if (input) input.value = '';
+        if (aliasInput) aliasInput.value = '';
+        display.innerHTML = '请搜索并选择成员';
+        display._selectedMemberId = null;
+        searchTaskForMember();
+    } catch (e) {
+        showToast('❌添加失败', 'error');
         console.error(e);
     }
 }

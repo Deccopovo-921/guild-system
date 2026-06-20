@@ -859,6 +859,7 @@ function initTaskMgrTab() {
                 <label>📂主分类</label>
                 <select id="newTaskCategory">
                     ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+                    <option value="无">📂 无</option>
                 </select>
             </div>
             <div class="form-group">
@@ -1461,12 +1462,10 @@ async function loadTaskList() {
             taskMemberMap[tm.task_id].push(tm.member_id);
         }
         
-        // 按主分类分组
         const categorized = {};
         for (const cat of TASK_CATEGORIES) {
             categorized[cat.id] = [];
         }
-        // 添加一个"无"分类
         categorized['无'] = [];
         for (const t of allTasks) {
             let cat = t.category;
@@ -1483,7 +1482,6 @@ async function loadTaskList() {
             <label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>
         </div>`;
         
-        // 只显示有任务的分类
         for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) {
             const tasks = categorized[cat.id] || [];
             if (!tasks.length) continue;
@@ -1506,7 +1504,6 @@ async function loadTaskList() {
             html += `<div class="collapse-body open" id="body_${cat.id}">`;
             
             if (showSubTag) {
-                // 按子标签分组
                 const subTagGroups = {};
                 for (const sub of SUB_TAGS) {
                     subTagGroups[sub] = [];
@@ -1546,7 +1543,6 @@ async function loadTaskList() {
                     html += `</div></div></div>`;
                 }
             } else {
-                // 不显示子标签，直接列出任务
                 html += `<div class="task-grid">`;
                 for (const t of tasks) {
                     const mids = taskMemberMap[t.id] || [];
@@ -1573,7 +1569,6 @@ async function loadTaskList() {
         
         div.innerHTML = html;
         
-        // 恢复折叠状态
         for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) {
             const state = sessionStorage.getItem('cat_' + cat.id);
             if (state === 'closed') {
@@ -1753,7 +1748,6 @@ function filterTaskList(q) {
         div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配任务</div></div>';
         return;
     }
-    // 搜索结果也按分类显示
     const categorized = {};
     for (const cat of [...TASK_CATEGORIES, { id: '无', icon: '📂', name: '无' }]) {
         categorized[cat.id] = [];
@@ -2441,6 +2435,7 @@ const PRESET_TEMPLATE = {
         ['600级张良', 21, '商'],
         ['600级青丘神女', 23, '商'],
         ['750级高启强', 25, '商'],
+        ['500级姜子牙', 27, '商'],
         ['600级红衣教主', 16, '文'],
         ['600级林冲', 16, '文'],
         ['600级聂风', 23, '文'],
@@ -2450,7 +2445,6 @@ const PRESET_TEMPLATE = {
         ['750级步惊云', 25, '文'],
         ['600级黄飞鸿', 16, '娱'],
         ['600级孙悟空', 23, '娱'],
-        ['500级姜子牙', 27, '商'],
         ['500级安塞腰鼓', 14, '娱'],
         ['600级鲁智深', 16, '娱']
     ],
@@ -2493,27 +2487,27 @@ const PRESET_TEMPLATE = {
         ['宋江-其疾如风', 21, '商'],
         ['郑经理+3意气风发', 21, '商'],
         ['强哥+3繁华盛会', 21, '商'],
+        ['高启强-兄弟创业', 21, '商'],
         ['高启强+3锋芒毕露', 23, '商'],
         ['宋江+5聚义梁山', 25, '商'],
         ['高启强+5电视风波', 25, '商'],
-        ['高启强-兄弟创业', 21, '商'],
         ['聂风-麒麟疯魔', 21, '文'],
         ['步惊云-无上霸剑', 21, '文'],
         ['步惊云-绝世好剑', 21, '文'],
         ['步惊云-云栖良辰', 21, '文'],
+        ['聂风-风神腿', 21, '文'],
         ['步惊云+3无上霸剑', 23, '文'],
         ['步惊云+3排云掌', 23, '文'],
         ['武则天+3媚色倾唐', 23, '文'],
         ['武则天+5寒寺诗情', 25, '文'],
         ['步惊云+5无上霸剑', 25, '文'],
-        ['聂风-风神腿', 21, '文'],
         ['孙悟空-定海神针', 21, '娱'],
         ['孙悟空-方寸学艺', 21, '娱'],
         ['至尊宝-夕阳武士', 21, '娱'],
         ['至尊宝-万妖之王', 21, '娱'],
+        ['人才-紫霞仙子-爱无期限', 21, '娱'],
         ['孙悟空+3大圣归来', 23, '娱'],
         ['孙悟空+3蟠桃园记', 23, '娱'],
-        ['人才-紫霞仙子-爱无期限', 21, '娱'],
         ['福尔康+3英骑护驾', 23, '娱']
     ],
     '艺人': [
@@ -2592,10 +2586,11 @@ const PRESET_TEMPLATE = {
         ['秋菊-冬日烟花', 18, '娱'],
         ['选美皇后-佳人茶韵', 24, '娱'],
         ['海燕-贺岁佳人', 24, '娱'],
-        ['海燕归巢', 24, '娱'],
+        ['海燕-海燕归巢', 24, '娱'],
         ['铁扇公主-云阶春晖', 24, '娱'],
         ['紫霞仙子-明曦春霞', 24, '娱'],
         ['紫霞仙子-嫦娥', 24, '娱'],
+        ['含香-破茧化蝶', 24, '娱'],
         ['上官婉儿-素心守正', 26, '娱'],
         ['白晶晶-刻骨铭心', 26, '娱'],
         ['夏雨荷-青荷雨待', 29, '娱'],
@@ -2605,8 +2600,7 @@ const PRESET_TEMPLATE = {
         ['夏雨荷+3轻舟画扇', 30, '娱'],
         ['夏雨荷+5青荷雨待', 30, '娱'],
         ['白晶晶-白骨红颜', 30, '娱'],
-        ['含香-蝶翼破茧', 30, '娱'],
-        ['含香-破茧化蝶', 24, '娱']
+        ['含香-蝶翼破茧', 30, '娱']
     ],
     '守护神': [
         ['守护神-篮球天才', 21, '无'],
@@ -2621,12 +2615,12 @@ const PRESET_TEMPLATE = {
         ['守护神-沉香', 21, '无'],
         ['守护神-哪吒', 21, '无'],
         ['守护神-星际战士', 21, '无'],
+        ['守护神-笔仙', 21, '无'],
         ['守护神-寿神', 23, '无'],
         ['守护神-禄神', 23, '无'],
         ['守护神-玄武', 23, '无'],
         ['守护神-青龙', 23, '无'],
         ['守护神-年兽', 23, '无'],
-        ['守护神-笔仙', 21, '无'],
         ['守护神-灵犀', 18, '无']
     ]
 };

@@ -162,7 +162,6 @@
         .recommend-card .rc-edit:hover { color: var(--accent); }
         .recommend-card .rc-body { display: none; padding-top: 6px; margin-top: 6px; border-top: 1px solid var(--border); }
         .recommend-card .rc-body.open { display: block; }
-        .recommend-card .rc-body .task-item { font-size: 11px; padding: 2px 4px; }
         .task-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
         .task-check-item { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: background .2s; font-size: 12px; }
         .task-check-item:hover { background: var(--hover); }
@@ -434,7 +433,7 @@ function setupTabs(tabs) {
     initGuildMgrTab();
 }
 
-// ===== 简化版：查询标签 =====
+// ===== 查询标签 =====
 function initAdminSearchTab() {
     var p = document.getElementById('tab-search');
     if (!p) return;
@@ -477,7 +476,6 @@ async function searchMemberForAdmin() {
             div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到</div></div>';
             return;
         }
-        // 获取推荐目标
         var targets = await db.recommendTargets.list(currentGuildId);
         var targetMap = {};
         targets.forEach(function(rt) {
@@ -486,7 +484,6 @@ async function searchMemberForAdmin() {
                 selectedScores: rt.selected_scores ? rt.selected_scores.split(',').map(Number) : []
             };
         });
-
         var html = '';
         for (var i = 0; i < filtered.length; i++) {
             var m = filtered[i];
@@ -507,7 +504,7 @@ async function searchMemberForAdmin() {
                 otherTasks.sort(function(a, b) { return b.score - a.score; });
             }
             html += '<div class="card"><div class="card-header"><span class="card-title">👤' + m.real_name + '</span></div>';
-            html += '<div style="font-size:11px;color:var(--text2)">别名：' + (m.alias || '无') + '</div>';
+            html += '<div style="font-size:11px;color:var(--text2);">别名：' + (m.alias || '无') + '</div>';
             html += '<div style="font-size:11px;color:var(--gold);font-weight:600;">📋能做：共 ' + tasks.length + ' 个任务</div>';
             if (priorityTasks.length > 0) {
                 html += '<div style="font-size:11px;color:var(--accent);margin-top:4px;">⭐ 优先推荐（' + priorityTasks.length + '个）：</div>';
@@ -1100,7 +1097,8 @@ async function loadTaskList() {
             if (!tasks.length) continue;
             var catChecked = tasks.every(function(tt) { return selectedTasks.has(tt.id); });
             var catCheckedCount = tasks.filter(function(tt) { return selectedTasks.has(tt.id); }).length;
-            var isOpen = sessionStorage.getItem('cat_open_' + catInfo.id) !== 'closed';
+            // 默认折叠：sessionStorage 没有 'open' 记录就是折叠
+            var isOpen = sessionStorage.getItem('cat_open_' + catInfo.id) === 'open';
 
             html += '<div class="card" style="padding:8px 12px;">';
             html += '<div class="collapse-header" onclick="toggleCategory(\'' + catInfo.id + '\')" style="display:flex;justify-content:space-between;align-items:center;">';
@@ -1129,19 +1127,20 @@ async function loadTaskList() {
                     if (!subTasks.length) continue;
                     var subChecked = subTasks.every(function(tt) { return selectedTasks.has(tt.id); });
                     var subCheckedCount = subTasks.filter(function(tt) { return selectedTasks.has(tt.id); }).length;
+                    var isSubOpen = sessionStorage.getItem('sub_open_' + catInfo.id + '_' + subName) === 'open';
                     html += '<div style="padding-left:12px;margin-bottom:4px;">';
                     html += '<div class="collapse-header" onclick="toggleSubCategory(\'' + catInfo.id + '_' + subName + '\')" style="padding:4px 4px;font-size:12px;">';
                     html += '<span>📂 ' + subName + ' (' + subTasks.length + '个) ' + (subChecked ? '☑️' : '☐ ' + subCheckedCount + '/' + subTasks.length) + '</span>';
-                    html += '<span class="arrow open" id="arrow_' + catInfo.id + '_' + subName + '">▶</span>';
+                    html += '<span class="arrow ' + (isSubOpen ? 'open' : '') + '" id="arrow_' + catInfo.id + '_' + subName + '">▶</span>';
                     html += '</div>';
-                    html += '<div class="collapse-body open" id="body_' + catInfo.id + '_' + subName + '">';
+                    html += '<div class="collapse-body ' + (isSubOpen ? 'open' : '') + '" id="body_' + catInfo.id + '_' + subName + '">';
                     html += '<div class="task-grid">';
                     for (var q = 0; q < subTasks.length; q++) {
                         var task = subTasks[q];
                         var mids = taskMemberMap[task.id] || [];
                         var members = allMembers.filter(function(mm) { return mids.includes(mm.id); });
                         var checked = selectedTasks.has(task.id) ? 'checked' : '';
-                        var isTaskOpen = sessionStorage.getItem('task_open_' + task.id) !== 'closed';
+                        var isTaskOpen = sessionStorage.getItem('task_open_' + task.id) === 'open';
                         html += '<div class="task-item" onclick="toggleTaskPeople(' + task.id + ')">';
                         html += '<div class="task-main">';
                         html += '<span class="toggle-icon ' + (isTaskOpen ? 'open' : '') + '" id="tog_' + task.id + '">▶</span>';
@@ -1175,7 +1174,7 @@ async function loadTaskList() {
                     var members2 = allMembers.filter(function(mm) { return mids2.includes(mm.id); });
                     var checked2 = selectedTasks.has(task2.id) ? 'checked' : '';
                     var subTagDisplay = task2.sub_tag && task2.sub_tag !== '无' ? '<span class="tag sub-tag">' + task2.sub_tag + '</span>' : '';
-                    var isTaskOpen2 = sessionStorage.getItem('task_open_' + task2.id) !== 'closed';
+                    var isTaskOpen2 = sessionStorage.getItem('task_open_' + task2.id) === 'open';
                     html += '<div class="task-item" onclick="toggleTaskPeople(' + task2.id + ')">';
                     html += '<div class="task-main">';
                     html += '<span class="toggle-icon ' + (isTaskOpen2 ? 'open' : '') + '" id="tog_' + task2.id + '">▶</span>';
@@ -1256,10 +1255,12 @@ function toggleSubCategory(id) {
         body.classList.remove('open');
         body.classList.add('closed');
         if (arrow) arrow.classList.remove('open');
+        sessionStorage.setItem('sub_open_' + id, 'closed');
     } else {
         body.classList.remove('closed');
         body.classList.add('open');
         if (arrow) arrow.classList.add('open');
+        sessionStorage.setItem('sub_open_' + id, 'open');
     }
 }
 

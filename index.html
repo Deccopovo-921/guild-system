@@ -149,7 +149,7 @@
         .score-filter-group label:hover { background: var(--hover); }
         .score-filter-group label.checked { border-color: var(--accent); color: var(--text); background: var(--tag-bg); }
         .score-filter-group input[type="checkbox"] { display: none; }
-        .recommend-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-top: 8px; }
+        .recommend-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 8px; }
         .recommend-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; position: relative; transition: border .2s; cursor: pointer; }
         .recommend-card:hover { border-color: var(--accent); }
         .recommend-card .rc-name { font-size: 14px; font-weight: 600; color: var(--text); }
@@ -162,6 +162,9 @@
         .recommend-card .rc-edit:hover { color: var(--accent); }
         .recommend-card .rc-body { display: none; padding-top: 6px; margin-top: 6px; border-top: 1px solid var(--border); }
         .recommend-card .rc-body.open { display: block; }
+        .recommend-card .rc-body .task-item { font-size: 11px; padding: 2px 4px; cursor: default; }
+        .recommend-card .rc-body .task-item .star-btn { cursor: pointer; color: var(--text2); font-size: 13px; margin-right: 4px; }
+        .recommend-card .rc-body .task-item .star-btn.active { color: var(--gold); }
         .task-check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
         .task-check-item { display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: background .2s; font-size: 12px; }
         .task-check-item:hover { background: var(--hover); }
@@ -176,6 +179,14 @@
         .member-search-dropdown .ms-item { padding: 6px 10px; cursor: pointer; font-size: 13px; transition: background .2s; }
         .member-search-dropdown .ms-item:hover { background: var(--hover); }
         .search-input-wrap { position: relative; }
+        .star-task-item { display: flex; align-items: center; gap: 6px; padding: 2px 4px; font-size: 11px; }
+        .star-task-item .star-btn { cursor: pointer; color: var(--text2); font-size: 13px; }
+        .star-task-item .star-btn.active { color: var(--gold); }
+        .recommend-preview { margin-top: 8px; max-height: 200px; overflow-y: auto; }
+        .recommend-preview .task-item { font-size: 11px; padding: 2px 4px; cursor: default; }
+        .recommend-preview .task-item .star-btn { cursor: pointer; color: var(--text2); font-size: 13px; margin-right: 4px; }
+        .recommend-preview .task-item .star-btn.active { color: var(--gold); }
+        .rc-task-section { font-size: 11px; color: var(--text2); margin: 4px 0 2px 0; }
         @media (max-width: 600px) { .task-check-grid { grid-template-columns: 1fr; } .score-filter-group label { font-size: 11px; padding: 2px 5px; } }
     </style>
 </head>
@@ -668,6 +679,7 @@ function initTaskMgrTab() {
                 <button class="btn btn-accent btn-sm" id="btnMemberAddTasks">✅ 确认添加</button>
                 <button class="btn btn-outline btn-sm" id="btnMemberSelectAllTasks">☑️ 全选</button>
                 <button class="btn btn-outline btn-sm" id="btnMemberDeselectAllTasks">☐ 取消全选</button>
+                <button class="btn btn-outline btn-sm" id="btnMemberClearForm">🗑️ 清空表单</button>
                 <span id="memberTaskCount" style="font-size:11px;color:var(--text2);">已选 0 个任务</span>
             </div>
             <div id="memberTaskResult" style="margin-top:6px;"></div>
@@ -717,6 +729,15 @@ function initTaskMgrTab() {
     document.getElementById('btnMemberDeselectAllTasks').addEventListener('click', function() {
         document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
         updateMemberTaskCount();
+    });
+    document.getElementById('btnMemberClearForm').addEventListener('click', function() {
+        document.getElementById('memberSearchInput').value = '';
+        document.getElementById('selectedMemberDisplay').innerHTML = '请搜索并选择成员';
+        document.getElementById('memberTaskCheckList').innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">请先选择成员</div>';
+        document.getElementById('memberTaskCount').textContent = '已选 0 个任务';
+        selectedMemberForTasks = null;
+        document.getElementById('memberSearchDropdown').classList.remove('show');
+        showToast('🧹 已清空表单', 'info');
     });
 
     loadTasksToSelect();
@@ -1097,7 +1118,6 @@ async function loadTaskList() {
             if (!tasks.length) continue;
             var catChecked = tasks.every(function(tt) { return selectedTasks.has(tt.id); });
             var catCheckedCount = tasks.filter(function(tt) { return selectedTasks.has(tt.id); }).length;
-            // 默认折叠：sessionStorage 没有 'open' 记录就是折叠
             var isOpen = sessionStorage.getItem('cat_open_' + catInfo.id) === 'open';
 
             html += '<div class="card" style="padding:8px 12px;">';
@@ -1542,7 +1562,8 @@ function initRecommendTab() {
                     ${SCORE_FILTERS.map(function(s) { return '<label class="score-filter-label" data-score="' + s + '"><input type="checkbox" value="' + s + '">' + s + '分</label>'; }).join('')}
                 </div>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div id="recommendPreview" style="margin-top:8px;max-height:200px;overflow-y:auto;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
                 <button class="btn btn-accent btn-sm" id="btnSaveRecommend">💾 保存目标</button>
                 <button class="btn btn-outline btn-sm" id="btnClearRecommend">🗑️ 清空表单</button>
             </div>
@@ -1560,17 +1581,39 @@ function initRecommendTab() {
     loadRecommendMembers();
     loadRecommendCards();
 
+    // 分数档位点击事件
     document.querySelectorAll('.score-filter-label').forEach(function(label) {
         label.addEventListener('click', function(e) {
             var cb = this.querySelector('input[type="checkbox"]');
             cb.checked = !cb.checked;
             this.classList.toggle('checked', cb.checked);
+            updateRecommendPreview();
         });
     });
 
+    document.getElementById('recommendMemberSelect').addEventListener('change', function() {
+        updateRecommendPreview();
+        loadMemberRecommendData();
+    });
+    document.getElementById('recommendTargetSelect').addEventListener('change', updateRecommendPreview);
+
     document.getElementById('btnSaveRecommend').addEventListener('click', saveRecommendTarget);
     document.getElementById('btnClearRecommend').addEventListener('click', clearRecommendForm);
-    document.getElementById('recommendMemberSelect').addEventListener('change', loadMemberRecommendData);
+
+    // 监听标签切换，自动折叠所有卡片
+    document.querySelectorAll('.tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            // 延迟执行，等待标签切换完成
+            setTimeout(function() {
+                document.querySelectorAll('.recommend-card .rc-body').forEach(function(body) {
+                    body.classList.remove('open');
+                    var parent = body.closest('.recommend-card');
+                    var toggleText = parent ? parent.querySelector('.rc-body ~ div') : null;
+                    if (toggleText) toggleText.textContent = '▼ 展开';
+                });
+            }, 100);
+        });
+    });
 }
 
 async function loadRecommendMembers() {
@@ -1600,6 +1643,7 @@ async function loadMemberRecommendData() {
             });
             showToast('📂 已加载该成员已保存的目标', 'info');
         }
+        updateRecommendPreview();
     } catch (e) { console.error(e); }
 }
 
@@ -1611,33 +1655,128 @@ function clearRecommendForm() {
         cb.closest('.score-filter-label').classList.remove('checked');
     });
     document.getElementById('recommendSaveResult').innerHTML = '';
+    document.getElementById('recommendPreview').innerHTML = '';
     showToast('🧹 已清空表单', 'info');
+}
+
+async function updateRecommendPreview() {
+    var memberId = document.getElementById('recommendMemberSelect').value;
+    var previewDiv = document.getElementById('recommendPreview');
+    if (!memberId) { previewDiv.innerHTML = ''; return; }
+
+    var checkedScores = [];
+    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]:checked').forEach(function(cb) {
+        checkedScores.push(parseInt(cb.value));
+    });
+    if (!checkedScores.length) { previewDiv.innerHTML = ''; return; }
+
+    try {
+        var tml = await db.taskMembers.listByMember(memberId);
+        var tids = tml.map(function(t) { return t.task_id; });
+        var tasks = allTasks.filter(function(t) { return tids.includes(t.id); });
+        var filtered = tasks.filter(function(t) { return checkedScores.includes(t.score); });
+        filtered.sort(function(a, b) { return b.score - a.score; });
+
+        if (!filtered.length) {
+            previewDiv.innerHTML = '<div style="color:var(--text2);font-size:12px;">该成员没有选中分数档位的任务</div>';
+            return;
+        }
+
+        // 从保存的目标中获取星标任务
+        var targets = await db.recommendTargets.list(currentGuildId);
+        var target = targets.find(function(t) { return t.member_id == memberId; });
+        var starTaskIds = [];
+        if (target && target.star_tasks) {
+            starTaskIds = target.star_tasks.split(',').map(Number);
+        }
+
+        var html = '<div style="font-size:12px;color:var(--text2);margin-bottom:4px;">📋 可做任务（' + filtered.length + '个）：</div>';
+        html += '<div style="max-height:150px;overflow-y:auto;">';
+        filtered.forEach(function(t) {
+            var isStar = starTaskIds.includes(t.id);
+            html += '<div class="task-item" style="cursor:default;padding:2px 4px;">';
+            html += '<span class="star-btn ' + (isStar ? 'active' : '') + '" onclick="toggleStarPreview(' + t.id + ')" style="cursor:pointer;font-size:13px;margin-right:4px;">' + (isStar ? '⭐' : '☆') + '</span>';
+            html += '<span style="font-size:11px;">' + t.task_name + ' ⭐' + t.score + '分</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+        previewDiv.innerHTML = html;
+    } catch (e) { console.error(e); }
+}
+
+function toggleStarPreview(taskId) {
+    var memberId = document.getElementById('recommendMemberSelect').value;
+    if (!memberId) return;
+    // 重新获取保存的目标，更新星标列表
+    (async function() {
+        try {
+            var targets = await db.recommendTargets.list(currentGuildId);
+            var target = targets.find(function(t) { return t.member_id == memberId; });
+            var starTaskIds = [];
+            if (target && target.star_tasks) {
+                starTaskIds = target.star_tasks.split(',').map(Number);
+            }
+            var idx = starTaskIds.indexOf(taskId);
+            if (idx > -1) {
+                starTaskIds.splice(idx, 1);
+            } else {
+                starTaskIds.push(taskId);
+            }
+            // 更新目标
+            var data = {
+                guild_id: currentGuildId,
+                member_id: parseInt(memberId),
+                target_score: parseInt(document.getElementById('recommendTargetSelect').value) || 0,
+                selected_scores: getCheckedScores().join(','),
+                star_tasks: starTaskIds.join(',')
+            };
+            await db.recommendTargets.delete(currentGuildId, parseInt(memberId));
+            await db.recommendTargets.upsert(data);
+            updateRecommendPreview();
+            showToast(starTaskIds.includes(taskId) ? '⭐ 已标记为最想做' : '☆ 已取消标记', 'info');
+        } catch (e) { console.error(e); }
+    })();
+}
+
+function getCheckedScores() {
+    var scores = [];
+    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]:checked').forEach(function(cb) {
+        scores.push(parseInt(cb.value));
+    });
+    return scores;
 }
 
 async function saveRecommendTarget() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     var memberId = document.getElementById('recommendMemberSelect').value;
     var targetScore = parseInt(document.getElementById('recommendTargetSelect').value) || 0;
-    var checkedScores = [];
-    document.querySelectorAll('#recommendScoreFilters input[type="checkbox"]:checked').forEach(function(cb) {
-        checkedScores.push(parseInt(cb.value));
-    });
+    var checkedScores = getCheckedScores();
     if (!memberId) { showToast('⚠️请选择成员', 'warning'); return; }
     if (!targetScore) { showToast('⚠️请选择目标档位', 'warning'); return; }
     if (!checkedScores.length) { showToast('⚠️请至少选择一个分数档位', 'warning'); return; }
 
+    // 获取星标任务
+    var targets = await db.recommendTargets.list(currentGuildId);
+    var target = targets.find(function(t) { return t.member_id == memberId; });
+    var starTaskIds = [];
+    if (target && target.star_tasks) {
+        starTaskIds = target.star_tasks.split(',').map(Number);
+    }
+
     try {
-        // 先删后插
         await db.recommendTargets.delete(currentGuildId, parseInt(memberId));
         await db.recommendTargets.upsert({
             guild_id: currentGuildId,
             member_id: parseInt(memberId),
             target_score: targetScore,
-            selected_scores: checkedScores.join(',')
+            selected_scores: checkedScores.join(','),
+            star_tasks: starTaskIds.join(',')
         });
         showToast('✅ 目标已保存！', 'success');
         document.getElementById('recommendSaveResult').innerHTML = '<div style="color:var(--success);font-size:13px;">✅ 保存成功！</div>';
         setTimeout(function() { document.getElementById('recommendSaveResult').innerHTML = ''; }, 3000);
+        // 清空表单
+        clearRecommendForm();
         await loadRecommendCards();
         await refreshCurrentGuildData();
     } catch (e) {
@@ -1663,11 +1802,16 @@ async function loadRecommendCards() {
             var member = members.find(function(m) { return m.id === target.member_id; });
             if (!member) continue;
             var scores = target.selected_scores ? target.selected_scores.split(',').map(Number) : [];
+            var starTaskIds = target.star_tasks ? target.star_tasks.split(',').map(Number) : [];
             var memberTasks = await db.taskMembers.listByMember(member.id);
             var taskIds = memberTasks.map(function(t) { return t.task_id; });
             var availableTasks = allTasks.filter(function(t) { return taskIds.includes(t.id); });
             var selectedTasks2 = availableTasks.filter(function(t) { return scores.includes(t.score); });
             var totalAvailable = availableTasks.length;
+
+            // 分类：星标任务 vs 普通任务
+            var starTasks = selectedTasks2.filter(function(t) { return starTaskIds.includes(t.id); });
+            var normalTasks = selectedTasks2.filter(function(t) { return !starTaskIds.includes(t.id); });
 
             html += '<div class="recommend-card" data-memberid="' + member.id + '">';
             html += '<button class="rc-delete" onclick="deleteRecommendTarget(' + member.id + ')" title="删除目标">✕</button>';
@@ -1678,10 +1822,21 @@ async function loadRecommendCards() {
             html += '<button class="rc-edit" onclick="editRecommendTarget(' + member.id + ')">✏️ 修改</button>';
             html += '<div class="rc-body" id="rc_body_' + member.id + '">';
             if (selectedTasks2.length) {
-                html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;">📋 目标任务：</div>';
-                selectedTasks2.forEach(function(t) {
-                    html += '<div class="task-item" style="font-size:11px;padding:2px 4px;cursor:default;">' + t.task_name + ' ⭐' + t.score + '</div>';
-                });
+                // 星标任务
+                if (starTasks.length > 0) {
+                    html += '<div class="rc-task-section">⭐ 最想做（' + starTasks.length + '个）：</div>';
+                    starTasks.forEach(function(t) {
+                        html += '<div class="task-item" style="font-size:11px;padding:2px 4px;cursor:default;">⭐ ' + t.task_name + ' ⭐' + t.score + '</div>';
+                    });
+                }
+                // 普通任务
+                if (normalTasks.length > 0) {
+                    if (starTasks.length > 0) html += '<div style="margin-top:4px;"></div>';
+                    html += '<div class="rc-task-section">📋 其他（' + normalTasks.length + '个）：</div>';
+                    normalTasks.forEach(function(t) {
+                        html += '<div class="task-item" style="font-size:11px;padding:2px 4px;cursor:default;">☆ ' + t.task_name + ' ⭐' + t.score + '</div>';
+                    });
+                }
             } else {
                 html += '<div style="font-size:11px;color:var(--text2);">暂无匹配任务</div>';
             }
@@ -1733,6 +1888,7 @@ async function editRecommendTarget(memberId) {
             cb.checked = scores.includes(parseInt(cb.value));
             cb.closest('.score-filter-label').classList.toggle('checked', cb.checked);
         });
+        updateRecommendPreview();
         showToast('✏️ 已加载该成员数据，修改后点击保存', 'info');
         document.querySelector('#tab-recommend .card').scrollIntoView({ behavior: 'smooth' });
     } catch (e) {

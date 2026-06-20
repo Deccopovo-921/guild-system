@@ -322,14 +322,79 @@
             transition: all .2s;
         }
         .tier-btn.active, .tier-btn.gold-active { background: #2a2010; color: var(--gold); border-color: var(--gold); }
-        .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
-        .collapse-body { display: none; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 6px; }
+        .collapse-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 6px;
+            border-radius: 6px;
+            transition: background .2s;
+            user-select: none;
+        }
+        .collapse-header:hover { background: var(--hover); }
+        .collapse-header .arrow { transition: transform .2s; font-size: 12px; }
+        .collapse-header .arrow.open { transform: rotate(90deg); }
+        .collapse-body { display: none; padding-top: 6px; }
         .collapse-body.open { display: block; }
+        .category-count { font-size: 11px; color: var(--text2); font-weight: 400; }
+        .task-grid { display: flex; flex-direction: column; gap: 4px; }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: background .2s;
+        }
+        .task-item:hover { background: var(--hover); }
+        .task-item .task-name { font-size: 12px; flex: 1; color: var(--text); }
+        .task-item .task-score { font-size: 11px; color: var(--gold); font-weight: 600; margin-right: 4px; }
+        .task-item .task-actions { display: flex; gap: 2px; flex-shrink: 0; }
+        .task-item .task-actions .btn { padding: 1px 4px; font-size: 9px; }
         .result-log { max-height: 150px; overflow-y: auto; font-size: 12px; margin-top: 6px; padding: 6px; background: var(--bg); border-radius: 4px; border: 1px solid var(--border); }
         .result-log .ok { color: var(--success); }
         .result-log .skip { color: var(--text2); }
         .result-log .fail { color: var(--danger); }
         .result-log .info { color: var(--accent); }
+        .empty-category { color: var(--text2); font-size: 11px; padding: 4px 6px; }
+        .task-check-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        .task-check-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: background .2s;
+            font-size: 12px;
+        }
+        .task-check-item:hover { background: var(--hover); }
+        .task-check-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .task-check-item .tci-name { flex: 1; color: var(--text); }
+        .task-check-item .tci-score { color: var(--gold); font-weight: 600; font-size: 11px; }
+        .task-check-item .tci-existing { color: var(--success); font-size: 10px; }
+        .task-check-item.disabled { opacity: 0.5; cursor: not-allowed; }
+        .task-check-item.disabled:hover { background: var(--bg); }
+        @media (max-width: 600px) {
+            .task-check-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -371,6 +436,22 @@ const ACHIEVEMENT_TIERS = [
     { name: '💎稀有', score: 1300, rewards: '称号+聊天气泡+领带' },
     { name: '👑传说', score: 1400, rewards: '皮肤+聊天气泡7天+称号7天+领带' }
 ];
+
+// ===== 任务分类定义 =====
+const TASK_CATEGORIES = [
+    { id: 'talent', icon: '👤', name: '人才' },
+    { id: 'talent_awake', icon: '⚡', name: '人才觉醒' },
+    { id: 'artist', icon: '🎭', name: '艺人' },
+    { id: 'talent_skin', icon: '🎨', name: '人才皮肤' },
+    { id: 'artist_skin', icon: '👗', name: '艺人皮肤' },
+    { id: 'guardian', icon: '🛡️', name: '守护神' },
+    { id: 'uncategorized', icon: '📂', name: '未分类' }
+];
+
+function getCategoryLabel(categoryId) {
+    const found = TASK_CATEGORIES.find(c => c.id === categoryId);
+    return found ? found.icon + ' ' + found.name : '📂 未分类';
+}
 
 function showToast(msg, type = 'info') {
     const c = document.getElementById('toastContainer');
@@ -703,28 +784,35 @@ function initTaskMgrTab() {
                 <div class="form-group"><label>📝任务名称</label><input type="text" id="newTaskName" placeholder="例如：击败BOSS"></div>
                 <div class="form-group"><label>⭐分数</label><input type="number" id="newTaskScore" placeholder="50" min="0"></div>
             </div>
+            <div class="form-group">
+                <label>📂分类</label>
+                <select id="newTaskCategory">
+                    <option value="">-- 请选择分类 --</option>
+                    ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+                </select>
+            </div>
             <div class="form-group"><label>👤初始能做的人（选填）</label><input type="text" id="newTaskMember" placeholder="输入大名，可留空"></div>
             <button class="btn btn-accent btn-sm" id="btnAddTask">✅添加任务</button>
         </div>
         <div class="card">
             <div class="section-title">📋批量添加任务</div>
-            <div class="form-group"><label>每行：任务名,分数</label><textarea id="batchTaskImport" placeholder="击败BOSS,50&#10;收集物资,30"></textarea></div>
+            <div class="form-group"><label>每行：任务名,分数,分类ID（可选：talent/talent_awake/artist/talent_skin/artist_skin/guardian）</label><textarea id="batchTaskImport" placeholder="击败BOSS,50,guardian&#10;收集物资,30,artist"></textarea></div>
             <button class="btn btn-success btn-sm" id="btnBatchTaskImport">📥批量导入</button>
         </div>
         <hr class="divider">
         <div class="card">
             <div class="section-title">📦任务模板</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
-                <button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板</button>
+                <button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板（168个，含分类）</button>
                 <button class="btn btn-outline btn-sm" id="btnSaveTemplate">💾保存当前为模板</button>
                 <button class="btn btn-outline btn-sm" id="btnLoadTemplate">📂加载我的模板</button>
                 <button class="btn btn-outline btn-sm" id="btnEditPreset">✏️编辑预设模板</button>
-                <span style="font-size:10px;color:var(--text2)">（168个任务）</span>
+                <span style="font-size:10px;color:var(--text2)">（168个任务，6个分类）</span>
             </div>
         </div>
         <hr class="divider">
         <div class="card">
-            <div class="section-title">👥批量加入成员到任务</div>
+            <div class="section-title">👥批量加入成员到任务（任务→人）</div>
             <div class="form-group">
                 <label>每行：任务名, 成员1, 成员2, 成员3...</label>
                 <textarea id="batchTaskMemberInput" placeholder="击败BOSS, 张三, 李四, 王五&#10;收集物资, 赵六, 张三, 小明" style="min-height:80px;"></textarea>
@@ -736,6 +824,29 @@ function initTaskMgrTab() {
             <div id="batchTaskMemberResult" style="margin-top:6px;"></div>
         </div>
         <hr class="divider">
+        <div class="card">
+            <div class="section-title">👤批量添加任务到成员（人→任务）</div>
+            <div class="form-group">
+                <label>选择成员</label>
+                <select id="memberToTasksSelect">
+                    <option value="">-- 请选择成员 --</option>
+                </select>
+            </div>
+            <div style="margin-top:6px;">
+                <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">☑️ 选择要添加的任务（灰色=已存在，不可选）</label>
+                <div id="memberTaskCheckList" class="task-check-grid">
+                    <div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">请先选择成员</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">
+                <button class="btn btn-accent btn-sm" id="btnMemberAddTasks">✅ 确认添加</button>
+                <button class="btn btn-outline btn-sm" id="btnMemberSelectAllTasks">☑️ 全选</button>
+                <button class="btn btn-outline btn-sm" id="btnMemberDeselectAllTasks">☐ 取消全选</button>
+                <span id="memberTaskCount" style="font-size:11px;color:var(--text2);">已选 0 个任务</span>
+            </div>
+            <div id="memberTaskResult" style="margin-top:6px;"></div>
+        </div>
+        <hr class="divider">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px">
             <div class="section-title" style="margin:0">📋所有任务</div>
             <div style="display:flex;gap:3px;align-items:center">
@@ -745,6 +856,7 @@ function initTaskMgrTab() {
             </div>
         </div>
         <div id="taskList"></div>`;
+    
     document.getElementById('btnAddTask').addEventListener('click', addTask);
     document.getElementById('newTaskName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addTask(); });
     document.getElementById('btnBatchTaskImport').addEventListener('click', batchImportTasks);
@@ -756,18 +868,154 @@ function initTaskMgrTab() {
     document.getElementById('btnSelectAll').addEventListener('click', toggleSelectAll);
     document.getElementById('btnBatchDelete').addEventListener('click', batchDeleteTasks);
     document.getElementById('taskSearchFilter').addEventListener('input', (e) => { filterTaskList(e.target.value.trim()); });
+    document.getElementById('memberToTasksSelect').addEventListener('change', loadMemberTaskChecklist);
+    document.getElementById('btnMemberAddTasks').addEventListener('click', memberAddTasks);
+    document.getElementById('btnMemberSelectAllTasks').addEventListener('click', () => {
+        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:not(:disabled)').forEach(cb => cb.checked = true);
+        updateMemberTaskCount();
+    });
+    document.getElementById('btnMemberDeselectAllTasks').addEventListener('click', () => {
+        document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]').forEach(cb => cb.checked = false);
+        updateMemberTaskCount();
+    });
     loadTasksToSelect();
+    loadTaskList();
+    loadMemberSelect();
+}
+
+// ===== 加载成员下拉框 =====
+async function loadMemberSelect() {
+    const sel = document.getElementById('memberToTasksSelect');
+    if (!sel || !currentGuildId) return;
+    try {
+        const members = await db.members.list(currentGuildId);
+        sel.innerHTML = '<option value="">-- 请选择成员 --</option>';
+        members.forEach(m => {
+            sel.innerHTML += `<option value="${m.id}">${m.real_name}${m.alias ? '（' + m.alias + '）' : ''}</option>`;
+        });
+    } catch (e) {}
+}
+
+// ===== 加载成员任务勾选列表 =====
+async function loadMemberTaskChecklist() {
+    const sel = document.getElementById('memberToTasksSelect');
+    const container = document.getElementById('memberTaskCheckList');
+    const memberId = sel.value;
+    
+    if (!memberId) {
+        container.innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">请先选择成员</div>';
+        document.getElementById('memberTaskCount').textContent = '已选 0 个任务';
+        return;
+    }
+    
+    try {
+        // 获取所有任务
+        const tasks = await db.tasks.list(currentGuildId);
+        if (!tasks.length) {
+            container.innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">⚠️ 暂无任务，请先创建任务</div>';
+            return;
+        }
+        
+        // 获取该成员已有的任务
+        const existing = await db.taskMembers.listByMember(memberId);
+        const existingTaskIds = new Set(existing.map(t => t.task_id));
+        
+        let html = '';
+        for (const t of tasks) {
+            const exists = existingTaskIds.has(t.id);
+            const disabled = exists ? 'disabled' : '';
+            const checked = exists ? 'checked' : '';
+            html += `<div class="task-check-item ${exists ? 'disabled' : ''}">
+                <input type="checkbox" ${checked} ${disabled} data-taskid="${t.id}" data-taskname="${t.task_name}" onchange="updateMemberTaskCount()">
+                <span class="tci-name">${t.task_name}</span>
+                <span class="tci-score">⭐${t.score}分</span>
+                ${exists ? '<span class="tci-existing">✅ 已有</span>' : ''}
+            </div>`;
+        }
+        container.innerHTML = html;
+        updateMemberTaskCount();
+    } catch (e) {
+        container.innerHTML = '<div style="color:var(--danger);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">❌ 加载失败</div>';
+        console.error(e);
+    }
+}
+
+// ===== 更新已选任务计数 =====
+function updateMemberTaskCount() {
+    const checked = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)').length;
+    document.getElementById('memberTaskCount').textContent = `已选 ${checked} 个任务`;
+}
+
+// ===== 成员添加任务 =====
+async function memberAddTasks() {
+    const sel = document.getElementById('memberToTasksSelect');
+    const memberId = sel.value;
+    if (!memberId) { showToast('⚠️请先选择成员', 'warning'); return; }
+    
+    const checkedBoxes = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)');
+    if (!checkedBoxes.length) { showToast('⚠️请至少选择一个任务', 'warning'); return; }
+    
+    const taskIds = [];
+    const taskNames = [];
+    checkedBoxes.forEach(cb => {
+        taskIds.push(parseInt(cb.dataset.taskid));
+        taskNames.push(cb.dataset.taskname);
+    });
+    
+    const resultDiv = document.getElementById('memberTaskResult');
+    resultDiv.innerHTML = '<div style="color:var(--text2);">⏳ 处理中...</div>';
+    
+    let added = 0, failed = 0;
+    const logs = [];
+    
+    for (const taskId of taskIds) {
+        try {
+            await db.taskMembers.add({ task_id: taskId, member_id: parseInt(memberId) });
+            added++;
+            const task = allTasks.find(t => t.id === taskId);
+            logs.push({ type: 'ok', msg: `✅ 已添加: ${task ? task.task_name : taskId}` });
+        } catch (e) {
+            failed++;
+            logs.push({ type: 'fail', msg: `❌ 添加失败: ${e.message}` });
+        }
+        await new Promise(r => setTimeout(r, 80));
+    }
+    
+    // 获取成员名字
+    const members = await db.members.list(currentGuildId);
+    const member = members.find(m => m.id == memberId);
+    const memberName = member ? member.real_name : memberId;
+    
+    let summary = `📊 完成！为 "${memberName}" 添加了 ${added} 个任务`;
+    if (failed > 0) summary += `，失败 ${failed} 个`;
+    
+    let logHtml = logs.map(log => {
+        const cls = log.type === 'ok' ? 'ok' : 'fail';
+        return `<div class="${cls}">${log.msg}</div>`;
+    }).join('');
+    
+    resultDiv.innerHTML = `
+        <div style="font-weight:600;color:var(--text);">${summary}</div>
+        <div class="result-log">${logHtml}</div>
+    `;
+    
+    showToast(summary, added > 0 ? 'success' : 'warning');
+    // 重新加载勾选列表（更新已有状态）
+    await loadMemberTaskChecklist();
+    await refreshCurrentGuildData();
     loadTaskList();
 }
 
+// ===== 添加任务（带分类） =====
 async function addTask() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const name = document.getElementById('newTaskName').value.trim();
     const score = parseInt(document.getElementById('newTaskScore').value) || 0;
+    const category = document.getElementById('newTaskCategory').value || 'uncategorized';
     const memberName = document.getElementById('newTaskMember').value.trim();
     if (!name) { showToast('⚠️请输入任务名称', 'warning'); return; }
     try {
-        const nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score });
+        const nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
         if (nt.length && memberName) {
             const m = await db.members.getByName(currentGuildId, memberName);
             if (m.length) await db.taskMembers.add({ task_id: nt[0].id, member_id: m[0].id });
@@ -775,13 +1023,16 @@ async function addTask() {
         showToast('✅任务添加成功！', 'success');
         document.getElementById('newTaskName').value = '';
         document.getElementById('newTaskScore').value = '';
+        document.getElementById('newTaskCategory').value = '';
         document.getElementById('newTaskMember').value = '';
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        loadMemberSelect();
     } catch (e) { showToast('❌添加失败', 'error'); }
 }
 
+// ===== 批量导入任务（带分类） =====
 async function batchImportTasks() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const text = document.getElementById('batchTaskImport').value.trim();
@@ -795,8 +1046,10 @@ async function batchImportTasks() {
         const name = parts[0];
         if (!name) { f++; continue; }
         if (existingNames.has(name)) { skip++; continue; }
+        const score = parseInt(parts[1]) || 0;
+        const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
         try {
-            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: parseInt(parts[1]) || 0 });
+            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
             existingNames.add(name);
             s++;
         } catch (e) { console.warn('任务导入失败:', name, e.message); f++; }
@@ -808,9 +1061,10 @@ async function batchImportTasks() {
     document.getElementById('batchTaskImport').value = '';
     loadTasksToSelect();
     loadTaskList();
+    loadMemberSelect();
 }
 
-// ===== 批量添加成员到任务（一行：任务名, 成员1, 成员2...） =====
+// ===== 批量添加成员到任务（任务→人） =====
 async function batchTaskMemberImport() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const text = document.getElementById('batchTaskMemberInput').value.trim();
@@ -823,7 +1077,6 @@ async function batchTaskMemberImport() {
     let totalAdded = 0, totalSkipped = 0, totalFailed = 0;
     let logs = [];
     
-    // 缓存所有任务和成员
     const allTasks = await db.tasks.list(currentGuildId);
     const allMembers = await db.members.list(currentGuildId);
     
@@ -843,7 +1096,6 @@ async function batchTaskMemberImport() {
         const taskName = parts[0];
         const memberNames = parts.slice(1);
         
-        // 查找任务（模糊匹配）
         const matchedTask = allTasks.find(t => t.task_name.includes(taskName) || taskName.includes(t.task_name));
         if (!matchedTask) {
             totalFailed++;
@@ -851,14 +1103,12 @@ async function batchTaskMemberImport() {
             continue;
         }
         
-        // 获取该任务已有成员
         const existingRelations = await db.taskMembers.list(matchedTask.id);
         const existingMemberIds = new Set(existingRelations.map(r => r.member_id));
         
         let added = 0, skipped = 0, failed = 0;
         
         for (const memberName of memberNames) {
-            // 查找成员（模糊匹配：大名或别名）
             const matchedMember = allMembers.find(m => 
                 m.real_name.includes(memberName) || 
                 memberName.includes(m.real_name) ||
@@ -867,7 +1117,6 @@ async function batchTaskMemberImport() {
             
             let member = matchedMember;
             
-            // 没找到则自动创建
             if (!member) {
                 try {
                     const created = await db.members.create({ 
@@ -891,7 +1140,6 @@ async function batchTaskMemberImport() {
                 }
             }
             
-            // 检查是否已存在
             if (existingMemberIds.has(member.id)) {
                 skipped++;
                 logs.push({ type: 'skip', msg: `⏭️ 已存在: "${member.real_name}" → "${matchedTask.task_name}"` });
@@ -912,11 +1160,9 @@ async function batchTaskMemberImport() {
         totalAdded += added;
         totalSkipped += skipped;
         totalFailed += failed;
-        
         await new Promise(r => setTimeout(r, 80));
     }
     
-    // 显示结果
     let summary = `📊 完成！添加 ${totalAdded} 人`;
     if (totalSkipped > 0) summary += `，跳过 ${totalSkipped} 人（已存在）`;
     if (totalFailed > 0) summary += `，失败 ${totalFailed} 个操作`;
@@ -936,8 +1182,10 @@ async function batchTaskMemberImport() {
     await refreshCurrentGuildData();
     loadTasksToSelect();
     loadTaskList();
+    loadMemberSelect();
 }
 
+// ===== 加载任务下拉框 =====
 async function loadTasksToSelect() {
     const sel = document.getElementById('selectTaskForBatch');
     if (!sel || !currentGuildId) return;
@@ -948,6 +1196,7 @@ async function loadTasksToSelect() {
     } catch (e) {}
 }
 
+// ===== 加载任务列表（按分类分组展示） =====
 async function loadTaskList() {
     const div = document.getElementById('taskList');
     if (!div || !currentGuildId) return;
@@ -957,6 +1206,8 @@ async function loadTaskList() {
             div.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';
             return;
         }
+        
+        // 批量获取所有任务的成员关系
         const taskIds = allTasks.map(t => t.id);
         let allTaskMembers = [];
         const batchSize = 50;
@@ -971,49 +1222,120 @@ async function loadTaskList() {
             if (!taskMemberMap[tm.task_id]) taskMemberMap[tm.task_id] = [];
             taskMemberMap[tm.task_id].push(tm.member_id);
         }
-        let html = '';
-        for (const t of allTasks) {
-            const mids = taskMemberMap[t.id] || [];
-            const members = allMembers.filter(m => mids.includes(m.id));
-            const checked = selectedTasks.has(t.id) ? 'checked' : '';
-            html += `<div class="card">
-                <div style="display:flex;align-items:flex-start;gap:4px">
-                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:14px;height:14px;cursor:pointer">
-                    <div style="flex:1">
-                        <button class="btn-close" onclick="deleteTask(${t.id})" title="删除任务">✕</button>
-                        <div class="card-header">
-                            <span class="card-title">📋${t.task_name}</span>
-                            <div style="display:flex;gap:3px;align-items:center">
-                                <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-                                <span class="tag gold">⭐${t.score}分</span>
-                            </div>
-                        </div>
-                        <div style="font-size:11px;color:var(--text2)">👥能做的人：</div>
-                        <div class="member-tags">${members.length ? members.map(m => `<span class="member-tag">${m.real_name}${m.alias ? '（' + m.alias.replace(/,/g, '、') + '）' : ''}<span class="remove" onclick="event.stopPropagation();removeTaskMember(${t.id},${m.id})">✕</span></span>`).join('') : '<span style="color:var(--text2);font-size:10px">暂无</span>'}</div>
-                    </div>
-                </div>
-            </div>`;
+        
+        // 按分类分组
+        const categorized = {};
+        for (const cat of TASK_CATEGORIES) {
+            categorized[cat.id] = [];
         }
+        for (const t of allTasks) {
+            const cat = t.category && TASK_CATEGORIES.some(c => c.id === t.category) ? t.category : 'uncategorized';
+            if (!categorized[cat]) categorized[cat] = [];
+            categorized[cat].push(t);
+        }
+        
+        // 生成HTML
+        let html = '';
+        for (const cat of TASK_CATEGORIES) {
+            const tasks = categorized[cat.id] || [];
+            if (!tasks.length) continue;
+            
+            const catChecked = tasks.every(t => selectedTasks.has(t.id));
+            const catCheckedCount = tasks.filter(t => selectedTasks.has(t.id)).length;
+            
+            html += `<div class="card" style="padding:8px 12px;">`;
+            html += `<div class="collapse-header" onclick="toggleCategory('${cat.id}')" style="display:flex;justify-content:space-between;align-items:center;">`;
+            html += `<div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:14px;">${cat.icon}</span>
+                <span style="font-weight:600;font-size:13px;">${cat.name}</span>
+                <span class="category-count">(${tasks.length}个任务)</span>
+                <span style="font-size:11px;color:var(--text2);">
+                    ${catChecked ? '☑️' : `☐ ${catCheckedCount}/${tasks.length}`}
+                </span>
+            </div>`;
+            html += `<span class="arrow open" id="arrow_${cat.id}">▶</span>`;
+            html += `</div>`;
+            html += `<div class="collapse-body open" id="body_${cat.id}">`;
+            html += `<div class="task-grid">`;
+            
+            for (const t of tasks) {
+                const mids = taskMemberMap[t.id] || [];
+                const members = allMembers.filter(m => mids.includes(m.id));
+                const checked = selectedTasks.has(t.id) ? 'checked' : '';
+                html += `<div class="task-item">
+                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+                    <span class="task-name">${t.task_name}</span>
+                    <span class="task-score">⭐${t.score}分</span>
+                    <span style="font-size:9px;color:var(--text2);">${members.length ? '👥' + members.length : '无人'}</span>
+                    <div class="task-actions">
+                        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                        <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+                    </div>
+                </div>`;
+            }
+            
+            html += `</div></div></div>`;
+        }
+        
         div.innerHTML = html;
-    } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; console.error(e); }
+        
+        // 恢复折叠状态
+        for (const cat of TASK_CATEGORIES) {
+            const state = sessionStorage.getItem('cat_' + cat.id);
+            if (state === 'closed') {
+                const body = document.getElementById('body_' + cat.id);
+                const arrow = document.getElementById('arrow_' + cat.id);
+                if (body) { body.classList.remove('open'); body.classList.add('closed'); }
+                if (arrow) { arrow.classList.remove('open'); }
+            }
+        }
+        
+    } catch (e) { 
+        div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; 
+        console.error(e);
+    }
 }
 
-// 编辑任务同时修改名称和分数
+// ===== 切换分类折叠 =====
+function toggleCategory(catId) {
+    const body = document.getElementById('body_' + catId);
+    const arrow = document.getElementById('arrow_' + catId);
+    if (!body) return;
+    if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        body.classList.add('closed');
+        if (arrow) arrow.classList.remove('open');
+        sessionStorage.setItem('cat_' + catId, 'closed');
+    } else {
+        body.classList.remove('closed');
+        body.classList.add('open');
+        if (arrow) arrow.classList.add('open');
+        sessionStorage.setItem('cat_' + catId, 'open');
+    }
+}
+
+// ===== 编辑任务 =====
 async function editTask(id, oldName, oldScore) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
     
     const dialog = document.createElement('div');
-    dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:380px;width:90%;';
+    dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:400px;width:90%;';
     dialog.innerHTML = `
         <div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>
         <div style="margin-bottom:10px;">
             <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label>
             <input id="editTaskNameInput" type="text" value="${oldName.replace(/"/g, '&quot;')}" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;">
         </div>
-        <div style="margin-bottom:16px;">
+        <div style="margin-bottom:10px;">
             <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label>
             <input id="editTaskScoreInput" type="number" value="${oldScore}" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 分类</label>
+            <select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">
+                ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+            </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
             <button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button>
@@ -1023,6 +1345,12 @@ async function editTask(id, oldName, oldScore) {
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
     
+    const currentTask = allTasks.find(t => t.id === id);
+    if (currentTask && currentTask.category) {
+        const sel = document.getElementById('editTaskCategoryInput');
+        if (sel) sel.value = currentTask.category;
+    }
+    
     setTimeout(() => {
         const nameInput = document.getElementById('editTaskNameInput');
         if (nameInput) nameInput.focus();
@@ -1031,6 +1359,7 @@ async function editTask(id, oldName, oldScore) {
     return new Promise((resolve) => {
         const nameInput = document.getElementById('editTaskNameInput');
         const scoreInput = document.getElementById('editTaskScoreInput');
+        const catInput = document.getElementById('editTaskCategoryInput');
         const confirmBtn = document.getElementById('editTaskConfirmBtn');
         const cancelBtn = document.getElementById('editTaskCancelBtn');
         
@@ -1042,6 +1371,7 @@ async function editTask(id, oldName, oldScore) {
         function handleConfirm() {
             const newName = nameInput.value.trim();
             const newScore = parseInt(scoreInput.value);
+            const newCategory = catInput ? catInput.value : 'uncategorized';
             if (!newName) {
                 showToast('⚠️请输入任务名称', 'warning');
                 return;
@@ -1051,7 +1381,7 @@ async function editTask(id, oldName, oldScore) {
                 return;
             }
             closeDialog();
-            doUpdateTask(id, newName, newScore);
+            doUpdateTask(id, newName, newScore, newCategory);
         }
         
         confirmBtn.addEventListener('click', handleConfirm);
@@ -1064,13 +1394,14 @@ async function editTask(id, oldName, oldScore) {
     });
 }
 
-async function doUpdateTask(id, newName, newScore) {
+async function doUpdateTask(id, newName, newScore, newCategory) {
     try {
-        await db.tasks.update(id, { task_name: newName, score: newScore });
+        await db.tasks.update(id, { task_name: newName, score: newScore, category: newCategory });
         showToast('✅任务已更新', 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        loadMemberSelect();
     } catch (e) { 
         showToast('❌修改失败', 'error');
         console.error(e);
@@ -1096,24 +1427,37 @@ function filterTaskList(q) {
         div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配任务</div></div>';
         return;
     }
-    let html = '';
+    const categorized = {};
+    for (const cat of TASK_CATEGORIES) {
+        categorized[cat.id] = [];
+    }
     for (const t of filtered) {
-        const checked = selectedTasks.has(t.id) ? 'checked' : '';
-        html += `<div class="card">
-            <div style="display:flex;align-items:flex-start;gap:4px">
-                <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="margin-top:2px;width:14px;height:14px;cursor:pointer">
-                <div style="flex:1">
-                    <button class="btn-close" onclick="deleteTask(${t.id})">✕</button>
-                    <div class="card-header">
-                        <span class="card-title">📋${t.task_name}</span>
-                        <div style="display:flex;gap:3px;align-items:center">
-                            <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-                            <span class="tag gold">⭐${t.score}分</span>
-                        </div>
-                    </div>
-                </div>
+        const cat = t.category && TASK_CATEGORIES.some(c => c.id === t.category) ? t.category : 'uncategorized';
+        if (!categorized[cat]) categorized[cat] = [];
+        categorized[cat].push(t);
+    }
+    let html = '';
+    for (const cat of TASK_CATEGORIES) {
+        const tasks = categorized[cat.id] || [];
+        if (!tasks.length) continue;
+        html += `<div class="card" style="padding:8px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;">
+                <span style="font-weight:600;font-size:13px;">${cat.icon} ${cat.name} (${tasks.length}个)</span>
             </div>
-        </div>`;
+            <div class="task-grid">`;
+        for (const t of tasks) {
+            const checked = selectedTasks.has(t.id) ? 'checked' : '';
+            html += `<div class="task-item">
+                <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+                <span class="task-name">${t.task_name}</span>
+                <span class="task-score">⭐${t.score}分</span>
+                <div class="task-actions">
+                    <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                    <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+                </div>
+            </div>`;
+        }
+        html += `</div></div>`;
     }
     div.innerHTML = html;
 }
@@ -1163,6 +1507,7 @@ async function addMember() {
         document.getElementById('newMemberAlias').value = '';
         await refreshCurrentGuildData();
         loadMemberList();
+        loadMemberSelect();
     } catch (e) { showToast('❌大名可能已存在', 'error'); }
 }
 
@@ -1194,6 +1539,7 @@ async function batchImportMembers() {
     document.getElementById('batchMemberImport').value = '';
     await refreshCurrentGuildData();
     loadMemberList();
+    loadMemberSelect();
 }
 
 async function loadMemberList(filterQuery = '') {
@@ -1237,6 +1583,7 @@ async function deleteMember(id) {
         showToast('🗑️已删除', 'success');
         await refreshCurrentGuildData();
         loadMemberList();
+        loadMemberSelect();
         if (document.getElementById('taskList')) loadTaskList();
     } catch (e) { showToast('❌删除失败', 'error'); }
 }
@@ -1249,6 +1596,7 @@ async function editMemberName(memberId, currentName) {
         showToast('✅大名已更新', 'success');
         await refreshCurrentGuildData();
         loadMemberList();
+        loadMemberSelect();
     } catch (e) { showToast('❌修改失败，大名可能重复', 'error'); }
 }
 
@@ -1260,6 +1608,7 @@ async function editAlias(memberId, name, currentAlias) {
         showToast('✅别名已更新', 'success');
         await refreshCurrentGuildData();
         loadMemberList();
+        loadMemberSelect();
     } catch (e) { showToast('❌更新失败', 'error'); }
 }
 
@@ -1790,88 +2139,93 @@ async function batchDeleteTasks() {
 }
 
 // ===== 任务模板 =====
-const PRESET_TEMPLATE = [
-    ["艺人-百灵鸟",10],["600级白素贞",16],["600级聂小倩",16],["艺人-英姿",16],["600级黄飞鸿",16],
-    ["600级武松",16],["百灵鸟-晨曦鸟语",16],["600级红衣教主",16],["600级林冲",16],["艺人-素芬",18],
-    ["彩霞-夜玫瑰",18],["英姿-沙滩排球",18],["觉醒+1聂小倩",18],["秋菊-冬日烟花",18],["艺人-艳红",18],
-    ["乾隆-御驾亲征",21],["乾隆-大明湖畔",21],["人才-小燕子-雀跃欢腾",21],["宋江-其疾如风",21],["步惊云-无上霸剑",21],
-    ["步惊云-绝世好剑",21],["孙悟空-定海神针",21],["艺人-秋菊",21],["600级张良",21],["守护神-篮球天才",21],
-    ["守护神-齐天大圣",21],["守护神-魔法见习生",21],["守护神-奇迹小兵",21],["守护神-光箭天女",21],["乾隆-盛世大帝",21],
-    ["郑经理+3意气风发",21],["守护神-天才厨师",21],["守护神-机甲少年",21],["守护神-快乐小鬼",21],["高启兰+3茶楼相会",21],
-    ["聂风-麒麟疯魔",21],["步惊云-云栖良辰",21],["孙悟空-方寸学艺",21],["艺人-静静",21],["静静+3孟钰",21],
-    ["艺人-彩霞",21],["强哥+3繁华盛会",21],["守护神-卡牌之王",21],["史蒂芬周-黯然销魂",21],["至尊宝-夕阳武士",21],
-    ["守护神-沉香",21],["彩霞+3夜玫瑰",21],["守护者-哪吒",21],["至尊宝-万妖之王",21],["觉醒+2聂小倩",22],
-    ["觉醒+2白素贞",22],["觉醒+2紫霞仙子",22],["觉醒+2红衣教主",22],["觉醒+2小燕子",22],["觉醒+2黄飞鸿",22],
-    ["600级孙悟空",23],["600级青丘神女",23],["600级聂风",23],["孙悟空+3大圣归来",23],["600级武则天",23],
-    ["守护神-寿神",23],["守护神-禄神",23],["守护神-玄武",23],["史蒂芬周+3食神归位",23],["孙悟空+3蟠桃园记",23],
-    ["高启强+3锋芒毕露",23],["守护神-青龙",23],["人才-紫霞仙子+3爱无期限",23],["武则天+3媚色倾唐",23],["步惊云+3无上霸剑",23],
-    ["步惊云+3排云掌",23],["守护神-年兽",23],["艺人-港星",24],["艺人-含香",24],["艺人-高启兰",24],
-    ["艺人-选美皇后",24],["选美皇后-佳人茶韵",24],["阿莲-喜收硕果",24],["白居易-天涯故交",24],["海燕-贺岁佳人",24],
-    ["阿诗玛-苗寨风光",24],["淑珍-璀璨时代",24],["艺人-小燕子-英姿飒爽",24],["小燕子-雀跃不已",24],["玲儿-桨漾童夏",24],
-    ["葬爱-哥特公主",24],["英姿-棋逢对手",24],["童心-午后扰闲",24],["紫霞仙子-明曦春霞",24],["紫霞仙子-嫦娥",24],
-    ["亦君-风光留影",24],["艺人-红衣教主-秋光散断",24],["艺人-红衣教主-剑破秋月",24],["艺人-白素贞-龙伴端阳",24],["觉醒+3白素贞",24],
-    ["港星-帝女花",24],["港星-暮然回首",24],["高启兰-千傩万象",24],["铁扇公主-云阶春晖",24],["艺人-聂小倩-林间倩影",24],
-    ["艺人-白素贞-西湖之约",24],["艺人-聂小倩-皑雪琴声",24],["海燕-还燕归巢",24],["艺人-葬爱",24],["阿诗玛-绚烂花火",24],
-    ["艺人-亦君",24],["武则天+5寒寺诗情",25],["750级高启强",25],["750级武则天",25],["人才-小燕子+5欢腾雀跃",25],
-    ["750级步惊云",25],["500级国民男神",25],["750级聂风",25],["宋江+5聚义梁山",25],["阿莲+3喜收硕果",26],
-    ["艺人-春三十娘",26],["艺人-第二梦",26],["艺人-白晶晶",26],["艺人-上官婉儿",26],["艺人-白居易",26],
-    ["上官婉儿-素心守正",26],["晚蔚-爱心圣诞",26],["白晶晶-刻骨铭心",26],["艺人-夏雨荷",26],["艺人-红衣教主+3剑破秋月",26],
-    ["艺人-晚蔚",26],["艺人-女儿国国王",26],["艺人-楚楚",26],["春三十娘-一池春色",26],["艺人-顾倾倾",26],
-    ["艺人-柳飘飘",26],["觉醒+1孙悟空",27],["觉醒+1高启强",27],["觉醒+1步惊云",27],["觉醒+1聂风",27],
-    ["觉醒+1青丘神女",27],["觉醒+1乾隆",27],["觉醒+1史蒂芬周",27],["觉醒+1武则天",27],["艺人-妲己",27],
-    ["艺人-玫瑰小姐",28],["淑珍+5璀璨时代",28],["高启兰+5千傩万象",28],["艺人-白素贞+5龙伴端阳",28],["艺人-陈书婷",28],
-    ["夏雨荷-青荷雨待",29],["夏雨荷-轻舟画扇",29],["玫瑰小姐-自由飞驰",29],["陈书婷-瀚海女王",29],["觉醒+2青丘神女",29],
-    ["觉醒+2聂风",29],["觉醒+2武则天",29],["陈书婷-旖旎春睡",29],["觉醒+2至尊宝",29],["觉醒+2高启强",29],
-    ["白晶晶+3刻骨铭心",29],["玫瑰小姐-流音韶光",29],["玫瑰小姐+3流音韶光",30],["白晶晶-白骨红颜",30],["陈书婷-鎏金夜宴",30],
-    ["含香-蝶衣破茧",30],["夏雨荷-画境声欢",30],["觉醒+3孙悟空",30],["夏雨荷+3轻舟画扇",30],["玫瑰小姐-破棘盛放",30],
-    ["上官婉儿+5素心守正",30],["夏雨荷+5青荷雨待",30],["觉醒＋3高启强",30],["含香 蝶翼破茧",30]
-];
+const PRESET_TEMPLATE = {
+    'talent': [
+        ["600级白素贞",16],["600级聂小倩",16],["600级黄飞鸿",16],["600级武松",16],["600级红衣教主",16],
+        ["600级林冲",16],["600级张良",21],["600级孙悟空",23],["600级青丘神女",23],["600级聂风",23],
+        ["600级乾隆",23],["600级武则天",23],["750级高启强",25],["750级武则天",25],["750级步惊云",25],
+        ["500级国民男神",25],["750级聂风",25]
+    ],
+    'talent_awake': [
+        ["觉醒+1聂小倩",18],["觉醒+2聂小倩",22],["觉醒+2白素贞",22],["觉醒+2紫霞仙子",22],["觉醒+2红衣教主",22],
+        ["觉醒+2小燕子",22],["觉醒+2黄飞鸿",22],["觉醒+3白素贞",24],["觉醒+1孙悟空",27],["觉醒+1高启强",27],
+        ["觉醒+1步惊云",27],["觉醒+1聂风",27],["觉醒+1青丘神女",27],["觉醒+1乾隆",27],["觉醒+1史蒂芬周",27],
+        ["觉醒+1武则天",27],["觉醒+2青丘神女",29],["觉醒+2聂风",29],["觉醒+2武则天",29],["觉醒+2至尊宝",29],
+        ["觉醒+2高启强",29],["觉醒+3孙悟空",30],["觉醒＋3高启强",30]
+    ],
+    'artist': [
+        ["艺人-百灵鸟",10],["艺人-英姿",16],["艺人-素芬",18],["艺人-艳红",18],["艺人-秋菊",21],
+        ["艺人-港星",24],["艺人-含香",24],["艺人-高启兰",24],["艺人-选美皇后",24],["艺人-亦君",24],
+        ["艺人-静静",21],["艺人-彩霞",21],["艺人-葬爱",24],["艺人-春三十娘",26],["艺人-第二梦",26],
+        ["艺人-白晶晶",26],["艺人-上官婉儿",26],["艺人-白居易",26],["艺人-夏雨荷",26],["艺人-晚蔚",26],
+        ["艺人-女儿国国王",26],["艺人-楚楚",26],["艺人-顾倾倾",26],["艺人-柳飘飘",26],["艺人-妲己",27],
+        ["艺人-玫瑰小姐",28],["艺人-陈书婷",28]
+    ],
+    'talent_skin': [
+        ["乾隆-御驾亲征",21],["乾隆-大明湖畔",21],["人才-小燕子-雀跃欢腾",21],["宋江-其疾如风",21],["步惊云-无上霸剑",21],
+        ["步惊云-绝世好剑",21],["孙悟空-定海神针",21],["乾隆-盛世大帝",21],["郑经理+3意气风发",21],["聂风-麒麟疯魔",21],
+        ["步惊云-云栖良辰",21],["孙悟空-方寸学艺",21],["强哥+3繁华盛会",21],["史蒂芬周-黯然销魂",21],["至尊宝-夕阳武士",21],
+        ["至尊宝-万妖之王",21],["孙悟空+3大圣归来",23],["史蒂芬周+3食神归位",23],["孙悟空+3蟠桃园记",23],
+        ["高启强+3锋芒毕露",23],["人才-紫霞仙子+3爱无期限",23],["武则天+3媚色倾唐",23],["步惊云+3无上霸剑",23],
+        ["步惊云+3排云掌",23],["武则天+5寒寺诗情",25],["人才-小燕子+5欢腾雀跃",25],["宋江+5聚义梁山",25]
+    ],
+    'artist_skin': [
+        ["百灵鸟-晨曦鸟语",16],["彩霞-夜玫瑰",18],["英姿-沙滩排球",18],["秋菊-冬日烟花",18],["高启兰+3茶楼相会",21],
+        ["静静+3孟钰",21],["彩霞+3夜玫瑰",21],["选美皇后-佳人茶韵",24],["阿莲-喜收硕果",24],["白居易-天涯故交",24],
+        ["海燕-贺岁佳人",24],["阿诗玛-苗寨风光",24],["淑珍-璀璨时代",24],["艺人-小燕子-英姿飒爽",24],["小燕子-雀跃不已",24],
+        ["玲儿-桨漾童夏",24],["葬爱-哥特公主",24],["英姿-棋逢对手",24],["童心-午后扰闲",24],["紫霞仙子-明曦春霞",24],
+        ["紫霞仙子-嫦娥",24],["亦君-风光留影",24],["艺人-红衣教主-秋光散断",24],["艺人-红衣教主-剑破秋月",24],
+        ["艺人-白素贞-龙伴端阳",24],["港星-帝女花",24],["港星-暮然回首",24],["高启兰-千傩万象",24],["铁扇公主-云阶春晖",24],
+        ["艺人-聂小倩-林间倩影",24],["艺人-白素贞-西湖之约",24],["艺人-聂小倩-皑雪琴声",24],["海燕-还燕归巢",24],
+        ["阿诗玛-绚烂花火",24],["阿莲+3喜收硕果",26],["上官婉儿-素心守正",26],["晚蔚-爱心圣诞",26],["白晶晶-刻骨铭心",26],
+        ["艺人-红衣教主+3剑破秋月",26],["春三十娘-一池春色",26],["淑珍+5璀璨时代",28],["高启兰+5千傩万象",28],
+        ["艺人-白素贞+5龙伴端阳",28],["夏雨荷-青荷雨待",29],["夏雨荷-轻舟画扇",29],["玫瑰小姐-自由飞驰",29],
+        ["陈书婷-瀚海女王",29],["陈书婷-旖旎春睡",29],["白晶晶+3刻骨铭心",29],["玫瑰小姐-流音韶光",29],
+        ["玫瑰小姐+3流音韶光",30],["白晶晶-白骨红颜",30],["陈书婷-鎏金夜宴",30],["含香-蝶衣破茧",30],
+        ["夏雨荷-画境声欢",30],["夏雨荷+3轻舟画扇",30],["玫瑰小姐-破棘盛放",30],["上官婉儿+5素心守正",30],
+        ["夏雨荷+5青荷雨待",30],["含香-蝶翼破茧",30]
+    ],
+    'guardian': [
+        ["守护神-篮球天才",21],["守护神-齐天大圣",21],["守护神-魔法见习生",21],["守护神-奇迹小兵",21],
+        ["守护神-光箭天女",21],["守护神-天才厨师",21],["守护神-机甲少年",21],["守护神-快乐小鬼",21],
+        ["守护神-卡牌之王",21],["守护神-沉香",21],["守护者-哪吒",21],["守护神-寿神",23],
+        ["守护神-禄神",23],["守护神-玄武",23],["守护神-青龙",23],["守护神-年兽",23]
+    ]
+};
 
-// 预设模板导入（显示进度）
+// 预设模板导入（带分类）
 async function usePresetTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    if (!confirm(`⚠️将导入预设模板（${PRESET_TEMPLATE.length}个任务），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
+    const totalCount = Object.values(PRESET_TEMPLATE).reduce((sum, arr) => sum + arr.length, 0);
+    if (!confirm(`⚠️将导入预设模板（${totalCount}个任务，6个分类），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
     showToast('⏳正在导入模板，请稍候...', 'info');
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
-        const tasksToCreate = [];
-        let skip = 0;
-        for (const [name, score] of PRESET_TEMPLATE) {
-            if (existingNames.has(name)) { skip++; continue; }
-            tasksToCreate.push({ guild_id: currentGuildId, task_name: name, score: score });
-            existingNames.add(name);
-        }
-        if (!tasksToCreate.length) {
-            showToast(`⚠️所有任务已存在（${skip}个）`, 'warning');
-            return;
-        }
-        let s = 0;
-        const total = tasksToCreate.length;
-        let lastProgress = 0;
-        for (let i = 0; i < tasksToCreate.length; i++) {
-            try {
-                await db.tasks.create(tasksToCreate[i]);
-                s++;
-                const progress = Math.floor((i + 1) / total * 100);
-                if (progress >= lastProgress + 10 || i === tasksToCreate.length - 1 || i % 10 === 0) {
-                    showToast(`⏳导入进度：${i + 1}/${total} (${progress}%)`, 'info');
-                    lastProgress = progress;
-                }
-            } catch (e) {
-                console.warn('导入失败:', tasksToCreate[i].task_name, e.message);
+        let s = 0, skip = 0;
+        let total = 0;
+        for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
+            for (const [name, score] of tasks) {
+                total++;
+                if (existingNames.has(name)) { skip++; continue; }
+                try {
+                    await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
+                    existingNames.add(name);
+                    s++;
+                } catch (e) { console.warn('导入失败:', name, e.message); }
             }
         }
         showToast(`✅成功导入${s}个${skip > 0 ? '，跳过' + skip + '个已有任务' : ''}`, 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        loadMemberSelect();
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
 function saveMyTemplate() {
     if (!allTasks.length) { showToast('⚠️当前没有任务可保存', 'warning'); return; }
-    const data = allTasks.map(t => `${t.task_name},${t.score}`).join('\n');
+    const data = allTasks.map(t => `${t.task_name},${t.score},${t.category || ''}`).join('\n');
     localStorage.setItem('guild_my_template', data);
     showToast(`💾已保存${allTasks.length}个任务为模板`, 'success');
 }
@@ -1886,51 +2240,53 @@ async function loadMyTemplate() {
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
-        const tasksToCreate = [];
-        let skip = 0;
+        let s = 0, skip = 0;
         for (const line of lines) {
             const parts = line.split(',').map(p => p.trim());
             if (!parts[0]) continue;
             if (existingNames.has(parts[0])) { skip++; continue; }
-            tasksToCreate.push({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0 });
-            existingNames.add(parts[0]);
-        }
-        if (!tasksToCreate.length) {
-            showToast(`⚠️所有任务已存在（${skip}个）`, 'warning');
-            return;
-        }
-        let s = 0;
-        const total = tasksToCreate.length;
-        for (let i = 0; i < tasksToCreate.length; i++) {
+            const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
             try {
-                await db.tasks.create(tasksToCreate[i]);
+                await db.tasks.create({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0, category: category });
+                existingNames.add(parts[0]);
                 s++;
-                if (i % 10 === 0 || i === tasksToCreate.length - 1) {
-                    showToast(`⏳导入进度：${i + 1}/${total}`, 'info');
-                }
-            } catch (e) {
-                console.warn('导入失败:', tasksToCreate[i].task_name, e.message);
-            }
+            } catch (e) { console.warn('导入失败:', parts[0], e.message); }
         }
         showToast(`✅导入${s}个${skip > 0 ? '，跳过' + skip + '个' : ''}`, 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        loadMemberSelect();
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
 function editPresetTemplate() {
-    const current = PRESET_TEMPLATE.map(t => t.join(',')).join('\n');
-    const newData = prompt('✏️编辑预设模板（每行：任务名,分数）\n\n修改后保存会覆盖预设模板', current);
+    const lines = [];
+    for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
+        for (const [name, score] of tasks) {
+            lines.push(`${name},${score},${category}`);
+        }
+    }
+    const current = lines.join('\n');
+    const newData = prompt('✏️编辑预设模板（每行：任务名,分数,分类ID）\n分类ID可选：talent/talent_awake/artist/talent_skin/artist_skin/guardian\n\n修改后保存会覆盖预设模板', current);
     if (newData === null) return;
-    const lines = newData.split('\n').filter(l => l.trim());
-    const newTemplate = lines.map(l => {
-        const parts = l.split(',').map(p => p.trim());
-        return [parts[0], parseInt(parts[1]) || 0];
-    });
-    PRESET_TEMPLATE.length = 0;
-    newTemplate.forEach(t => PRESET_TEMPLATE.push(t));
-    showToast(`✅预设模板已更新（${PRESET_TEMPLATE.length}个任务）`, 'success');
+    const newLines = newData.split('\n').filter(l => l.trim());
+    const newTemplate = {};
+    for (const cat of TASK_CATEGORIES) {
+        newTemplate[cat.id] = [];
+    }
+    for (const line of newLines) {
+        const parts = line.split(',').map(p => p.trim());
+        if (!parts[0]) continue;
+        const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
+        if (!newTemplate[category]) newTemplate[category] = [];
+        newTemplate[category].push([parts[0], parseInt(parts[1]) || 0]);
+    }
+    Object.keys(PRESET_TEMPLATE).forEach(key => delete PRESET_TEMPLATE[key]);
+    for (const [key, val] of Object.entries(newTemplate)) {
+        if (val.length) PRESET_TEMPLATE[key] = val;
+    }
+    showToast(`✅预设模板已更新（${Object.values(PRESET_TEMPLATE).reduce((s, arr) => s + arr.length, 0)}个任务）`, 'success');
 }
 
 // ===== 启动 =====

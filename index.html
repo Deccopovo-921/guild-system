@@ -264,6 +264,7 @@
         .tag { display: inline-block; padding: 2px 6px; border-radius: 8px; font-size: 10px; background: var(--tag-bg); color: var(--text); margin: 1px 2px 1px 0; }
         .tag.gold { background: #2a2010; color: var(--gold); }
         .tag.accent { background: #102040; color: var(--accent); }
+        .tag.sub-tag { background: #1a2a1a; color: #7ddf7d; font-size: 9px; padding: 1px 6px; border-radius: 10px; }
         .member-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
         .member-tag { display: inline-flex; align-items: center; gap: 3px; padding: 3px 6px; border-radius: 4px; font-size: 11px; background: var(--tag-bg); border: 1px solid var(--border); }
         .member-tag .remove { cursor: pointer; color: var(--text2); font-size: 12px; line-height: 1; transition: color .2s; margin-left: 1px; }
@@ -392,6 +393,22 @@
         .task-check-item .tci-existing { color: var(--success); font-size: 10px; }
         .task-check-item.disabled { opacity: 0.5; cursor: not-allowed; }
         .task-check-item.disabled:hover { background: var(--bg); }
+        .task-check-item .tci-category { color: var(--text2); font-size: 10px; }
+        .sub-tag-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 6px;
+            padding: 4px 0;
+        }
+        .sub-tag-filter input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
         @media (max-width: 600px) {
             .task-check-grid { grid-template-columns: 1fr; }
         }
@@ -437,18 +454,21 @@ const ACHIEVEMENT_TIERS = [
     { name: '👑传说', score: 1400, rewards: '皮肤+聊天气泡7天+称号7天+领带' }
 ];
 
-// ===== 任务分类定义 =====
+// ===== 主分类定义 =====
 const TASK_CATEGORIES = [
-    { id: 'talent', icon: '👤', name: '人才' },
-    { id: 'talent_awake', icon: '⚡', name: '人才觉醒' },
-    { id: 'artist', icon: '🎭', name: '艺人' },
-    { id: 'talent_skin', icon: '🎨', name: '人才皮肤' },
-    { id: 'artist_skin', icon: '👗', name: '艺人皮肤' },
-    { id: 'guardian', icon: '🛡️', name: '守护神' },
-    { id: 'uncategorized', icon: '📂', name: '未分类' }
+    { id: '人才', icon: '👤', name: '人才' },
+    { id: '人才觉醒', icon: '⚡', name: '人才觉醒' },
+    { id: '人才皮肤', icon: '🎨', name: '人才皮肤' },
+    { id: '艺人', icon: '🎭', name: '艺人' },
+    { id: '艺人皮肤', icon: '👗', name: '艺人皮肤' },
+    { id: '守护神', icon: '🛡️', name: '守护神' }
 ];
 
+// ===== 子标签定义 =====
+const SUB_TAGS = ['农', '商', '文', '娱', '无'];
+
 function getCategoryLabel(categoryId) {
+    if (!categoryId) return '📂 未分类';
     const found = TASK_CATEGORIES.find(c => c.id === categoryId);
     return found ? found.icon + ' ' + found.name : '📂 未分类';
 }
@@ -552,6 +572,7 @@ function showMainPage() {
 }
 
 let currentGuildId = null, currentRole = null, allGuilds = [], allMembers = [], allTasks = [];
+let showSubTag = false;
 
 document.getElementById('loginInput').value = getRememberedCode();
 document.getElementById('btnLogin').addEventListener('click', doLogin);
@@ -785,10 +806,15 @@ function initTaskMgrTab() {
                 <div class="form-group"><label>⭐分数</label><input type="number" id="newTaskScore" placeholder="50" min="0"></div>
             </div>
             <div class="form-group">
-                <label>📂分类</label>
+                <label>📂主分类</label>
                 <select id="newTaskCategory">
-                    <option value="">-- 请选择分类 --</option>
                     ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🏷️子标签</label>
+                <select id="newTaskSubTag">
+                    ${SUB_TAGS.map(t => `<option value="${t}">${t}</option>`).join('')}
                 </select>
             </div>
             <div class="form-group"><label>👤初始能做的人（选填）</label><input type="text" id="newTaskMember" placeholder="输入大名，可留空"></div>
@@ -796,18 +822,21 @@ function initTaskMgrTab() {
         </div>
         <div class="card">
             <div class="section-title">📋批量添加任务</div>
-            <div class="form-group"><label>每行：任务名,分数,分类ID（可选：talent/talent_awake/artist/talent_skin/artist_skin/guardian）</label><textarea id="batchTaskImport" placeholder="击败BOSS,50,guardian&#10;收集物资,30,artist"></textarea></div>
+            <div class="form-group"><label>每行：任务名, 分数, 主分类, 子标签（可选）</label>
+            <textarea id="batchTaskImport" placeholder="600级白素贞, 16, 人才, 农" style="min-height:80px;"></textarea>
+            <div style="font-size:10px;color:var(--text2);margin-top:2px;">💡 主分类：人才 / 人才觉醒 / 人才皮肤 / 艺人 / 艺人皮肤 / 守护神 | 子标签：农 / 商 / 文 / 娱 / 无（可选）</div>
+            </div>
             <button class="btn btn-success btn-sm" id="btnBatchTaskImport">📥批量导入</button>
         </div>
         <hr class="divider">
         <div class="card">
             <div class="section-title">📦任务模板</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
-                <button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板（168个，含分类）</button>
+                <button class="btn btn-gold btn-sm" id="btnUseTemplate">📥使用预设模板（169个，含分类+子标签）</button>
                 <button class="btn btn-outline btn-sm" id="btnSaveTemplate">💾保存当前为模板</button>
                 <button class="btn btn-outline btn-sm" id="btnLoadTemplate">📂加载我的模板</button>
                 <button class="btn btn-outline btn-sm" id="btnEditPreset">✏️编辑预设模板</button>
-                <span style="font-size:10px;color:var(--text2)">（168个任务，6个分类）</span>
+                <span style="font-size:10px;color:var(--text2)">（169个任务）</span>
             </div>
         </div>
         <hr class="divider">
@@ -815,7 +844,7 @@ function initTaskMgrTab() {
             <div class="section-title">👥批量加入成员到任务（任务→人）</div>
             <div class="form-group">
                 <label>每行：任务名, 成员1, 成员2, 成员3...</label>
-                <textarea id="batchTaskMemberInput" placeholder="击败BOSS, 张三, 李四, 王五&#10;收集物资, 赵六, 张三, 小明" style="min-height:80px;"></textarea>
+                <textarea id="batchTaskMemberInput" placeholder="600级白素贞, 张三, 李四, 王五" style="min-height:80px;"></textarea>
             </div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
                 <button class="btn btn-success btn-sm" id="btnBatchTaskMember">📥 批量添加</button>
@@ -909,14 +938,12 @@ async function loadMemberTaskChecklist() {
     }
     
     try {
-        // 获取所有任务
         const tasks = await db.tasks.list(currentGuildId);
         if (!tasks.length) {
             container.innerHTML = '<div style="color:var(--text2);font-size:12px;grid-column:1/-1;text-align:center;padding:12px;">⚠️ 暂无任务，请先创建任务</div>';
             return;
         }
         
-        // 获取该成员已有的任务
         const existing = await db.taskMembers.listByMember(memberId);
         const existingTaskIds = new Set(existing.map(t => t.task_id));
         
@@ -925,10 +952,12 @@ async function loadMemberTaskChecklist() {
             const exists = existingTaskIds.has(t.id);
             const disabled = exists ? 'disabled' : '';
             const checked = exists ? 'checked' : '';
+            const catLabel = getCategoryLabel(t.category);
             html += `<div class="task-check-item ${exists ? 'disabled' : ''}">
                 <input type="checkbox" ${checked} ${disabled} data-taskid="${t.id}" data-taskname="${t.task_name}" onchange="updateMemberTaskCount()">
                 <span class="tci-name">${t.task_name}</span>
                 <span class="tci-score">⭐${t.score}分</span>
+                <span class="tci-category">${catLabel}</span>
                 ${exists ? '<span class="tci-existing">✅ 已有</span>' : ''}
             </div>`;
         }
@@ -940,13 +969,11 @@ async function loadMemberTaskChecklist() {
     }
 }
 
-// ===== 更新已选任务计数 =====
 function updateMemberTaskCount() {
     const checked = document.querySelectorAll('#memberTaskCheckList input[type="checkbox"]:checked:not(:disabled)').length;
     document.getElementById('memberTaskCount').textContent = `已选 ${checked} 个任务`;
 }
 
-// ===== 成员添加任务 =====
 async function memberAddTasks() {
     const sel = document.getElementById('memberToTasksSelect');
     const memberId = sel.value;
@@ -956,10 +983,8 @@ async function memberAddTasks() {
     if (!checkedBoxes.length) { showToast('⚠️请至少选择一个任务', 'warning'); return; }
     
     const taskIds = [];
-    const taskNames = [];
     checkedBoxes.forEach(cb => {
         taskIds.push(parseInt(cb.dataset.taskid));
-        taskNames.push(cb.dataset.taskname);
     });
     
     const resultDiv = document.getElementById('memberTaskResult');
@@ -981,7 +1006,6 @@ async function memberAddTasks() {
         await new Promise(r => setTimeout(r, 80));
     }
     
-    // 获取成员名字
     const members = await db.members.list(currentGuildId);
     const member = members.find(m => m.id == memberId);
     const memberName = member ? member.real_name : memberId;
@@ -1000,22 +1024,21 @@ async function memberAddTasks() {
     `;
     
     showToast(summary, added > 0 ? 'success' : 'warning');
-    // 重新加载勾选列表（更新已有状态）
     await loadMemberTaskChecklist();
     await refreshCurrentGuildData();
     loadTaskList();
 }
 
-// ===== 添加任务（带分类） =====
 async function addTask() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const name = document.getElementById('newTaskName').value.trim();
     const score = parseInt(document.getElementById('newTaskScore').value) || 0;
-    const category = document.getElementById('newTaskCategory').value || 'uncategorized';
+    const category = document.getElementById('newTaskCategory').value || '人才';
+    const subTag = document.getElementById('newTaskSubTag').value || '无';
     const memberName = document.getElementById('newTaskMember').value.trim();
     if (!name) { showToast('⚠️请输入任务名称', 'warning'); return; }
     try {
-        const nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
+        const nt = await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
         if (nt.length && memberName) {
             const m = await db.members.getByName(currentGuildId, memberName);
             if (m.length) await db.taskMembers.add({ task_id: nt[0].id, member_id: m[0].id });
@@ -1023,7 +1046,8 @@ async function addTask() {
         showToast('✅任务添加成功！', 'success');
         document.getElementById('newTaskName').value = '';
         document.getElementById('newTaskScore').value = '';
-        document.getElementById('newTaskCategory').value = '';
+        document.getElementById('newTaskCategory').value = '人才';
+        document.getElementById('newTaskSubTag').value = '无';
         document.getElementById('newTaskMember').value = '';
         await refreshCurrentGuildData();
         loadTasksToSelect();
@@ -1032,7 +1056,7 @@ async function addTask() {
     } catch (e) { showToast('❌添加失败', 'error'); }
 }
 
-// ===== 批量导入任务（带分类） =====
+// ===== 批量导入任务 =====
 async function batchImportTasks() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const text = document.getElementById('batchTaskImport').value.trim();
@@ -1041,15 +1065,24 @@ async function batchImportTasks() {
     const existingNames = new Set(existingTasks.map(t => t.task_name));
     const lines = text.split('\n').filter(l => l.trim());
     let s = 0, f = 0, skip = 0;
+    const validCategories = TASK_CATEGORIES.map(c => c.id);
+    
     for (const line of lines) {
         const parts = line.split(',').map(p => p.trim());
         const name = parts[0];
         if (!name) { f++; continue; }
         if (existingNames.has(name)) { skip++; continue; }
         const score = parseInt(parts[1]) || 0;
-        const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
+        let category = '人才';
+        if (parts[2] && validCategories.includes(parts[2])) {
+            category = parts[2];
+        }
+        let subTag = '无';
+        if (parts[3] && SUB_TAGS.includes(parts[3])) {
+            subTag = parts[3];
+        }
         try {
-            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
+            await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag });
             existingNames.add(name);
             s++;
         } catch (e) { console.warn('任务导入失败:', name, e.message); f++; }
@@ -1064,7 +1097,6 @@ async function batchImportTasks() {
     loadMemberSelect();
 }
 
-// ===== 批量添加成员到任务（任务→人） =====
 async function batchTaskMemberImport() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const text = document.getElementById('batchTaskMemberInput').value.trim();
@@ -1185,7 +1217,6 @@ async function batchTaskMemberImport() {
     loadMemberSelect();
 }
 
-// ===== 加载任务下拉框 =====
 async function loadTasksToSelect() {
     const sel = document.getElementById('selectTaskForBatch');
     if (!sel || !currentGuildId) return;
@@ -1196,7 +1227,7 @@ async function loadTasksToSelect() {
     } catch (e) {}
 }
 
-// ===== 加载任务列表（按分类分组展示） =====
+// ===== 加载任务列表 =====
 async function loadTaskList() {
     const div = document.getElementById('taskList');
     if (!div || !currentGuildId) return;
@@ -1207,7 +1238,6 @@ async function loadTaskList() {
             return;
         }
         
-        // 批量获取所有任务的成员关系
         const taskIds = allTasks.map(t => t.id);
         let allTaskMembers = [];
         const batchSize = 50;
@@ -1223,19 +1253,26 @@ async function loadTaskList() {
             taskMemberMap[tm.task_id].push(tm.member_id);
         }
         
-        // 按分类分组
+        // 按主分类分组
         const categorized = {};
         for (const cat of TASK_CATEGORIES) {
             categorized[cat.id] = [];
         }
         for (const t of allTasks) {
-            const cat = t.category && TASK_CATEGORIES.some(c => c.id === t.category) ? t.category : 'uncategorized';
+            let cat = t.category;
+            if (!cat || !TASK_CATEGORIES.some(c => c.id === cat)) {
+                cat = '人才';
+            }
             if (!categorized[cat]) categorized[cat] = [];
             categorized[cat].push(t);
         }
         
-        // 生成HTML
         let html = '';
+        html += `<div class="sub-tag-filter">
+            <input type="checkbox" id="showSubTagCheck" ${showSubTag ? 'checked' : ''} onchange="toggleSubTag()">
+            <label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>
+        </div>`;
+        
         for (const cat of TASK_CATEGORIES) {
             const tasks = categorized[cat.id] || [];
             if (!tasks.length) continue;
@@ -1256,25 +1293,71 @@ async function loadTaskList() {
             html += `<span class="arrow open" id="arrow_${cat.id}">▶</span>`;
             html += `</div>`;
             html += `<div class="collapse-body open" id="body_${cat.id}">`;
-            html += `<div class="task-grid">`;
             
-            for (const t of tasks) {
-                const mids = taskMemberMap[t.id] || [];
-                const members = allMembers.filter(m => mids.includes(m.id));
-                const checked = selectedTasks.has(t.id) ? 'checked' : '';
-                html += `<div class="task-item">
-                    <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
-                    <span class="task-name">${t.task_name}</span>
-                    <span class="task-score">⭐${t.score}分</span>
-                    <span style="font-size:9px;color:var(--text2);">${members.length ? '👥' + members.length : '无人'}</span>
-                    <div class="task-actions">
-                        <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
-                        <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
-                    </div>
-                </div>`;
+            if (showSubTag) {
+                // 按子标签分组
+                const subTagGroups = {};
+                for (const sub of SUB_TAGS) {
+                    subTagGroups[sub] = [];
+                }
+                for (const t of tasks) {
+                    let sub = t.sub_tag || '无';
+                    if (!subTagGroups[sub]) subTagGroups[sub] = [];
+                    subTagGroups[sub].push(t);
+                }
+                for (const sub of SUB_TAGS) {
+                    const subTasks = subTagGroups[sub] || [];
+                    if (!subTasks.length) continue;
+                    const subChecked = subTasks.every(t => selectedTasks.has(t.id));
+                    const subCheckedCount = subTasks.filter(t => selectedTasks.has(t.id)).length;
+                    html += `<div style="padding-left:12px;margin-bottom:4px;">
+                        <div class="collapse-header" onclick="toggleSubCategory('${cat.id}_${sub}')" style="padding:4px 4px;font-size:12px;">
+                            <span>📂 ${sub} (${subTasks.length}个) ${subChecked ? '☑️' : `☐ ${subCheckedCount}/${subTasks.length}`}</span>
+                            <span class="arrow open" id="arrow_${cat.id}_${sub}">▶</span>
+                        </div>
+                        <div class="collapse-body open" id="body_${cat.id}_${sub}">
+                            <div class="task-grid">`;
+                    for (const t of subTasks) {
+                        const mids = taskMemberMap[t.id] || [];
+                        const members = allMembers.filter(m => mids.includes(m.id));
+                        const checked = selectedTasks.has(t.id) ? 'checked' : '';
+                        html += `<div class="task-item">
+                            <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+                            <span class="task-name">${t.task_name}</span>
+                            <span class="task-score">⭐${t.score}分</span>
+                            <span style="font-size:9px;color:var(--text2);">${members.length ? '👥' + members.length : '无人'}</span>
+                            <div class="task-actions">
+                                <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                                <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+                            </div>
+                        </div>`;
+                    }
+                    html += `</div></div></div>`;
+                }
+            } else {
+                // 不显示子标签，直接列出任务
+                html += `<div class="task-grid">`;
+                for (const t of tasks) {
+                    const mids = taskMemberMap[t.id] || [];
+                    const members = allMembers.filter(m => mids.includes(m.id));
+                    const checked = selectedTasks.has(t.id) ? 'checked' : '';
+                    const subTagDisplay = t.sub_tag && t.sub_tag !== '无' ? `<span class="tag sub-tag">${t.sub_tag}</span>` : '';
+                    html += `<div class="task-item">
+                        <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
+                        <span class="task-name">${t.task_name}</span>
+                        ${subTagDisplay}
+                        <span class="task-score">⭐${t.score}分</span>
+                        <span style="font-size:9px;color:var(--text2);">${members.length ? '👥' + members.length : '无人'}</span>
+                        <div class="task-actions">
+                            <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
+                            <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();deleteTask(${t.id})">✕</button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div>`;
             }
             
-            html += `</div></div></div>`;
+            html += `</div></div>`;
         }
         
         div.innerHTML = html;
@@ -1296,7 +1379,11 @@ async function loadTaskList() {
     }
 }
 
-// ===== 切换分类折叠 =====
+function toggleSubTag() {
+    showSubTag = !showSubTag;
+    loadTaskList();
+}
+
 function toggleCategory(catId) {
     const body = document.getElementById('body_' + catId);
     const arrow = document.getElementById('arrow_' + catId);
@@ -1314,13 +1401,31 @@ function toggleCategory(catId) {
     }
 }
 
+function toggleSubCategory(id) {
+    const body = document.getElementById('body_' + id);
+    const arrow = document.getElementById('arrow_' + id);
+    if (!body) return;
+    if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        body.classList.add('closed');
+        if (arrow) arrow.classList.remove('open');
+    } else {
+        body.classList.remove('closed');
+        body.classList.add('open');
+        if (arrow) arrow.classList.add('open');
+    }
+}
+
 // ===== 编辑任务 =====
 async function editTask(id, oldName, oldScore) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
     
+    const currentTask = allTasks.find(t => t.id === id);
+    const currentSubTag = currentTask?.sub_tag || '无';
+    
     const dialog = document.createElement('div');
-    dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:400px;width:90%;';
+    dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:420px;width:90%;';
     dialog.innerHTML = `
         <div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>
         <div style="margin-bottom:10px;">
@@ -1331,10 +1436,16 @@ async function editTask(id, oldName, oldScore) {
             <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label>
             <input id="editTaskScoreInput" type="number" value="${oldScore}" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;">
         </div>
-        <div style="margin-bottom:16px;">
-            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 分类</label>
+        <div style="margin-bottom:10px;">
+            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 主分类</label>
             <select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">
                 ${TASK_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.name}</option>`).join('')}
+            </select>
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">🏷️ 子标签</label>
+            <select id="editTaskSubTagInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">
+                ${SUB_TAGS.map(t => `<option value="${t}">${t}</option>`).join('')}
             </select>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end;">
@@ -1345,11 +1456,12 @@ async function editTask(id, oldName, oldScore) {
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
     
-    const currentTask = allTasks.find(t => t.id === id);
     if (currentTask && currentTask.category) {
         const sel = document.getElementById('editTaskCategoryInput');
         if (sel) sel.value = currentTask.category;
     }
+    const subSel = document.getElementById('editTaskSubTagInput');
+    if (subSel) subSel.value = currentSubTag;
     
     setTimeout(() => {
         const nameInput = document.getElementById('editTaskNameInput');
@@ -1360,6 +1472,7 @@ async function editTask(id, oldName, oldScore) {
         const nameInput = document.getElementById('editTaskNameInput');
         const scoreInput = document.getElementById('editTaskScoreInput');
         const catInput = document.getElementById('editTaskCategoryInput');
+        const subInput = document.getElementById('editTaskSubTagInput');
         const confirmBtn = document.getElementById('editTaskConfirmBtn');
         const cancelBtn = document.getElementById('editTaskCancelBtn');
         
@@ -1371,7 +1484,8 @@ async function editTask(id, oldName, oldScore) {
         function handleConfirm() {
             const newName = nameInput.value.trim();
             const newScore = parseInt(scoreInput.value);
-            const newCategory = catInput ? catInput.value : 'uncategorized';
+            const newCategory = catInput ? catInput.value : '人才';
+            const newSubTag = subInput ? subInput.value : '无';
             if (!newName) {
                 showToast('⚠️请输入任务名称', 'warning');
                 return;
@@ -1381,7 +1495,7 @@ async function editTask(id, oldName, oldScore) {
                 return;
             }
             closeDialog();
-            doUpdateTask(id, newName, newScore, newCategory);
+            doUpdateTask(id, newName, newScore, newCategory, newSubTag);
         }
         
         confirmBtn.addEventListener('click', handleConfirm);
@@ -1394,9 +1508,9 @@ async function editTask(id, oldName, oldScore) {
     });
 }
 
-async function doUpdateTask(id, newName, newScore, newCategory) {
+async function doUpdateTask(id, newName, newScore, newCategory, newSubTag) {
     try {
-        await db.tasks.update(id, { task_name: newName, score: newScore, category: newCategory });
+        await db.tasks.update(id, { task_name: newName, score: newScore, category: newCategory, sub_tag: newSubTag });
         showToast('✅任务已更新', 'success');
         await refreshCurrentGuildData();
         loadTasksToSelect();
@@ -1427,16 +1541,24 @@ function filterTaskList(q) {
         div.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><div class="text">未找到匹配任务</div></div>';
         return;
     }
+    // 搜索结果也按分类显示
     const categorized = {};
     for (const cat of TASK_CATEGORIES) {
         categorized[cat.id] = [];
     }
     for (const t of filtered) {
-        const cat = t.category && TASK_CATEGORIES.some(c => c.id === t.category) ? t.category : 'uncategorized';
+        let cat = t.category;
+        if (!cat || !TASK_CATEGORIES.some(c => c.id === cat)) {
+            cat = '人才';
+        }
         if (!categorized[cat]) categorized[cat] = [];
         categorized[cat].push(t);
     }
     let html = '';
+    html += `<div class="sub-tag-filter">
+        <input type="checkbox" id="showSubTagCheck" ${showSubTag ? 'checked' : ''} onchange="toggleSubTag()">
+        <label for="showSubTagCheck">☑️ 显示子分类（农/商/文/娱）</label>
+    </div>`;
     for (const cat of TASK_CATEGORIES) {
         const tasks = categorized[cat.id] || [];
         if (!tasks.length) continue;
@@ -1447,9 +1569,11 @@ function filterTaskList(q) {
             <div class="task-grid">`;
         for (const t of tasks) {
             const checked = selectedTasks.has(t.id) ? 'checked' : '';
+            const subTagDisplay = t.sub_tag && t.sub_tag !== '无' ? `<span class="tag sub-tag">${t.sub_tag}</span>` : '';
             html += `<div class="task-item">
                 <input type="checkbox" ${checked} onchange="toggleSelectTask(${t.id})" style="width:14px;height:14px;cursor:pointer;flex-shrink:0;">
                 <span class="task-name">${t.task_name}</span>
+                ${subTagDisplay}
                 <span class="task-score">⭐${t.score}分</span>
                 <div class="task-actions">
                     <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();editTask(${t.id},'${t.task_name.replace(/'/g,"\\'")}',${t.score})">✏️</button>
@@ -1712,6 +1836,7 @@ async function saveMemberTarget() {
         const tml = await db.taskMembers.listByMember(memberId);
         const tids = tml.map(t => t.task_id);
         const tasks = (await db.tasks.list(currentGuildId)).filter(t => tids.includes(t.id));
+        // 按分数从高到低排序
         tasks.sort((a, b) => b.score - a.score);
         const maxTasks = diamondMode ? 24 : 18;
         const topTasks = tasks.slice(0, maxTasks);
@@ -1722,7 +1847,7 @@ async function saveMemberTarget() {
             <div class="highlight-box">⭐能做总分：<b>${totalScore}</b>（${topTasks.length}个任务）`;
         if (diff > 0) html += `<br>⚠️还差<b style="color:var(--danger)">${diff}</b>分，即使全做也达不到目标`;
         else html += `<br>✅可以达到目标！`;
-        html += `</div><div class="section-title">📋推荐任务（按分数排序）</div>`;
+        html += `</div><div class="section-title">📋推荐任务（按分数排序，从高到低）</div>`;
         if (!topTasks.length) html += '<span style="color:var(--text2);font-size:11px">暂无任务</span>';
         else topTasks.forEach((t, i) => { html += `<div class="member-tag" style="margin:2px">${i + 1}.${t.task_name} ⭐${t.score}</div>`; });
         html += '</div>';
@@ -2138,78 +2263,207 @@ async function batchDeleteTasks() {
     loadTaskList();
 }
 
-// ===== 任务模板 =====
+// ===== 预设模板（169个任务，按分类顺序，分数从低到高，含子标签） =====
 const PRESET_TEMPLATE = {
-    'talent': [
-        ["600级白素贞",16],["600级聂小倩",16],["600级黄飞鸿",16],["600级武松",16],["600级红衣教主",16],
-        ["600级林冲",16],["600级张良",21],["600级孙悟空",23],["600级青丘神女",23],["600级聂风",23],
-        ["600级乾隆",23],["600级武则天",23],["750级高启强",25],["750级武则天",25],["750级步惊云",25],
-        ["500级国民男神",25],["750级聂风",25]
+    '人才': [
+        ['600级聂小倩', 16, '商'],
+        ['600级白素贞', 16, '农'],
+        ['600级武松', 16, '农'],
+        ['600级红衣教主', 16, '文'],
+        ['600级林冲', 16, '文'],
+        ['600级黄飞鸿', 16, '娱'],
+        ['600级张良', 21, '商'],
+        ['600级青丘神女', 23, '商'],
+        ['600级聂风', 23, '文'],
+        ['600级孙悟空', 23, '娱'],
+        ['600级武则天', 23, '文'],
+        ['600级乾隆', 23, '农'],
+        ['500级国民男神', 25, '农'],
+        ['750级高启强', 25, '商'],
+        ['750级聂风', 25, '文'],
+        ['750级武则天', 25, '文'],
+        ['750级步惊云', 25, '文']
     ],
-    'talent_awake': [
-        ["觉醒+1聂小倩",18],["觉醒+2聂小倩",22],["觉醒+2白素贞",22],["觉醒+2紫霞仙子",22],["觉醒+2红衣教主",22],
-        ["觉醒+2小燕子",22],["觉醒+2黄飞鸿",22],["觉醒+3白素贞",24],["觉醒+1孙悟空",27],["觉醒+1高启强",27],
-        ["觉醒+1步惊云",27],["觉醒+1聂风",27],["觉醒+1青丘神女",27],["觉醒+1乾隆",27],["觉醒+1史蒂芬周",27],
-        ["觉醒+1武则天",27],["觉醒+2青丘神女",29],["觉醒+2聂风",29],["觉醒+2武则天",29],["觉醒+2至尊宝",29],
-        ["觉醒+2高启强",29],["觉醒+3孙悟空",30],["觉醒＋3高启强",30]
+    '人才觉醒': [
+        ['觉醒+1聂小倩', 18, '商'],
+        ['觉醒+2白素贞', 22, '农'],
+        ['觉醒+2聂小倩', 22, '商'],
+        ['觉醒+2红衣教主', 22, '文'],
+        ['觉醒+2小燕子', 22, '农'],
+        ['觉醒+2黄飞鸿', 22, '娱'],
+        ['觉醒+2紫霞仙子', 22, '娱'],
+        ['觉醒+3白素贞', 24, '农'],
+        ['觉醒+1高启强', 27, '商'],
+        ['觉醒+1青丘神女', 27, '商'],
+        ['觉醒+1聂风', 27, '文'],
+        ['觉醒+1武则天', 27, '文'],
+        ['觉醒+1步惊云', 27, '文'],
+        ['觉醒+1史蒂芬周', 27, '农'],
+        ['觉醒+1乾隆', 27, '农'],
+        ['觉醒+1孙悟空', 27, '娱'],
+        ['觉醒+2青丘神女', 29, '商'],
+        ['觉醒+2高启强', 29, '商'],
+        ['觉醒+2聂风', 29, '文'],
+        ['觉醒+2武则天', 29, '文'],
+        ['觉醒+2至尊宝', 29, '娱'],
+        ['觉醒+3高启强', 30, '商'],
+        ['觉醒+3孙悟空', 30, '娱']
     ],
-    'artist': [
-        ["艺人-百灵鸟",10],["艺人-英姿",16],["艺人-素芬",18],["艺人-艳红",18],["艺人-秋菊",21],
-        ["艺人-港星",24],["艺人-含香",24],["艺人-高启兰",24],["艺人-选美皇后",24],["艺人-亦君",24],
-        ["艺人-静静",21],["艺人-彩霞",21],["艺人-葬爱",24],["艺人-春三十娘",26],["艺人-第二梦",26],
-        ["艺人-白晶晶",26],["艺人-上官婉儿",26],["艺人-白居易",26],["艺人-夏雨荷",26],["艺人-晚蔚",26],
-        ["艺人-女儿国国王",26],["艺人-楚楚",26],["艺人-顾倾倾",26],["艺人-柳飘飘",26],["艺人-妲己",27],
-        ["艺人-玫瑰小姐",28],["艺人-陈书婷",28]
+    '人才皮肤': [
+        ['郑经理+3意气风发', 21, '商'],
+        ['强哥+3繁华盛会', 21, '商'],
+        ['宋江-其疾如风', 21, '商'],
+        ['聂风-麒麟疯魔', 21, '文'],
+        ['步惊云-无上霸剑', 21, '文'],
+        ['步惊云-绝世好剑', 21, '文'],
+        ['步惊云-云栖良辰', 21, '文'],
+        ['至尊宝-夕阳武士', 21, '娱'],
+        ['至尊宝-万妖之王', 21, '娱'],
+        ['孙悟空-定海神针', 21, '娱'],
+        ['孙悟空-方寸学艺', 21, '娱'],
+        ['乾隆-御驾亲征', 21, '农'],
+        ['乾隆-大明湖畔', 21, '农'],
+        ['人才-小燕子-雀跃欢腾', 21, '农'],
+        ['史蒂芬周-黯然销魂', 21, '农'],
+        ['乾隆-盛世大帝', 21, '农'],
+        ['高启强+3锋芒毕露', 23, '商'],
+        ['步惊云+3无上霸剑', 23, '文'],
+        ['步惊云+3排云掌', 23, '文'],
+        ['武则天+3媚色倾唐', 23, '文'],
+        ['人才-紫霞仙子+3爱无期限', 23, '娱'],
+        ['孙悟空+3大圣归来', 23, '娱'],
+        ['孙悟空+3蟠桃园记', 23, '娱'],
+        ['史蒂芬周+3食神归位', 23, '农'],
+        ['乾隆-闲游雅趣+3', 23, '农'],
+        ['武则天+5寒寺诗情', 25, '文'],
+        ['人才-小燕子+5欢腾雀跃', 25, '农'],
+        ['宋江+5聚义梁山', 25, '商']
     ],
-    'talent_skin': [
-        ["乾隆-御驾亲征",21],["乾隆-大明湖畔",21],["人才-小燕子-雀跃欢腾",21],["宋江-其疾如风",21],["步惊云-无上霸剑",21],
-        ["步惊云-绝世好剑",21],["孙悟空-定海神针",21],["乾隆-盛世大帝",21],["郑经理+3意气风发",21],["聂风-麒麟疯魔",21],
-        ["步惊云-云栖良辰",21],["孙悟空-方寸学艺",21],["强哥+3繁华盛会",21],["史蒂芬周-黯然销魂",21],["至尊宝-夕阳武士",21],
-        ["至尊宝-万妖之王",21],["孙悟空+3大圣归来",23],["史蒂芬周+3食神归位",23],["孙悟空+3蟠桃园记",23],
-        ["高启强+3锋芒毕露",23],["人才-紫霞仙子+3爱无期限",23],["武则天+3媚色倾唐",23],["步惊云+3无上霸剑",23],
-        ["步惊云+3排云掌",23],["武则天+5寒寺诗情",25],["人才-小燕子+5欢腾雀跃",25],["宋江+5聚义梁山",25]
+    '艺人': [
+        ['艺人-百灵鸟', 10, '文'],
+        ['艺人-英姿', 16, '农'],
+        ['艺人-艳红', 18, '商'],
+        ['艺人-素芬', 18, '农'],
+        ['艺人-静静', 21, '农'],
+        ['艺人-彩霞', 21, '商'],
+        ['艺人-秋菊', 21, '娱'],
+        ['艺人-高启兰', 24, '文'],
+        ['艺人-亦君', 24, '文'],
+        ['艺人-港星', 24, '商'],
+        ['艺人-含香', 24, '娱'],
+        ['艺人-选美皇后', 24, '娱'],
+        ['艺人-葬爱', 24, '农'],
+        ['艺人-白居易', 26, '文'],
+        ['艺人-夏雨荷', 26, '娱'],
+        ['艺人-楚楚', 26, '娱'],
+        ['艺人-白晶晶', 26, '娱'],
+        ['艺人-上官婉儿', 26, '娱'],
+        ['艺人-春三十娘', 26, '商'],
+        ['艺人-第二梦', 26, '商'],
+        ['艺人-晚蔚', 26, '农'],
+        ['艺人-女儿国国王', 26, '农'],
+        ['艺人-柳飘飘（顾倾倾）', 26, '农'],
+        ['艺人-妲己', 27, '商'],
+        ['艺人-玫瑰小姐', 28, '商'],
+        ['艺人-陈书婷', 28, '文']
     ],
-    'artist_skin': [
-        ["百灵鸟-晨曦鸟语",16],["彩霞-夜玫瑰",18],["英姿-沙滩排球",18],["秋菊-冬日烟花",18],["高启兰+3茶楼相会",21],
-        ["静静+3孟钰",21],["彩霞+3夜玫瑰",21],["选美皇后-佳人茶韵",24],["阿莲-喜收硕果",24],["白居易-天涯故交",24],
-        ["海燕-贺岁佳人",24],["阿诗玛-苗寨风光",24],["淑珍-璀璨时代",24],["艺人-小燕子-英姿飒爽",24],["小燕子-雀跃不已",24],
-        ["玲儿-桨漾童夏",24],["葬爱-哥特公主",24],["英姿-棋逢对手",24],["童心-午后扰闲",24],["紫霞仙子-明曦春霞",24],
-        ["紫霞仙子-嫦娥",24],["亦君-风光留影",24],["艺人-红衣教主-秋光散断",24],["艺人-红衣教主-剑破秋月",24],
-        ["艺人-白素贞-龙伴端阳",24],["港星-帝女花",24],["港星-暮然回首",24],["高启兰-千傩万象",24],["铁扇公主-云阶春晖",24],
-        ["艺人-聂小倩-林间倩影",24],["艺人-白素贞-西湖之约",24],["艺人-聂小倩-皑雪琴声",24],["海燕-还燕归巢",24],
-        ["阿诗玛-绚烂花火",24],["阿莲+3喜收硕果",26],["上官婉儿-素心守正",26],["晚蔚-爱心圣诞",26],["白晶晶-刻骨铭心",26],
-        ["艺人-红衣教主+3剑破秋月",26],["春三十娘-一池春色",26],["淑珍+5璀璨时代",28],["高启兰+5千傩万象",28],
-        ["艺人-白素贞+5龙伴端阳",28],["夏雨荷-青荷雨待",29],["夏雨荷-轻舟画扇",29],["玫瑰小姐-自由飞驰",29],
-        ["陈书婷-瀚海女王",29],["陈书婷-旖旎春睡",29],["白晶晶+3刻骨铭心",29],["玫瑰小姐-流音韶光",29],
-        ["玫瑰小姐+3流音韶光",30],["白晶晶-白骨红颜",30],["陈书婷-鎏金夜宴",30],["含香-蝶衣破茧",30],
-        ["夏雨荷-画境声欢",30],["夏雨荷+3轻舟画扇",30],["玫瑰小姐-破棘盛放",30],["上官婉儿+5素心守正",30],
-        ["夏雨荷+5青荷雨待",30],["含香-蝶翼破茧",30]
+    '艺人皮肤': [
+        ['百灵鸟-晨曦鸟语', 16, '文'],
+        ['英姿-沙滩排球', 18, '农'],
+        ['秋菊-冬日烟花', 18, '娱'],
+        ['彩霞-夜玫瑰', 18, '商'],
+        ['静静+3孟钰', 21, '农'],
+        ['高启兰+3茶楼相会', 21, '文'],
+        ['彩霞+3夜玫瑰', 21, '商'],
+        ['艺人-白素贞-龙伴端阳', 24, '农'],
+        ['艺人-白素贞-西湖之约', 24, '农'],
+        ['艺人-小燕子-英姿飒爽', 24, '农'],
+        ['艺人-小燕子-雀跃不已', 24, '农'],
+        ['阿诗玛-苗寨风光', 24, '农'],
+        ['阿诗玛-绚烂花火', 24, '农'],
+        ['葬爱-哥特公主', 24, '农'],
+        ['葬爱-圣诞快乐', 24, '农'],
+        ['英姿-棋逢对手', 24, '农'],
+        ['海燕-贺岁佳人', 24, '娱'],
+        ['海燕-还燕归巢', 24, '娱'],
+        ['铁扇公主-云阶春晖', 24, '娱'],
+        ['紫霞仙子-明曦春霞', 24, '娱'],
+        ['紫霞仙子-嫦娥', 24, '娱'],
+        ['选美皇后-佳人茶韵', 24, '娱'],
+        ['艺人-聂小倩-林间倩影', 24, '商'],
+        ['艺人-聂小倩-皑雪琴声', 24, '商'],
+        ['港星-帝女花', 24, '商'],
+        ['港星-暮然回首', 24, '商'],
+        ['白居易-天涯故交', 24, '文'],
+        ['高启兰-千傩万象', 24, '文'],
+        ['艺人-红衣教主-秋光散断', 24, '文'],
+        ['艺人-红衣教主-剑破秋月', 24, '文'],
+        ['阿莲-喜收硕果', 24, '文'],
+        ['淑珍-璀璨时代', 24, '文'],
+        ['玲儿-桨漾童夏', 24, '文'],
+        ['童心-午后扰闲', 24, '文'],
+        ['亦君-风光留影', 24, '文'],
+        ['晚蔚-爱心圣诞', 26, '农'],
+        ['春三十娘-一池春色', 26, '商'],
+        ['上官婉儿-素心守正', 26, '娱'],
+        ['白晶晶-刻骨铭心', 26, '娱'],
+        ['艺人-红衣教主+3剑破秋月', 26, '文'],
+        ['阿莲+3喜收硕果', 26, '文'],
+        ['高启兰+5千傩万象', 28, '文'],
+        ['淑珍+5璀璨时代', 28, '文'],
+        ['艺人-白素贞+5龙伴端阳', 28, '农'],
+        ['玫瑰小姐-自由飞驰', 29, '商'],
+        ['玫瑰小姐-流音韶光', 29, '商'],
+        ['陈书婷-瀚海女王', 29, '文'],
+        ['陈书婷-旖旎春睡', 29, '文'],
+        ['夏雨荷-青荷雨待', 29, '娱'],
+        ['夏雨荷-轻舟画扇', 29, '娱'],
+        ['白晶晶+3刻骨铭心', 29, '娱'],
+        ['陈书婷-鎏金夜宴', 30, '文'],
+        ['玫瑰小姐-破棘盛放', 30, '商'],
+        ['玫瑰小姐+3流音韶光', 30, '商'],
+        ['夏雨荷-画境声欢', 30, '娱'],
+        ['夏雨荷+3轻舟画扇', 30, '娱'],
+        ['夏雨荷+5青荷雨待', 30, '娱'],
+        ['白晶晶-白骨红颜', 30, '娱'],
+        ['含香-蝶翼破茧', 30, '娱'],
+        ['含香-破茧化蝶', 30, '娱']
     ],
-    'guardian': [
-        ["守护神-篮球天才",21],["守护神-齐天大圣",21],["守护神-魔法见习生",21],["守护神-奇迹小兵",21],
-        ["守护神-光箭天女",21],["守护神-天才厨师",21],["守护神-机甲少年",21],["守护神-快乐小鬼",21],
-        ["守护神-卡牌之王",21],["守护神-沉香",21],["守护者-哪吒",21],["守护神-寿神",23],
-        ["守护神-禄神",23],["守护神-玄武",23],["守护神-青龙",23],["守护神-年兽",23]
+    '守护神': [
+        ['守护神-篮球天才', 21, '无'],
+        ['守护神-齐天大圣', 21, '无'],
+        ['守护神-魔法见习生', 21, '无'],
+        ['守护神-奇迹小兵', 21, '无'],
+        ['守护神-光箭天女', 21, '无'],
+        ['守护神-天才厨师', 21, '无'],
+        ['守护神-机甲少年', 21, '无'],
+        ['守护神-快乐小鬼', 21, '无'],
+        ['守护神-卡牌之王', 21, '无'],
+        ['守护神-沉香', 21, '无'],
+        ['守护神-哪吒', 21, '无'],
+        ['守护神-寿神', 23, '无'],
+        ['守护神-禄神', 23, '无'],
+        ['守护神-玄武', 23, '无'],
+        ['守护神-青龙', 23, '商'],
+        ['守护神-年兽', 23, '商']
     ]
 };
 
-// 预设模板导入（带分类）
+// ===== 使用预设模板 =====
 async function usePresetTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const totalCount = Object.values(PRESET_TEMPLATE).reduce((sum, arr) => sum + arr.length, 0);
-    if (!confirm(`⚠️将导入预设模板（${totalCount}个任务，6个分类），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
+    if (!confirm(`⚠️将导入预设模板（${totalCount}个任务，6个分类，含子标签），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
     showToast('⏳正在导入模板，请稍候...', 'info');
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
         let s = 0, skip = 0;
-        let total = 0;
         for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
-            for (const [name, score] of tasks) {
-                total++;
+            for (const [name, score, subTag] of tasks) {
                 if (existingNames.has(name)) { skip++; continue; }
                 try {
-                    await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category });
+                    await db.tasks.create({ guild_id: currentGuildId, task_name: name, score: score, category: category, sub_tag: subTag || '无' });
                     existingNames.add(name);
                     s++;
                 } catch (e) { console.warn('导入失败:', name, e.message); }
@@ -2223,13 +2477,15 @@ async function usePresetTemplate() {
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
+// ===== 保存模板 =====
 function saveMyTemplate() {
     if (!allTasks.length) { showToast('⚠️当前没有任务可保存', 'warning'); return; }
-    const data = allTasks.map(t => `${t.task_name},${t.score},${t.category || ''}`).join('\n');
+    const data = allTasks.map(t => `${t.task_name},${t.score},${t.category || '人才'},${t.sub_tag || '无'}`).join('\n');
     localStorage.setItem('guild_my_template', data);
     showToast(`💾已保存${allTasks.length}个任务为模板`, 'success');
 }
 
+// ===== 加载模板 =====
 async function loadMyTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const data = localStorage.getItem('guild_my_template');
@@ -2240,14 +2496,22 @@ async function loadMyTemplate() {
     try {
         const existingTasks = await db.tasks.list(currentGuildId);
         const existingNames = new Set(existingTasks.map(t => t.task_name));
+        const validCategories = TASK_CATEGORIES.map(c => c.id);
         let s = 0, skip = 0;
         for (const line of lines) {
             const parts = line.split(',').map(p => p.trim());
             if (!parts[0]) continue;
             if (existingNames.has(parts[0])) { skip++; continue; }
-            const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
+            let category = '人才';
+            if (parts[2] && validCategories.includes(parts[2])) {
+                category = parts[2];
+            }
+            let subTag = '无';
+            if (parts[3] && SUB_TAGS.includes(parts[3])) {
+                subTag = parts[3];
+            }
             try {
-                await db.tasks.create({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0, category: category });
+                await db.tasks.create({ guild_id: currentGuildId, task_name: parts[0], score: parseInt(parts[1]) || 0, category: category, sub_tag: subTag });
                 existingNames.add(parts[0]);
                 s++;
             } catch (e) { console.warn('导入失败:', parts[0], e.message); }
@@ -2260,33 +2524,43 @@ async function loadMyTemplate() {
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
+// ===== 编辑预设模板 =====
 function editPresetTemplate() {
     const lines = [];
     for (const [category, tasks] of Object.entries(PRESET_TEMPLATE)) {
-        for (const [name, score] of tasks) {
-            lines.push(`${name},${score},${category}`);
+        for (const [name, score, subTag] of tasks) {
+            lines.push(`${name},${score},${category},${subTag || '无'}`);
         }
     }
     const current = lines.join('\n');
-    const newData = prompt('✏️编辑预设模板（每行：任务名,分数,分类ID）\n分类ID可选：talent/talent_awake/artist/talent_skin/artist_skin/guardian\n\n修改后保存会覆盖预设模板', current);
+    const newData = prompt('✏️编辑预设模板（每行：任务名,分数,主分类,子标签）\n主分类：人才 / 人才觉醒 / 人才皮肤 / 艺人 / 艺人皮肤 / 守护神\n子标签：农 / 商 / 文 / 娱 / 无\n\n修改后保存会覆盖预设模板', current);
     if (newData === null) return;
     const newLines = newData.split('\n').filter(l => l.trim());
     const newTemplate = {};
     for (const cat of TASK_CATEGORIES) {
         newTemplate[cat.id] = [];
     }
+    const validCategories = TASK_CATEGORIES.map(c => c.id);
     for (const line of newLines) {
         const parts = line.split(',').map(p => p.trim());
         if (!parts[0]) continue;
-        const category = parts[2] && TASK_CATEGORIES.some(c => c.id === parts[2]) ? parts[2] : 'uncategorized';
+        let category = '人才';
+        if (parts[2] && validCategories.includes(parts[2])) {
+            category = parts[2];
+        }
+        let subTag = '无';
+        if (parts[3] && SUB_TAGS.includes(parts[3])) {
+            subTag = parts[3];
+        }
         if (!newTemplate[category]) newTemplate[category] = [];
-        newTemplate[category].push([parts[0], parseInt(parts[1]) || 0]);
+        newTemplate[category].push([parts[0], parseInt(parts[1]) || 0, subTag]);
     }
     Object.keys(PRESET_TEMPLATE).forEach(key => delete PRESET_TEMPLATE[key]);
     for (const [key, val] of Object.entries(newTemplate)) {
         if (val.length) PRESET_TEMPLATE[key] = val;
     }
-    showToast(`✅预设模板已更新（${Object.values(PRESET_TEMPLATE).reduce((s, arr) => s + arr.length, 0)}个任务）`, 'success');
+    const total = Object.values(PRESET_TEMPLATE).reduce((s, arr) => s + arr.length, 0);
+    showToast(`✅预设模板已更新（${total}个任务）`, 'success');
 }
 
 // ===== 启动 =====

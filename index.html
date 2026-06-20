@@ -325,6 +325,11 @@
         .collapse-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
         .collapse-body { display: none; padding-top: 6px; border-top: 1px solid var(--border); margin-top: 6px; }
         .collapse-body.open { display: block; }
+        .result-log { max-height: 150px; overflow-y: auto; font-size: 12px; margin-top: 6px; padding: 6px; background: var(--bg); border-radius: 4px; border: 1px solid var(--border); }
+        .result-log .ok { color: var(--success); }
+        .result-log .skip { color: var(--text2); }
+        .result-log .fail { color: var(--danger); }
+        .result-log .info { color: var(--accent); }
     </style>
 </head>
 <body>
@@ -720,17 +725,15 @@ function initTaskMgrTab() {
         <hr class="divider">
         <div class="card">
             <div class="section-title">👥批量加入成员到任务</div>
-            <div class="form-row">
-                <div class="form-group"><label>📋选择任务</label><select id="selectTaskForBatch"><option value="">--请选择--</option></select></div>
-                <div class="form-group">
-                    <label>👤搜索成员（逗号分隔多人）</label>
-                    <div class="dropdown-wrap">
-                        <input type="text" id="batchMemberSearch" placeholder="模糊搜索，逗号分隔多人..." autocomplete="off">
-                        <div class="dropdown-menu" id="batchMemberDropdown"></div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>每行：任务名, 成员1, 成员2, 成员3...</label>
+                <textarea id="batchTaskMemberInput" placeholder="击败BOSS, 张三, 李四, 王五&#10;收集物资, 赵六, 张三, 小明" style="min-height:80px;"></textarea>
             </div>
-            <button class="btn btn-accent btn-sm" id="btnBatchAdd">➕添加到任务</button>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-success btn-sm" id="btnBatchTaskMember">📥 批量添加</button>
+                <span style="font-size:10px;color:var(--text2);">💡 成员名模糊匹配，自动创建不存在的成员</span>
+            </div>
+            <div id="batchTaskMemberResult" style="margin-top:6px;"></div>
         </div>
         <hr class="divider">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px">
@@ -745,17 +748,13 @@ function initTaskMgrTab() {
     document.getElementById('btnAddTask').addEventListener('click', addTask);
     document.getElementById('newTaskName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addTask(); });
     document.getElementById('btnBatchTaskImport').addEventListener('click', batchImportTasks);
-    document.getElementById('btnBatchAdd').addEventListener('click', batchAddMember);
+    document.getElementById('btnBatchTaskMember').addEventListener('click', batchTaskMemberImport);
     document.getElementById('btnUseTemplate').addEventListener('click', usePresetTemplate);
     document.getElementById('btnSaveTemplate').addEventListener('click', saveMyTemplate);
     document.getElementById('btnLoadTemplate').addEventListener('click', loadMyTemplate);
     document.getElementById('btnEditPreset').addEventListener('click', editPresetTemplate);
     document.getElementById('btnSelectAll').addEventListener('click', toggleSelectAll);
     document.getElementById('btnBatchDelete').addEventListener('click', batchDeleteTasks);
-    const bi = document.getElementById('batchMemberSearch'), dd = document.getElementById('batchMemberDropdown');
-    bi.addEventListener('input', () => filterMemberDropdown(bi, dd));
-    bi.addEventListener('focus', () => filterMemberDropdown(bi, dd));
-    document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown-wrap')) dd.classList.remove('show'); });
     document.getElementById('taskSearchFilter').addEventListener('input', (e) => { filterTaskList(e.target.value.trim()); });
     loadTasksToSelect();
     loadTaskList();
@@ -811,46 +810,131 @@ async function batchImportTasks() {
     loadTaskList();
 }
 
-function filterMemberDropdown(input, dropdown) {
-    const q = input.value.trim().toLowerCase();
-    dropdown.innerHTML = '';
-    if (!q) { dropdown.classList.remove('show'); return; }
-    const filtered = allMembers.filter(m => m.real_name.toLowerCase().includes(q));
-    if (!filtered.length) {
-        dropdown.innerHTML = '<div class="dropdown-item" style="color:var(--text2)">未找到</div>';
-    } else {
-        filtered.forEach(m => {
-            const item = document.createElement('div');
-            item.className = 'dropdown-item';
-            item.textContent = `${m.real_name}${m.alias ? '（' + m.alias + '）' : ''}`;
-            item.addEventListener('click', () => {
-                input.value = m.real_name;
-                dropdown.classList.remove('show');
-            });
-            dropdown.appendChild(item);
-        });
-    }
-    dropdown.classList.add('show');
-}
-
-async function batchAddMember() {
+// ===== 批量添加成员到任务（一行：任务名, 成员1, 成员2...） =====
+async function batchTaskMemberImport() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
-    const taskId = document.getElementById('selectTaskForBatch').value;
-    const memberName = document.getElementById('batchMemberSearch').value.trim();
-    if (!taskId) { showToast('⚠️请选择任务', 'warning'); return; }
-    if (!memberName) { showToast('⚠️请输入成员大名', 'warning'); return; }
-    const names = memberName.split(/[,，、]/).map(s => s.trim()).filter(s => s);
-    let s = 0, f = 0;
-    for (const name of names) {
-        try {
-            const m = await db.members.getByName(currentGuildId, name);
-            if (!m.length) { f++; continue; }
-            await db.taskMembers.add({ task_id: parseInt(taskId), member_id: m[0].id });
-            s++;
-        } catch (e) { f++; }
+    const text = document.getElementById('batchTaskMemberInput').value.trim();
+    if (!text) { showToast('⚠️请输入数据', 'warning'); return; }
+    
+    const resultDiv = document.getElementById('batchTaskMemberResult');
+    resultDiv.innerHTML = '<div style="color:var(--text2);">⏳ 处理中...</div>';
+    
+    const lines = text.split('\n').filter(l => l.trim());
+    let totalAdded = 0, totalSkipped = 0, totalFailed = 0;
+    let logs = [];
+    
+    // 缓存所有任务和成员
+    const allTasks = await db.tasks.list(currentGuildId);
+    const allMembers = await db.members.list(currentGuildId);
+    
+    if (!allTasks.length) {
+        resultDiv.innerHTML = '<div style="color:var(--danger);">⚠️ 请先创建任务！</div>';
+        return;
     }
-    showToast(`✅成功添加${s}人${f > 0 ? '，失败' + f + '人' : ''}`, s > 0 ? 'success' : 'warning');
-    document.getElementById('batchMemberSearch').value = '';
+    
+    for (const line of lines) {
+        const parts = line.split(/[,，、]/).map(s => s.trim()).filter(s => s);
+        if (parts.length < 2) {
+            totalFailed++;
+            logs.push({ type: 'fail', msg: `格式错误: "${line}"` });
+            continue;
+        }
+        
+        const taskName = parts[0];
+        const memberNames = parts.slice(1);
+        
+        // 查找任务（模糊匹配）
+        const matchedTask = allTasks.find(t => t.task_name.includes(taskName) || taskName.includes(t.task_name));
+        if (!matchedTask) {
+            totalFailed++;
+            logs.push({ type: 'fail', msg: `未找到任务: "${taskName}"` });
+            continue;
+        }
+        
+        // 获取该任务已有成员
+        const existingRelations = await db.taskMembers.list(matchedTask.id);
+        const existingMemberIds = new Set(existingRelations.map(r => r.member_id));
+        
+        let added = 0, skipped = 0, failed = 0;
+        
+        for (const memberName of memberNames) {
+            // 查找成员（模糊匹配：大名或别名）
+            const matchedMember = allMembers.find(m => 
+                m.real_name.includes(memberName) || 
+                memberName.includes(m.real_name) ||
+                (m.alias && (m.alias.includes(memberName) || memberName.includes(m.alias)))
+            );
+            
+            let member = matchedMember;
+            
+            // 没找到则自动创建
+            if (!member) {
+                try {
+                    const created = await db.members.create({ 
+                        guild_id: currentGuildId, 
+                        real_name: memberName, 
+                        alias: '' 
+                    });
+                    if (created && created.length) {
+                        member = created[0];
+                        allMembers.push(member);
+                        logs.push({ type: 'info', msg: `🆕 创建成员: "${memberName}"` });
+                    } else {
+                        failed++;
+                        logs.push({ type: 'fail', msg: `创建失败: "${memberName}"` });
+                        continue;
+                    }
+                } catch (e) {
+                    failed++;
+                    logs.push({ type: 'fail', msg: `创建失败: "${memberName}"` });
+                    continue;
+                }
+            }
+            
+            // 检查是否已存在
+            if (existingMemberIds.has(member.id)) {
+                skipped++;
+                logs.push({ type: 'skip', msg: `⏭️ 已存在: "${member.real_name}" → "${matchedTask.task_name}"` });
+                continue;
+            }
+            
+            try {
+                await db.taskMembers.add({ task_id: matchedTask.id, member_id: member.id });
+                existingMemberIds.add(member.id);
+                added++;
+                logs.push({ type: 'ok', msg: `✅ "${member.real_name}" → "${matchedTask.task_name}"` });
+            } catch (e) {
+                failed++;
+                logs.push({ type: 'fail', msg: `添加失败: "${member.real_name}" → "${matchedTask.task_name}"` });
+            }
+        }
+        
+        totalAdded += added;
+        totalSkipped += skipped;
+        totalFailed += failed;
+        
+        await new Promise(r => setTimeout(r, 80));
+    }
+    
+    // 显示结果
+    let summary = `📊 完成！添加 ${totalAdded} 人`;
+    if (totalSkipped > 0) summary += `，跳过 ${totalSkipped} 人（已存在）`;
+    if (totalFailed > 0) summary += `，失败 ${totalFailed} 个操作`;
+    
+    let logHtml = logs.map(log => {
+        const cls = log.type === 'ok' ? 'ok' : log.type === 'skip' ? 'skip' : log.type === 'info' ? 'info' : 'fail';
+        return `<div class="${cls}">${log.msg}</div>`;
+    }).join('');
+    
+    resultDiv.innerHTML = `
+        <div style="font-weight:600;color:var(--text);">${summary}</div>
+        <div class="result-log">${logHtml}</div>
+    `;
+    
+    showToast(summary, totalAdded > 0 ? 'success' : 'warning');
+    document.getElementById('batchTaskMemberInput').value = '';
+    await refreshCurrentGuildData();
+    loadTasksToSelect();
     loadTaskList();
 }
 
@@ -873,7 +957,6 @@ async function loadTaskList() {
             div.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';
             return;
         }
-        // 批量获取所有任务的成员关系
         const taskIds = allTasks.map(t => t.id);
         let allTaskMembers = [];
         const batchSize = 50;
@@ -915,9 +998,8 @@ async function loadTaskList() {
     } catch (e) { div.innerHTML = '<div class="empty-state"><div class="icon">❌</div><div class="text">加载失败</div></div>'; console.error(e); }
 }
 
-// 🚀 修复：编辑任务同时修改名称和分数
+// 编辑任务同时修改名称和分数
 async function editTask(id, oldName, oldScore) {
-    // 创建自定义对话框
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
     
@@ -941,7 +1023,6 @@ async function editTask(id, oldName, oldScore) {
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
     
-    // 聚焦到名称输入框
     setTimeout(() => {
         const nameInput = document.getElementById('editTaskNameInput');
         if (nameInput) nameInput.focus();
@@ -970,25 +1051,19 @@ async function editTask(id, oldName, oldScore) {
                 return;
             }
             closeDialog();
-            // 执行更新
             doUpdateTask(id, newName, newScore);
         }
         
         confirmBtn.addEventListener('click', handleConfirm);
         cancelBtn.addEventListener('click', closeDialog);
-        
-        // 回车键确认
         nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
         scoreInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
-        
-        // 点击遮罩关闭
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) closeDialog();
         });
     });
 }
 
-// 新增：执行更新的函数
 async function doUpdateTask(id, newName, newScore) {
     try {
         await db.tasks.update(id, { task_name: newName, score: newScore });
@@ -1322,7 +1397,6 @@ async function loadAllMembersPlan() {
     try {
         const members = await db.members.list(currentGuildId);
         const tasks = await db.tasks.list(currentGuildId);
-        // 批量获取所有成员的任务关系
         const memberIds = members.map(m => m.id);
         let allTaskMembers = [];
         const batchSize = 50;
@@ -1753,7 +1827,7 @@ const PRESET_TEMPLATE = [
     ["上官婉儿+5素心守正",30],["夏雨荷+5青荷雨待",30],["觉醒＋3高启强",30],["含香 蝶翼破茧",30]
 ];
 
-// 🚀 优化：预设模板导入（显示进度）
+// 预设模板导入（显示进度）
 async function usePresetTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     if (!confirm(`⚠️将导入预设模板（${PRESET_TEMPLATE.length}个任务），\n已存在的同名任务会跳过。\n确定继续吗？`)) return;
@@ -1802,7 +1876,6 @@ function saveMyTemplate() {
     showToast(`💾已保存${allTasks.length}个任务为模板`, 'success');
 }
 
-// 🚀 优化：加载我的模板（显示进度）
 async function loadMyTemplate() {
     if (!currentGuildId) { showToast('⚠️请先进公会', 'warning'); return; }
     const data = localStorage.getItem('guild_my_template');

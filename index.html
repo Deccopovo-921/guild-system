@@ -187,6 +187,7 @@
         .recommend-preview .task-item .star-btn { cursor: pointer; color: var(--text2); font-size: 13px; margin-right: 4px; }
         .recommend-preview .task-item .star-btn.active { color: var(--gold); }
         .rc-task-section { font-size: 11px; color: var(--text2); margin: 4px 0 2px 0; }
+        .total-tasks-badge { background: var(--accent); color: #fff; font-size: 11px; border-radius: 12px; padding: 1px 10px; font-weight: 600; margin-left: 6px; }
         @media (max-width: 600px) { .task-check-grid { grid-template-columns: 1fr; } .score-filter-group label { font-size: 11px; padding: 2px 5px; } }
     </style>
 </head>
@@ -442,7 +443,8 @@ function setupTabs(tabs) {
     initMemberMgrTab();
     initRecommendTab();
     initGuildMgrTab();
-}// ===== 查询标签 =====
+}
+// ===== 查询标签 =====
 function initAdminSearchTab() {
     var p = document.getElementById('tab-search');
     if (!p) return;
@@ -701,7 +703,7 @@ function initTaskMgrTab() {
         </div>
         <hr class="divider">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px">
-            <div class="section-title" style="margin:0">📋所有任务</div>
+            <div class="section-title" style="margin:0;">📋所有任务 <span class="total-tasks-badge" id="taskTotalBadge">0</span></div>
             <div style="display:flex;gap:3px;align-items:center">
                 <input type="text" id="taskSearchFilter" placeholder="🔍搜索..." style="width:80px;padding:3px 5px;font-size:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;outline:none">
                 <button class="btn btn-outline btn-sm" id="btnSelectAll">☑️全选</button>
@@ -757,6 +759,12 @@ function initTaskMgrTab() {
 
     loadTasksToSelect();
     loadTaskList();
+    updateTaskTotalBadge();
+}
+
+function updateTaskTotalBadge() {
+    var badge = document.getElementById('taskTotalBadge');
+    if (badge) badge.textContent = allTasks.length || 0;
 }
 
 async function filterMemberSearch(input, dropdown) {
@@ -847,6 +855,7 @@ async function memberAddTasks() {
     await loadMemberTaskChecklistForMember(selectedMemberForTasks.id);
     await refreshCurrentGuildData();
     loadTaskList();
+    updateTaskTotalBadge();
 }
 
 // ===== 自动分类 =====
@@ -867,7 +876,7 @@ var CLASSIFY_RULES = {
     '人才皮肤_娱': ['神魔一念', '定海神针', '蟠桃园记', '方寸学艺', '齐天大圣', '斗战胜佛', '万妖之王', '太极张三丰', '不动如山', '英骑护驾', '一念悟空', '月光宝盒', '夕阳武士', '爱你万年', '大圣归来', '爱无期限'],
     '艺人_娱': ['杜鹃', '玉兰', '歌婷', '邻家女孩', '楚楚', '海燕', '古丽', '选美皇后', '秋菊', '紫霞仙子', '一代天后', '白晶晶', '上官婉儿', '铁扇公主', '含香', '夏雨荷'],
     '艺人皮肤_娱': ['楚遇良辰', '楚愈云殇', '海上弦音', '海燕归巢', '贺岁佳人', '佳人茶韵', '冬日烟花', '娥', '明曦春霞', '锦绣戏灵', '佛灯仙子', '初照春霞', '爱无期限', '青霞', '紫兰戏灵', '白骨红颜', '刻骨铭心', '素心守正', '云阶春晖', '蝶翼破茧', '破茧化蝶', '离别故土', '画境生欢', '青荷雨待', '轻舟画扇'],
-    '守护神_无': ['守护神', '篮球天才', '齐天大圣', '魔法见习生', '奇迹小兵', '光箭天女', '天才厨师', '机甲少年', '快乐小鬼', '卡牌之王', '沉香', '哪吒', '星际战士', '寿神', '禄神', '玄武', '青龙', '年兽', '笔仙', '灵犀']
+    '守护神_无': ['守护神', '篮球天才', '齐天大圣', '魔法见习生', '奇迹小兵', '光箭天女', '天才厨师', '机甲少年', '快乐小鬼', '卡牌之王', '沉香', '哪吒', '星际战士', '寿神', '禄神', '玄武', '青龙', '年兽', '笔仙', '灵犀', '电视姑娘', '灵猫', '精卫', '爱丽丝', '忍者小熊猫', '格斗天才', '月之少女', '俏皮豆丁', '神奇小猪', '小超人', '神笔马良', '鼠鼠飞行家', '猫猫探长', '小机甲', '猫头鹰', '仓鼠兄弟', '超级猫猫', '奇异小鸟', '小白虎', '饕餮', '穷奇', '混沌', '梼杌', '彩神', '福神', '囍新娘', '白虎', '红月剑', '彩凤', '菖蒲灵', '香囊精', '千千结', '艾团', '粽宝']
 };
 
 function autoClassifyTask(taskName) {
@@ -968,6 +977,7 @@ async function addTask() {
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        updateTaskTotalBadge();
     } catch (e) { showToast('❌添加失败', 'error'); }
 }
 
@@ -1001,8 +1011,10 @@ async function batchImportTasks() {
     if (f > 0) msg += '，失败' + f + '个';
     showToast(msg, s > 0 ? 'success' : 'warning');
     document.getElementById('batchTaskImport').value = '';
+    await refreshCurrentGuildData();
     loadTasksToSelect();
     loadTaskList();
+    updateTaskTotalBadge();
 }
 
 async function batchTaskMemberImport() {
@@ -1070,6 +1082,7 @@ async function batchTaskMemberImport() {
     await refreshCurrentGuildData();
     loadTasksToSelect();
     loadTaskList();
+    updateTaskTotalBadge();
 }
 
 async function loadTasksToSelect() {
@@ -1088,6 +1101,7 @@ async function loadTaskList() {
     if (!div || !currentGuildId) return;
     try {
         allTasks = await db.tasks.list(currentGuildId);
+        updateTaskTotalBadge();
         if (!allTasks.length) {
             div.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div class="text">还没有任务</div></div>';
             return;
@@ -1397,12 +1411,13 @@ async function doUpdateTask(id, newName, newScore, newCategory, newSubTag) {
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        updateTaskTotalBadge();
     } catch (e) { showToast('❌修改失败', 'error'); }
 }
 
 async function deleteTask(id) {
     if (!confirm('确定删除整个任务吗？')) return;
-    try { await db.tasks.delete(id); showToast('🗑️已删除', 'success'); loadTaskList(); }
+    try { await db.tasks.delete(id); showToast('🗑️已删除', 'success'); await refreshCurrentGuildData(); loadTaskList(); updateTaskTotalBadge(); }
     catch (e) { showToast('❌删除失败', 'error'); }
 }
 
@@ -1589,7 +1604,8 @@ async function editAlias(memberId, name, currentAlias) {
         await refreshCurrentGuildData();
         loadMemberList();
     } catch (e) { showToast('❌更新失败', 'error'); }
-}// ===== 推荐页面 =====
+}
+// ===== 推荐页面 =====
 function initRecommendTab() {
     var p = document.getElementById('tab-recommend');
     if (!p) return;
@@ -2254,6 +2270,7 @@ async function refreshCurrentGuildData() {
         allMembers = await db.members.list(currentGuildId);
         allTasks = await db.tasks.list(currentGuildId);
         allRecommendTargets = await db.recommendTargets.list(currentGuildId);
+        updateTaskTotalBadge();
     } catch (e) {}
 }
 
@@ -2277,8 +2294,10 @@ async function batchDeleteTasks() {
     }
     selectedTasks.clear();
     showToast('✅删除' + s + '个' + (f > 0 ? '，失败' + f + '个' : ''), 'success');
+    await refreshCurrentGuildData();
     loadTasksToSelect();
     loadTaskList();
+    updateTaskTotalBadge();
 }
 
 // ===== 预设模板 =====
@@ -2314,7 +2333,8 @@ var PRESET_TEMPLATE = {
         ['秋菊-冬日烟花', 18, '娱'], ['选美皇后-佳人茶韵', 24, '娱'], ['海燕-贺岁佳人', 24, '娱'], ['海燕-海燕归巢', 24, '娱'], ['铁扇公主-云阶春晖', 24, '娱'], ['紫霞仙子-明曦春霞', 24, '娱'], ['紫霞仙子-嫦娥', 24, '娱'], ['含香-破茧化蝶', 24, '娱'], ['上官婉儿-素心守正', 26, '娱'], ['白晶晶-刻骨铭心', 26, '娱'], ['夏雨荷-青荷雨待', 29, '娱'], ['夏雨荷-轻舟画扇', 29, '娱'], ['白晶晶+3刻骨铭心', 29, '娱'], ['夏雨荷-画境声欢', 30, '娱'], ['夏雨荷+3轻舟画扇', 30, '娱'], ['夏雨荷+5青荷雨待', 30, '娱'], ['白晶晶-白骨红颜', 30, '娱'], ['含香-蝶翼破茧', 30, '娱']
     ],
     '守护神': [
-        ['守护神-篮球天才', 21, '无'], ['守护神-齐天大圣', 21, '无'], ['守护神-魔法见习生', 21, '无'], ['守护神-奇迹小兵', 21, '无'], ['守护神-光箭天女', 21, '无'], ['守护神-天才厨师', 21, '无'], ['守护神-机甲少年', 21, '无'], ['守护神-快乐小鬼', 21, '无'], ['守护神-卡牌之王', 21, '无'], ['守护神-沉香', 21, '无'], ['守护神-哪吒', 21, '无'], ['守护神-星际战士', 21, '无'], ['守护神-笔仙', 21, '无'], ['守护神-寿神', 23, '无'], ['守护神-禄神', 23, '无'], ['守护神-玄武', 23, '无'], ['守护神-青龙', 23, '无'], ['守护神-年兽', 23, '无'], ['守护神-灵犀', 18, '无']
+        ['守护神-篮球天才', 21, '无'], ['守护神-齐天大圣', 21, '无'], ['守护神-魔法见习生', 21, '无'], ['守护神-奇迹小兵', 21, '无'], ['守护神-光箭天女', 21, '无'], ['守护神-天才厨师', 21, '无'], ['守护神-机甲少年', 21, '无'], ['守护神-快乐小鬼', 21, '无'], ['守护神-卡牌之王', 21, '无'], ['守护神-沉香', 21, '无'], ['守护神-哪吒', 21, '无'], ['守护神-星际战士', 21, '无'], ['守护神-笔仙', 21, '无'], ['守护神-寿神', 23, '无'], ['守护神-禄神', 23, '无'], ['守护神-玄武', 23, '无'], ['守护神-青龙', 23, '无'], ['守护神-年兽', 23, '无'], ['守护神-灵犀', 18, '无'],
+        ['守护神-电视姑娘', 21, '无'], ['守护神-灵猫', 21, '无'], ['守护神-精卫', 21, '无'], ['守护神-爱丽丝', 21, '无'], ['守护神-忍者小熊猫', 21, '无'], ['守护神-格斗天才', 21, '无'], ['守护神-月之少女', 21, '无'], ['守护神-俏皮豆丁', 21, '无'], ['守护神-神奇小猪', 21, '无'], ['守护神-小超人', 21, '无'], ['守护神-神笔马良', 21, '无'], ['守护神-鼠鼠飞行家', 21, '无'], ['守护神-猫猫探长', 21, '无'], ['守护神-小机甲', 21, '无'], ['守护神-猫头鹰', 21, '无'], ['守护神-仓鼠兄弟', 21, '无'], ['守护神-超级猫猫', 21, '无'], ['守护神-奇异小鸟', 21, '无'], ['守护神-小白虎', 21, '无'], ['守护神-饕餮', 21, '无'], ['守护神-穷奇', 21, '无'], ['守护神-混沌', 21, '无'], ['守护神-梼杌', 21, '无'], ['守护神-彩神', 21, '无'], ['守护神-福神', 21, '无'], ['守护神-囍新娘', 21, '无'], ['守护神-白虎', 21, '无'], ['守护神-红月剑', 21, '无'], ['守护神-彩凤', 21, '无'], ['守护神-菖蒲灵', 21, '无'], ['守护神-香囊精', 21, '无'], ['守护神-千千结', 21, '无'], ['守护神-艾团', 21, '无'], ['守护神-粽宝', 21, '无']
     ]
 };
 
@@ -2345,6 +2365,7 @@ async function usePresetTemplate() {
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        updateTaskTotalBadge();
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 
@@ -2385,6 +2406,7 @@ async function loadMyTemplate() {
         await refreshCurrentGuildData();
         loadTasksToSelect();
         loadTaskList();
+        updateTaskTotalBadge();
     } catch (e) { showToast('❌导入失败', 'error'); console.error(e); }
 }
 

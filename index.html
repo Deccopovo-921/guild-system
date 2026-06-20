@@ -1299,31 +1299,54 @@ function toggleSubCategory(id) {
     }
 }
 
+// ===== 编辑任务（修复版） =====
 async function editTask(id, oldName, oldScore) {
+    var currentTask = allTasks.find(function(t) { return t.id === id; });
+    var currentSubTag = '无';
+    var currentCategory = '无';
+    if (currentTask) {
+        currentSubTag = currentTask.sub_tag || '无';
+        currentCategory = currentTask.category || '无';
+    }
+    console.log('📝 编辑任务:', id, '分类:', currentCategory, '子标签:', currentSubTag);
+    
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
-    var currentTask = allTasks.find(function(t) { return t.id === id; });
-    var currentSubTag = currentTask ? currentTask.sub_tag || '无' : '无';
-    var currentCategory = currentTask ? currentTask.category || '无' : '无';
+    
     var dialog = document.createElement('div');
     dialog.style.cssText = 'background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border);max-width:420px;width:90%;';
-    dialog.innerHTML = '<div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>';
-    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label><input id="editTaskNameInput" type="text" value="' + oldName.replace(/"/g, '&quot;') + '" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>';
-    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label><input id="editTaskScoreInput" type="number" value="' + oldScore + '" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>';
-    dialog.innerHTML += '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 主分类</label><select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">';
-    TASK_CATEGORIES.forEach(function(c) { dialog.innerHTML += '<option value="' + c.id + '">' + c.icon + ' ' + c.name + '</option>'; });
-    dialog.innerHTML += '<option value="无">📂 无</option></select></div>';
-    dialog.innerHTML += '<div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">🏷️ 子标签</label><select id="editTaskSubTagInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;">';
-    SUB_TAGS.forEach(function(t) { dialog.innerHTML += '<option value="' + t + '">' + t + '</option>'; });
-    dialog.innerHTML += '</select></div>';
-    dialog.innerHTML += '<div style="display:flex;gap:8px;justify-content:flex-end;"><button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button><button id="editTaskConfirmBtn" style="padding:6px 18px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">确认</button></div>';
+    
+    var categoryOptions = '';
+    var allCats = TASK_CATEGORIES.concat([{ id: '无', icon: '📂', name: '无' }]);
+    for (var i = 0; i < allCats.length; i++) {
+        var c = allCats[i];
+        var selected = (c.id === currentCategory) ? ' selected' : '';
+        categoryOptions += '<option value="' + c.id + '"' + selected + '>' + c.icon + ' ' + c.name + '</option>';
+    }
+    
+    var subTagOptions = '';
+    for (var j = 0; j < SUB_TAGS.length; j++) {
+        var t = SUB_TAGS[j];
+        var selected = (t === currentSubTag) ? ' selected' : '';
+        subTagOptions += '<option value="' + t + '"' + selected + '>' + t + '</option>';
+    }
+    
+    dialog.innerHTML = 
+        '<div style="font-size:17px;font-weight:600;color:#fff;margin-bottom:14px;">✏️ 编辑任务</div>' +
+        '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📝 任务名称</label><input id="editTaskNameInput" type="text" value="' + oldName.replace(/"/g, '&quot;') + '" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>' +
+        '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">⭐ 分数</label><input id="editTaskScoreInput" type="number" value="' + oldScore + '" min="0" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:14px;outline:none;"></div>' +
+        '<div style="margin-bottom:10px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">📂 主分类</label><select id="editTaskCategoryInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;cursor:pointer;">' + categoryOptions + '</select></div>' +
+        '<div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text2);margin-bottom:4px;">🏷️ 子标签</label><select id="editTaskSubTagInput" style="width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;font-size:13px;outline:none;cursor:pointer;">' + subTagOptions + '</select></div>' +
+        '<div style="display:flex;gap:8px;justify-content:flex-end;"><button id="editTaskCancelBtn" style="padding:6px 18px;border:1px solid var(--border);background:transparent;color:var(--text2);border-radius:6px;cursor:pointer;font-size:13px;">取消</button><button id="editTaskConfirmBtn" style="padding:6px 18px;border:none;background:var(--accent);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">确认</button></div>';
+    
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
-    var catSel = document.getElementById('editTaskCategoryInput');
-    if (catSel && currentCategory) catSel.value = currentCategory;
-    var subSel = document.getElementById('editTaskSubTagInput');
-    if (subSel && currentSubTag) subSel.value = currentSubTag;
-    setTimeout(function() { var ni = document.getElementById('editTaskNameInput'); if (ni) ni.focus(); }, 100);
+    
+    setTimeout(function() { 
+        var ni = document.getElementById('editTaskNameInput'); 
+        if (ni) ni.focus(); 
+    }, 100);
+    
     return new Promise(function(resolve) {
         var nameInput = document.getElementById('editTaskNameInput');
         var scoreInput = document.getElementById('editTaskScoreInput');
@@ -1331,22 +1354,39 @@ async function editTask(id, oldName, oldScore) {
         var subInput = document.getElementById('editTaskSubTagInput');
         var confirmBtn = document.getElementById('editTaskConfirmBtn');
         var cancelBtn = document.getElementById('editTaskCancelBtn');
-        function closeDialog() { if (overlay.parentNode) overlay.remove(); resolve(); }
+        
+        function closeDialog() { 
+            if (overlay.parentNode) overlay.remove(); 
+            resolve(); 
+        }
+        
         function handleConfirm() {
             var newName = nameInput.value.trim();
             var newScore = parseInt(scoreInput.value);
             var newCategory = catInput ? catInput.value : '无';
             var newSubTag = subInput ? subInput.value : '无';
-            if (!newName) { showToast('⚠️请输入任务名称', 'warning'); return; }
-            if (isNaN(newScore) || newScore < 0) { showToast('⚠️请输入有效的分数（大于等于0）', 'warning'); return; }
+            
+            if (!newName) { 
+                showToast('⚠️请输入任务名称', 'warning'); 
+                return; 
+            }
+            if (isNaN(newScore) || newScore < 0) { 
+                showToast('⚠️请输入有效的分数（大于等于0）', 'warning'); 
+                return; 
+            }
+            
+            console.log('📤 保存任务:', id, '分类:', newCategory, '子标签:', newSubTag);
             closeDialog();
             doUpdateTask(id, newName, newScore, newCategory, newSubTag);
         }
+        
         confirmBtn.addEventListener('click', handleConfirm);
         cancelBtn.addEventListener('click', closeDialog);
         nameInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleConfirm(); });
         scoreInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') handleConfirm(); });
-        overlay.addEventListener('click', function(e) { if (e.target === overlay) closeDialog(); });
+        overlay.addEventListener('click', function(e) { 
+            if (e.target === overlay) closeDialog(); 
+        });
     });
 }
 
